@@ -5,6 +5,6 @@ public record CreateUserRequest(
         String lastName,
         String middleName,
         String email,
-        String password // Дописать passwordHash и тп
+        String password
 ) {
 }

@@ -2,18 +2,13 @@ package com.devops_labs.userService.api.controllers;
 
 import com.devops_labs.userService.api.dto.CreateUserRequest;
 import com.devops_labs.userService.api.dto.UserResponse;
-import com.devops_labs.userService.core.entity.User;
 import com.devops_labs.userService.core.service.UserService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
-import org.apache.coyote.Response;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
