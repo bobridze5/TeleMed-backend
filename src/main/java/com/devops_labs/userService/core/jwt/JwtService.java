@@ -23,6 +23,9 @@ public class JwtService {
     @Value("${application.refresh.lifetimeMs}")
     private long refreshLifeTimeMs;
 
+    private static final String TOKEN_TYPE_ACCESS = "access";
+    private static final String TOKEN_TYPE_REFRESH = "refresh";
+
     private SecretKey getKey() {
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
@@ -34,6 +37,7 @@ public class JwtService {
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + accessLifeTimeMs))
                 .signWith(getKey())
+                .claim("type", TOKEN_TYPE_ACCESS)
                 .compact();
     }
 
@@ -43,6 +47,7 @@ public class JwtService {
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + refreshLifeTimeMs))
                 .signWith(getKey())
+                .claim("type", TOKEN_TYPE_REFRESH)
                 .compact();
     }
 
@@ -52,5 +57,23 @@ public class JwtService {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
+
+
+    public boolean isAccessTokenValid(String accessToken) {
+        return isTokenValid(accessToken, TOKEN_TYPE_ACCESS);
+    }
+
+    public boolean isRefreshTokenValid(String refreshToken) {
+        return isTokenValid(refreshToken, TOKEN_TYPE_REFRESH);
+    }
+
+    private boolean isTokenValid(String token, String type) {
+        try {
+            Claims claims = parse(token);
+            return type.equals(claims.get("type"));
+        } catch (JwtException | IllegalStateException e) {
+            return false;
+        }
     }
 }

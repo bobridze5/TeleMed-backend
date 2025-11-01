@@ -1,22 +1,22 @@
 package com.devops_labs.userService.core.service;
 
 import com.devops_labs.userService.api.dto.login.LoginUserRequest;
-import com.devops_labs.userService.api.dto.login.LoginUserResponse;
+import com.devops_labs.userService.api.dto.tokens.TokenResponse;
+import com.devops_labs.userService.api.dto.tokens.RefreshTokenRequest;
 import com.devops_labs.userService.api.dto.register.RegisterUserRequest;
 import com.devops_labs.userService.api.dto.register.RegisterUserResponse;
 import com.devops_labs.userService.core.entity.User;
 import com.devops_labs.userService.core.entity.UserStatus;
 import com.devops_labs.userService.core.jwt.JwtService;
 import com.devops_labs.userService.core.repository.UserRepository;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.NoSuchElementException;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserAuthService {
@@ -50,7 +50,7 @@ public class UserAuthService {
     }
 
     @Transactional
-    public LoginUserResponse login(LoginUserRequest request) {
+    public TokenResponse login(LoginUserRequest request) {
         var email = request.email();
         var username = request.username();
         var password = request.password();
@@ -67,21 +67,13 @@ public class UserAuthService {
             throw new IllegalArgumentException("Password must be provided");
         }
 
-        String hash = getHashPassword(password);
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NoSuchElementException("User doesn't exists"));
 
-//        log.info(hash);
-//        log.info(user.getPasswordHash());
-//        log.info(user.getPassword());
-//        log.info(String.valueOf(hash.equals(user.getPasswordHash())));
-
-
         if (!passwordEncoder.matches(password, user.getPasswordHash())) {
             throw new IllegalArgumentException("Passwords don't match");
         }
-
 
         user.setStatus(UserStatus.ACTIVE);
         user = userRepository.save(user);
@@ -89,9 +81,26 @@ public class UserAuthService {
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
 
-        return new LoginUserResponse(accessToken, refreshToken);
+        return new TokenResponse(accessToken, refreshToken);
     }
 
+    @Transactional
+    public TokenResponse refresh(RefreshTokenRequest request) {
+        String token = request.refreshToken();
+
+        if (!jwtService.isRefreshTokenValid(token)) {
+            throw new IllegalArgumentException("RefreshToken is invalid");
+        }
+
+        Claims claims = jwtService.parse(token);
+        User user = userRepository.findByUsername(claims.getSubject())
+                .orElseThrow(() -> new NoSuchElementException("User doesn't exists"));
+
+        String accessToken = jwtService.generateAccessToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+
+        return new TokenResponse(accessToken, refreshToken);
+    }
 
     private String getHashPassword(String password) {
         return passwordEncoder.encode(password);

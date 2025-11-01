@@ -1,7 +1,8 @@
 package com.devops_labs.userService.api.controllers;
 
 import com.devops_labs.userService.api.dto.login.LoginUserRequest;
-import com.devops_labs.userService.api.dto.login.LoginUserResponse;
+import com.devops_labs.userService.api.dto.tokens.TokenResponse;
+import com.devops_labs.userService.api.dto.tokens.RefreshTokenRequest;
 import com.devops_labs.userService.api.dto.register.RegisterUserRequest;
 import com.devops_labs.userService.api.dto.register.RegisterUserResponse;
 import com.devops_labs.userService.core.service.UserAuthService;
@@ -31,8 +32,14 @@ public class UserAuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginUserResponse> login(@RequestBody LoginUserRequest request) {
-        LoginUserResponse response = userAuthService.login(request);
+    public ResponseEntity<TokenResponse> login(@RequestBody LoginUserRequest request) {
+        TokenResponse response = userAuthService.login(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<TokenResponse> refreshToken(@RequestBody RefreshTokenRequest request) {
+        TokenResponse response = userAuthService.refresh(request);
         return ResponseEntity.ok(response);
     }
 
