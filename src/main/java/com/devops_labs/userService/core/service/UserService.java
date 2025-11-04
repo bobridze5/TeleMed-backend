@@ -4,8 +4,10 @@ import com.devops_labs.userService.api.dto.UserResponse;
 import com.devops_labs.userService.api.dto.data.ChangeUserDataRequest;
 import com.devops_labs.userService.api.dto.data.ChangeUserDataResponse;
 import com.devops_labs.userService.core.entity.User;
+import com.devops_labs.userService.core.entity.UserStatus;
 import com.devops_labs.userService.core.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -75,12 +77,18 @@ public class UserService {
 
     @Transactional
     @PreAuthorize("#id == authentication.principal.id")
-    public void deleteUserById(Long id){
+    public void deleteUserById(Long id) {
         if (!userRepository.existsById(id)) {
             throw new NoSuchElementException("User with id = " + id);
         }
 
-        userRepository.deleteById(id);
+//        userRepository.deleteById(id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("User with id = " + id + " not found"));
+
+        user.setStatus(UserStatus.INACTIVE);
+
+        userRepository.save(user);
     }
 
 }

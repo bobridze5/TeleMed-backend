@@ -80,4 +80,9 @@ public class User implements UserDetails {
     public String getUsername() {
         return username;
     }
+
+    @Override
+    public boolean isEnabled() {
+        return this.status == UserStatus.ACTIVE;
+    }
 }
