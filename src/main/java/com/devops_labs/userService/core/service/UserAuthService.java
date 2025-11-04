@@ -37,9 +37,13 @@ public class UserAuthService {
 
         String hash = getHashPassword(request.password1());
 
+
+        // TODO: Необходимо переделать логику формирования username и nickname
+        String username = request.email().split("@")[0];
         User user = User.builder()
                 .email(request.email())
-                .username(request.email().split("@")[0])
+                .username(username)
+                .nickname(username)
                 .passwordHash(hash)
                 .status(UserStatus.INACTIVE)
                 .build();

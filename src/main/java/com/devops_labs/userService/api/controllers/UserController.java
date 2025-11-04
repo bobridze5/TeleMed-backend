@@ -1,14 +1,12 @@
 package com.devops_labs.userService.api.controllers;
 
-import com.devops_labs.userService.api.dto.CreateUserRequest;
 import com.devops_labs.userService.api.dto.UserResponse;
+import com.devops_labs.userService.api.dto.data.ChangeUserDataRequest;
+import com.devops_labs.userService.api.dto.data.ChangeUserDataResponse;
 import com.devops_labs.userService.core.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import java.net.URI;
 
 @RestController
 @RequestMapping("/api/users")
@@ -23,30 +21,25 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    @PatchMapping("/{userId}")
+    public ResponseEntity<ChangeUserDataResponse> patchUserById(
+            @PathVariable("userId") Long id,
+            @RequestBody ChangeUserDataRequest request
+    ) {
+        ChangeUserDataResponse response = userService.changeUserData(id, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> deleteUserById(@PathVariable("userId") Long id) {
+        userService.deleteUserById(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping
     public ResponseEntity<?> getUsers() {
 
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping
-    public ResponseEntity<UserResponse> createUser(@RequestBody CreateUserRequest body) {
-        UserResponse response = userService.createUser(body);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(response.id())
-                .toUri();
-
-        return ResponseEntity.created(location).body(response);
-    }
-
-
-//    @PatchMapping("/{userId}")
-//    public ResponseEntity<User> changeUser(
-//            @PathVariable Long id,
-//            @RequestBody UserDto userDto
-//    ) {
-//
-//        return null;
-//    }
 }

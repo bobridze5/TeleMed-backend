@@ -37,9 +37,13 @@ public class User implements UserDetails {
     @Column(name = "users_middle_name", length = 120)
     private String middleName;
 
-    @Column(name = "users_username", length = 120, unique = true)
+    @Column(name = "users_username", length = 60, unique = true)
     @NotBlank(message = "Username is mandatory")
     private String username;
+
+    @Column(name = "users_nickname", length = 60, unique = true)
+    @NotBlank(message = "Nickname is mandatory")
+    private String nickname;
 
     @Column(name = "users_email", unique = true, nullable = false)
     @Email(message = "Email must be correct")
@@ -76,24 +80,4 @@ public class User implements UserDetails {
     public String getUsername() {
         return username;
     }
-
-//    @Override
-//    public boolean isAccountNonExpired() {
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean isAccountNonLocked() {
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean isCredentialsNonExpired() {
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean isEnabled() {
-//        return true;
-//    }
 }

@@ -3,12 +3,10 @@ package com.devops_labs.userService.core.jwt;
 import com.devops_labs.userService.core.entity.User;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
 import io.jsonwebtoken.*;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
