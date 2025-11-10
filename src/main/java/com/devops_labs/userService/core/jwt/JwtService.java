@@ -2,6 +2,7 @@ package com.devops_labs.userService.core.jwt;
 
 import com.devops_labs.userService.core.entity.User;
 import io.jsonwebtoken.security.Keys;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import io.jsonwebtoken.*;
 import org.springframework.stereotype.Service;
@@ -15,9 +16,11 @@ public class JwtService {
     @Value("${application.secret}")
     private String secret;
 
+    @Getter
     @Value("${application.access.lifetimeMs}")
     private long accessLifeTimeMs;
 
+    @Getter
     @Value("${application.refresh.lifetimeMs}")
     private long refreshLifeTimeMs;
 
@@ -27,7 +30,6 @@ public class JwtService {
     private SecretKey getKey() {
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
-
 
     public String generateAccessToken(User user) {
         return Jwts.builder()
@@ -57,6 +59,10 @@ public class JwtService {
                 .getPayload();
     }
 
+    public String extractUsername(String token) {
+        Claims claims = parse(token);
+        return claims.getSubject();
+    }
 
     public boolean isAccessTokenValid(String accessToken) {
         return isTokenValid(accessToken, TOKEN_TYPE_ACCESS);

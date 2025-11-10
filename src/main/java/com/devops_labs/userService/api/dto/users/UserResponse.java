@@ -1,4 +1,4 @@
-package com.devops_labs.userService.api.dto;
+package com.devops_labs.userService.api.dto.users;
 
 import com.devops_labs.userService.core.entity.UserStatus;
 

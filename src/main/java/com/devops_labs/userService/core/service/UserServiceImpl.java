@@ -1,37 +1,61 @@
 package com.devops_labs.userService.core.service;
 
-import com.devops_labs.userService.api.dto.UserResponse;
+import com.devops_labs.userService.api.dto.users.UserResponse;
 import com.devops_labs.userService.api.dto.data.ChangeUserDataRequest;
 import com.devops_labs.userService.api.dto.data.ChangeUserDataResponse;
+import com.devops_labs.userService.api.dto.users.UsersResponse;
 import com.devops_labs.userService.core.entity.User;
 import com.devops_labs.userService.core.entity.UserStatus;
+import com.devops_labs.userService.core.exceptions.EntityNotFoundException;
 import com.devops_labs.userService.core.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.crossstore.ChangeSetPersister;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserServiceImpl {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final RefreshTokenStoreServiceImpl refreshTokenStoreService;
 
     @Transactional(readOnly = true)
     public UserResponse getUserById(Long id) {
         User user = userRepository.findById(id).orElseThrow(NoSuchElementException::new);
-        return new UserResponse(user.getId(), user.getFirstName(), user.getLastName(), user.getMiddleName(), user.getStatus());
+        return new UserResponse(
+                user.getId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getMiddleName(),
+                user.getStatus()
+        );
+    }
+
+    public UsersResponse getUsers(Pageable pageable) {
+        List<User> users = userRepository.findAll(pageable).toList();
+
+        List<UserResponse> data = users.stream().map(i -> new UserResponse(
+                i.getId(),
+                i.getFirstName(),
+                i.getLastName(),
+                i.getMiddleName(),
+                i.getStatus()
+        )).toList();
+
+        return new UsersResponse(data);
     }
 
     @Transactional
     @PreAuthorize("#id == authentication.principal.id")
     public ChangeUserDataResponse changeUserData(Long id, ChangeUserDataRequest request) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("User doesn't exists"));
+                .orElseThrow(() -> new EntityNotFoundException("User with id = " + id + " not found"));
 
         if (request.firstName() != null) {
             user.setFirstName(request.firstName());
@@ -79,16 +103,15 @@ public class UserService {
     @PreAuthorize("#id == authentication.principal.id")
     public void deleteUserById(Long id) {
         if (!userRepository.existsById(id)) {
-            throw new NoSuchElementException("User with id = " + id);
+            throw new EntityNotFoundException("User with id = " + id + " not found");
         }
 
-//        userRepository.deleteById(id);
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("User with id = " + id + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User with id = " + id + " not found"));
 
         user.setStatus(UserStatus.INACTIVE);
-
-        userRepository.save(user);
+        user = userRepository.save(user);
+        refreshTokenStoreService.delete(user.getId());
     }
 
 }

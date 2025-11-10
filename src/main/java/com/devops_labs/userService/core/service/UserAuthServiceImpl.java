@@ -7,32 +7,33 @@ import com.devops_labs.userService.api.dto.register.RegisterUserRequest;
 import com.devops_labs.userService.api.dto.register.RegisterUserResponse;
 import com.devops_labs.userService.core.entity.User;
 import com.devops_labs.userService.core.entity.UserStatus;
+import com.devops_labs.userService.core.exceptions.*;
 import com.devops_labs.userService.core.jwt.JwtService;
 import com.devops_labs.userService.core.repository.UserRepository;
+import com.devops_labs.userService.core.service.interfaces.UserAuthService;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.NoSuchElementException;
-
 @Service
 @RequiredArgsConstructor
-public class UserAuthService {
+public class UserAuthServiceImpl implements UserAuthService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final RefreshTokenStoreServiceImpl refreshTokenStoreService;
 
     @Transactional
     public RegisterUserResponse register(RegisterUserRequest request) {
 
         if (!request.password1().equals(request.password2())) {
-            throw new IllegalArgumentException("The passwords don't match");
+            throw new PasswordsDoNotMatchException();
         }
 
         if (userRepository.existsByEmail(request.email())) {
-            throw new IllegalArgumentException("User with email = " + request.email() + " already exists");
+            throw new EntityAlreadyExistsException("User with email = " + request.email() + " already exists");
         }
 
         String hash = getHashPassword(request.password1());
@@ -55,28 +56,30 @@ public class UserAuthService {
 
     @Transactional
     public TokenResponse login(LoginUserRequest request) {
-        var email = request.email();
-        var username = request.username();
-        var password = request.password();
+        String email = request.email();
+        String username = request.username();
+        String password = request.password();
 
         if (email == null || email.isBlank()) {
             if (username == null || username.isBlank()) {
-                throw new IllegalArgumentException("Either email or username must be provided");
+                throw new MissingRequestBodyFieldException("Either email or username must be provided");
             }
         } else {
             username = email.split("@")[0];
         }
 
         if (password == null || password.isBlank()) {
-            throw new IllegalArgumentException("Password must be provided");
+            throw new MissingRequestBodyFieldException("Password must be provided");
         }
 
 
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new NoSuchElementException("User doesn't exists"));
+                .orElseThrow(
+                        () -> new EntityNotFoundException("User not found")
+                );
 
         if (!passwordEncoder.matches(password, user.getPasswordHash())) {
-            throw new IllegalArgumentException("Passwords don't match");
+            throw new PasswordsDoNotMatchException();
         }
 
         user.setStatus(UserStatus.ACTIVE);
@@ -84,6 +87,8 @@ public class UserAuthService {
 
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
+
+        refreshTokenStoreService.save(user.getId(), refreshToken, jwtService.getRefreshLifeTimeMs());
 
         return new TokenResponse(accessToken, refreshToken);
     }
@@ -93,17 +98,37 @@ public class UserAuthService {
         String token = request.refreshToken();
 
         if (!jwtService.isRefreshTokenValid(token)) {
-            throw new IllegalArgumentException("RefreshToken is invalid");
+            throw new InvalidTokenException("RefreshToken is invalid");
         }
 
         Claims claims = jwtService.parse(token);
-        User user = userRepository.findByUsername(claims.getSubject())
-                .orElseThrow(() -> new NoSuchElementException("User doesn't exists"));
+        String username = claims.getSubject();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(
+                        () -> new EntityNotFoundException("User with username = " + username + " not found")
+                );
+
+        String actualRefreshToken = refreshTokenStoreService.get(user.getId());
+        if (actualRefreshToken == null || !actualRefreshToken.equals(token)) {
+            throw new InvalidTokenException("RefreshToken is not recognized");
+        }
 
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
 
+        refreshTokenStoreService.save(user.getId(), refreshToken, jwtService.getRefreshLifeTimeMs());
+
         return new TokenResponse(accessToken, refreshToken);
+    }
+
+    public void logout(String accessToken) {
+        String username = jwtService.extractUsername(accessToken);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(
+                        () -> new EntityNotFoundException("User with username = " + username + " not found")
+                );
+
+        refreshTokenStoreService.delete(user.getId());
     }
 
     private String getHashPassword(String password) {

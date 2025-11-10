@@ -5,7 +5,10 @@ import com.devops_labs.userService.api.dto.tokens.TokenResponse;
 import com.devops_labs.userService.api.dto.tokens.RefreshTokenRequest;
 import com.devops_labs.userService.api.dto.register.RegisterUserRequest;
 import com.devops_labs.userService.api.dto.register.RegisterUserResponse;
-import com.devops_labs.userService.core.service.UserAuthService;
+import com.devops_labs.userService.core.service.UserAuthServiceImpl;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,12 +19,19 @@ import java.net.URI;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users/auth")
+@Tag(name = "Регистрация, Аутентификация и авторизация")
 public class UserAuthController {
 
-    private final UserAuthService userAuthService;
+    private final UserAuthServiceImpl userAuthService;
 
     @PostMapping("/register")
-    public ResponseEntity<RegisterUserResponse> register(@RequestBody RegisterUserRequest request) {
+    @Operation(
+            summary = "Регистрация пользователя",
+            description = "Позволяет зарегистрировать нового пользователя"
+    )
+    public ResponseEntity<RegisterUserResponse> register(
+            @RequestBody RegisterUserRequest request
+    ) {
         RegisterUserResponse response = userAuthService.register(request);
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/api/users/{id}")
@@ -32,21 +42,33 @@ public class UserAuthController {
     }
 
     @PostMapping("/login")
+    @Operation(
+            summary = "Авторизация пользователя",
+            description = "Аутентификация и авторизация пользователя"
+    )
     public ResponseEntity<TokenResponse> login(@RequestBody LoginUserRequest request) {
         TokenResponse response = userAuthService.login(request);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<TokenResponse> refreshToken(@RequestBody RefreshTokenRequest request) {
+    @Operation(
+            summary = "Обновление JWT токена",
+            description = "Обновление Access токена и получение новой пары: AccessToken и RefreshToken"
+    )
+    public ResponseEntity<TokenResponse> refresh(@Valid @RequestBody RefreshTokenRequest request) {
         TokenResponse response = userAuthService.refresh(request);
         return ResponseEntity.ok(response);
     }
 
-    // TODO: Переделать
     @PostMapping("/logout")
-    public String logout(@RequestHeader("Authorization") String accessToken) {
-        return "типо вышли!";
+    @Operation(
+            summary = "Выход из аккаунта",
+            description = "Удаление токенов"
+    )
+    public ResponseEntity<Void> logout(@RequestHeader("Authorization") String accessToken) {
+        userAuthService.logout(accessToken);
+        return ResponseEntity.noContent().build();
     }
 
 }
