@@ -13,9 +13,12 @@ import com.devops_labs.userService.core.repository.UserRepository;
 import com.devops_labs.userService.core.service.interfaces.UserAuthService;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import redis.clients.authentication.core.TokenRequestException;
 
 @Service
 @RequiredArgsConstructor
@@ -39,7 +42,6 @@ public class UserAuthServiceImpl implements UserAuthService {
         String hash = getHashPassword(request.password1());
 
 
-        // TODO: Необходимо переделать логику формирования username и nickname
         String username = request.email().split("@")[0];
         User user = User.builder()
                 .email(request.email())
@@ -79,7 +81,7 @@ public class UserAuthServiceImpl implements UserAuthService {
                 );
 
         if (!passwordEncoder.matches(password, user.getPasswordHash())) {
-            throw new PasswordsDoNotMatchException();
+            throw new PasswordsDoNotMatchException(HttpStatus.NOT_FOUND, "User login or password incorrect");
         }
 
         user.setStatus(UserStatus.ACTIVE);
@@ -114,14 +116,22 @@ public class UserAuthServiceImpl implements UserAuthService {
         }
 
         String accessToken = jwtService.generateAccessToken(user);
-        String refreshToken = jwtService.generateRefreshToken(user);
+//        String refreshToken = jwtService.generateRefreshToken(user);
 
-        refreshTokenStoreService.save(user.getId(), refreshToken, jwtService.getRefreshLifeTimeMs());
+//        refreshTokenStoreService.save(user.getId(), refreshToken, jwtService.getRefreshLifeTimeMs());
 
-        return new TokenResponse(accessToken, refreshToken);
+        return new TokenResponse(accessToken, token);
     }
 
     public void logout(String accessToken) {
+        if (accessToken.startsWith("Bearer ")) {
+            accessToken = accessToken.substring(7);
+        }
+
+        if (!jwtService.isAccessTokenValid(accessToken)) {
+            throw new InvalidTokenException("Invalid access Token");
+        }
+
         String username = jwtService.extractUsername(accessToken);
         User user = userRepository.findByUsername(username)
                 .orElseThrow(

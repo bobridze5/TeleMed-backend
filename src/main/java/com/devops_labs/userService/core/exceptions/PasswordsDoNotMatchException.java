@@ -14,4 +14,8 @@ public class PasswordsDoNotMatchException extends ApiException {
       super(status, message);
     }
 
+    public PasswordsDoNotMatchException(HttpStatus status, String message){
+        super(status, message);
+    }
+
 }

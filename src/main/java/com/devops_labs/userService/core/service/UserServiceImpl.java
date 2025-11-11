@@ -7,16 +7,22 @@ import com.devops_labs.userService.api.dto.users.UsersResponse;
 import com.devops_labs.userService.core.entity.User;
 import com.devops_labs.userService.core.entity.UserStatus;
 import com.devops_labs.userService.core.exceptions.EntityNotFoundException;
+import com.devops_labs.userService.core.exceptions.RequestParamInvalidException;
+import com.devops_labs.userService.core.jwt.JwtService;
 import com.devops_labs.userService.core.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -24,10 +30,13 @@ public class UserServiceImpl {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final RefreshTokenStoreServiceImpl refreshTokenStoreService;
+    private final JwtService jwtService;
 
     @Transactional(readOnly = true)
     public UserResponse getUserById(Long id) {
-        User user = userRepository.findById(id).orElseThrow(NoSuchElementException::new);
+        User user = userRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("User with id = " + id + " not found")
+        );
         return new UserResponse(
                 user.getId(),
                 user.getFirstName(),
@@ -37,7 +46,13 @@ public class UserServiceImpl {
         );
     }
 
-    public UsersResponse getUsers(Pageable pageable) {
+    public UsersResponse getUsers(Integer pageNumber) {
+        if (pageNumber == null || pageNumber < 0) {
+            throw new RequestParamInvalidException("Request parameter page must be int and >= 0");
+        }
+
+        Pageable pageable = PageRequest.of(pageNumber, 5, Sort.by("id"));
+
         List<User> users = userRepository.findAll(pageable).toList();
 
         List<UserResponse> data = users.stream().map(i -> new UserResponse(
@@ -52,8 +67,21 @@ public class UserServiceImpl {
     }
 
     @Transactional
-    @PreAuthorize("#id == authentication.principal.id")
+//    @PreAuthorize("#id == authentication.principal.id")
     public ChangeUserDataResponse changeUserData(Long id, ChangeUserDataRequest request) {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
+            throw new AccessDeniedException("Access denied");
+        }
+
+        User currentUser = (User) authentication.getPrincipal();
+
+        if (!currentUser.getId().equals(id)) {
+            throw new AccessDeniedException("Access denied");
+        }
+
+
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User with id = " + id + " not found"));
 
@@ -100,10 +128,18 @@ public class UserServiceImpl {
     }
 
     @Transactional
-    @PreAuthorize("#id == authentication.principal.id")
+//    @PreAuthorize("#id == authentication.principal.id")
     public void deleteUserById(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new EntityNotFoundException("User with id = " + id + " not found");
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
+            throw new AccessDeniedException("Access denied");
+        }
+
+        User currentUser = (User) authentication.getPrincipal();
+
+        if (!currentUser.getId().equals(id)) {
+            throw new AccessDeniedException("Access denied");
         }
 
         User user = userRepository.findById(id)

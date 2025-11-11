@@ -23,6 +23,8 @@ services:
     ports:
       - "6379:6379"
     restart: unless-stopped
+    volumes:
+      - redis-data:/data
 
   app:
     build:
@@ -43,3 +45,4 @@ services:
 
 volumes:
   db-data:
+  redis-data:
