@@ -1,24 +1,53 @@
 package com.devops_labs.userService.api.controllers;
 
+import com.devops_labs.userService.api.dto.users.UserResponse;
+import com.devops_labs.userService.api.dto.data.ChangeUserDataRequest;
+import com.devops_labs.userService.api.dto.data.ChangeUserDataResponse;
+import com.devops_labs.userService.api.dto.users.UsersResponse;
+import com.devops_labs.userService.core.service.UserServiceImpl;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/users")
+@RequiredArgsConstructor
+@Tag(name = "Пользователи")
 public class UserController {
 
-    @GetMapping("{id}")
-    public ResponseEntity<?> getSomething(){
+    private final UserServiceImpl userService;
 
-        return null;
+    @GetMapping("/")
+    public ResponseEntity<UsersResponse> getUsers(@RequestParam(value = "page") Integer pageNumber) {
+        UsersResponse response = userService.getUsers(pageNumber);
+        return ResponseEntity.ok(response);
     }
 
-    @PutMapping("{id}")
-    public ResponseEntity<?> get(){
-
-        return null;
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserResponse> getUserById(@PathVariable("userId") Long id) {
+        UserResponse response = userService.getUserById(id);
+        return ResponseEntity.ok(response);
     }
+
+    @PatchMapping("/{userId}")
+    public ResponseEntity<ChangeUserDataResponse> patchUserById(
+            @PathVariable("userId") Long id,
+            @Valid @RequestBody ChangeUserDataRequest request
+    ) {
+        ChangeUserDataResponse response = userService.changeUserData(id, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> deleteUserById(@PathVariable("userId") Long id) {
+        userService.deleteUserById(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }
