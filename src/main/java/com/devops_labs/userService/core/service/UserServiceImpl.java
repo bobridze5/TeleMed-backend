@@ -15,12 +15,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.List;
 
@@ -67,7 +65,6 @@ public class UserServiceImpl {
     }
 
     @Transactional
-//    @PreAuthorize("#id == authentication.principal.id")
     public ChangeUserDataResponse changeUserData(Long id, ChangeUserDataRequest request) {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -128,7 +125,6 @@ public class UserServiceImpl {
     }
 
     @Transactional
-//    @PreAuthorize("#id == authentication.principal.id")
     public void deleteUserById(Long id) {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
 
