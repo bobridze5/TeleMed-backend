@@ -18,7 +18,7 @@ import java.net.URI;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/users/auth")
+@RequestMapping("/api/v1/users/auth")
 @Tag(name = "Регистрация, Аутентификация и авторизация")
 public class UserAuthController {
 
