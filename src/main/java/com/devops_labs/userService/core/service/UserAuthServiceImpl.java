@@ -7,17 +7,21 @@ import com.devops_labs.userService.api.dto.register.RegisterUserRequest;
 import com.devops_labs.userService.api.dto.register.RegisterUserResponse;
 import com.devops_labs.userService.core.entity.User;
 import com.devops_labs.userService.core.entity.UserStatus;
+import com.devops_labs.userService.core.event.OnRegistrationCompleteEvent;
 import com.devops_labs.userService.core.exceptions.*;
 import com.devops_labs.userService.core.jwt.JwtService;
 import com.devops_labs.userService.core.repository.UserRepository;
 import com.devops_labs.userService.core.service.interfaces.UserAuthService;
+import com.devops_labs.userService.core.service.interfaces.VerificationTokenService;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.ModelAndView;
 import redis.clients.authentication.core.TokenRequestException;
 
 @Service
@@ -27,9 +31,11 @@ public class UserAuthServiceImpl implements UserAuthService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final RefreshTokenStoreServiceImpl refreshTokenStoreService;
+    private final ApplicationEventPublisher eventPublisher;
+    private final VerificationTokenService verificationTokenService;
 
     @Transactional
-    public RegisterUserResponse register(RegisterUserRequest request) {
+    public RegisterUserResponse register(RegisterUserRequest request, String url) {
 
         if (!request.password1().equals(request.password2())) {
             throw new PasswordsDoNotMatchException();
@@ -48,10 +54,10 @@ public class UserAuthServiceImpl implements UserAuthService {
                 .username(username)
                 .nickname(username)
                 .passwordHash(hash)
-                .status(UserStatus.INACTIVE)
                 .build();
 
         user = userRepository.save(user);
+        eventPublisher.publishEvent(new OnRegistrationCompleteEvent(user, url));
 
         return new RegisterUserResponse(user.getId());
     }
@@ -143,5 +149,16 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     private String getHashPassword(String password) {
         return passwordEncoder.encode(password);
+    }
+
+    public String confirmEmail(String token) {
+        if (!verificationTokenService.isTokenValid(token)) {
+            // TODO: TOKEN EXCEPTION
+            throw new IllegalArgumentException("Token invalid");
+        }
+
+        // TODO: URL
+        verificationTokenService.deleteToken(token);
+        return "http://localhost:8083/api/v1/users/auth/login";
     }
 }

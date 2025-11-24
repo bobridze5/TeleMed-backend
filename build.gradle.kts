@@ -44,6 +44,7 @@ dependencies {
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.13.0")
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.14") // TODO: 2.6.0
 	implementation("org.springframework.boot:spring-boot-starter-data-redis:3.5.7")
+	implementation("org.springframework.boot:spring-boot-starter-mail:4.0.0")
 }
 
 tasks.withType<Test> {

@@ -54,9 +54,10 @@ public class User implements UserDetails {
     @NotBlank(message = "password is mandatory")
     private String passwordHash;
 
+    @Builder.Default
     @Column(name = "users_status", nullable = false)
     @Enumerated(EnumType.STRING)
-    private UserStatus status;
+    private UserStatus status = UserStatus.INACTIVE;
 
     @CreationTimestamp
     @Column(name = "users_datetime_created", nullable = false)

@@ -28,7 +28,6 @@ public class UserServiceImpl {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final RefreshTokenStoreServiceImpl refreshTokenStoreService;
-    private final JwtService jwtService;
 
     @Transactional(readOnly = true)
     public UserResponse getUserById(Long id) {
@@ -50,7 +49,6 @@ public class UserServiceImpl {
         }
 
         Pageable pageable = PageRequest.of(pageNumber, 5, Sort.by("id"));
-
         List<User> users = userRepository.findAll(pageable).toList();
 
         List<UserResponse> data = users.stream().map(i -> new UserResponse(

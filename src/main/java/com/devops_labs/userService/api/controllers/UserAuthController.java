@@ -5,7 +5,9 @@ import com.devops_labs.userService.api.dto.tokens.TokenResponse;
 import com.devops_labs.userService.api.dto.tokens.RefreshTokenRequest;
 import com.devops_labs.userService.api.dto.register.RegisterUserRequest;
 import com.devops_labs.userService.api.dto.register.RegisterUserResponse;
+import com.devops_labs.userService.core.service.EmailVerificationTokenServiceImpl;
 import com.devops_labs.userService.core.service.UserAuthServiceImpl;
+import com.devops_labs.userService.core.service.interfaces.VerificationTokenService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -21,7 +23,6 @@ import java.net.URI;
 @RequestMapping("/api/v1/users/auth")
 @Tag(name = "Регистрация, Аутентификация и авторизация")
 public class UserAuthController {
-
     private final UserAuthServiceImpl userAuthService;
 
     @PostMapping("/register")
@@ -32,11 +33,14 @@ public class UserAuthController {
     public ResponseEntity<RegisterUserResponse> register(
             @RequestBody RegisterUserRequest request
     ) {
-        RegisterUserResponse response = userAuthService.register(request);
-        URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/api/users/{id}")
-                .buildAndExpand(response.id())
-                .toUri();
+        String appURL = ServletUriComponentsBuilder
+                .fromCurrentContextPath()
+                .path("/api/v1/users/auth/")
+                .build()
+                .toString();
+
+        RegisterUserResponse response = userAuthService.register(request, appURL);
+        URI location = URI.create(appURL + response.id());
 
         return ResponseEntity.created(location).body(response);
     }
@@ -49,6 +53,11 @@ public class UserAuthController {
     public ResponseEntity<TokenResponse> login(@RequestBody LoginUserRequest request) {
         TokenResponse response = userAuthService.login(request);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/login")
+    public ResponseEntity<String> loginPage(){
+        return ResponseEntity.ok("Здесь должна быть страница логина");
     }
 
     @PostMapping("/refresh")
@@ -69,6 +78,20 @@ public class UserAuthController {
     public ResponseEntity<Void> logout(@RequestHeader("Authorization") String accessToken) {
         userAuthService.logout(accessToken);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/registrationConfirm")
+    public ResponseEntity<Void> confirmEmail(
+//            @RequestHeader("Authorization") String accessToken,
+            @RequestParam("token") String token
+    ) {
+
+        String url = userAuthService.confirmEmail(token);
+
+        return ResponseEntity
+                .status(302)
+                .header("Location", url)
+                .build();
     }
 
 }
