@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: users-service
-          image: users-service:1.0
+          image: alsaevdmitry/users-service:latest
           ports:
             - containerPort: 8080
           env:
@@ -32,3 +32,8 @@ spec:
                   key: POSTGRES_PASSWORD
             - name: SPRING_REDIS_HOST
               value: redis
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: users-secret
+                  key: SECRET_KEY

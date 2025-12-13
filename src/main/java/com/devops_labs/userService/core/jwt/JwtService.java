@@ -51,7 +51,7 @@ public class JwtService {
                 .compact();
     }
 
-    public Claims parse(String token) {
+    public Claims parse(String token) throws IllegalArgumentException, JwtException {
         return Jwts.parser()
                 .verifyWith(getKey())
                 .build()
