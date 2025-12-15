@@ -25,46 +25,46 @@ import java.util.List;
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "users_id")
+    @Column(name = "user_id")
     private Long id;
 
-    @Column(name = "users_first_name", length = 120)
+    @Column(name = "user_first_name", length = 120)
     private String firstName;
 
-    @Column(name = "users_last_name", length = 120)
+    @Column(name = "user_last_name", length = 120)
     private String lastName;
 
-    @Column(name = "users_middle_name", length = 120)
+    @Column(name = "user_middle_name", length = 120)
     private String middleName;
 
-    @Column(name = "users_username", length = 60, unique = true)
+    @Column(name = "user_username", length = 60, unique = true)
     @NotBlank(message = "Username is mandatory")
     private String username;
 
-    @Column(name = "users_nickname", length = 60, unique = true)
+    @Column(name = "user_nickname", length = 60, unique = true)
     @NotBlank(message = "Nickname is mandatory")
     private String nickname;
 
-    @Column(name = "users_email", unique = true, nullable = false)
+    @Column(name = "user_email", unique = true, nullable = false)
     @Email(message = "Email must be correct")
     @NotBlank(message = "Email is mandatory")
     private String email;
 
-    @Column(name = "users_password_hash", nullable = false)
+    @Column(name = "user_password_hash", nullable = false)
     @NotBlank(message = "password is mandatory")
     private String passwordHash;
 
     @Builder.Default
-    @Column(name = "users_status", nullable = false)
+    @Column(name = "user_status", nullable = false)
     @Enumerated(EnumType.STRING)
     private UserStatus status = UserStatus.INACTIVE;
 
     @CreationTimestamp
-    @Column(name = "users_datetime_created", nullable = false)
+    @Column(name = "user_datetime_created", nullable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(name = "users_datetime_updated", nullable = false)
+    @Column(name = "user_datetime_updated", nullable = false)
     private LocalDateTime updatedAt;
 
     @Override
