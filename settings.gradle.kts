@@ -1,1 +1,1 @@
-rootProject.name = "userService"
+rootProject.name = "TeleMed-backend"
