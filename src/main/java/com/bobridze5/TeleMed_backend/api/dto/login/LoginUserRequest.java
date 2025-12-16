@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 public record LoginUserRequest(
         @Email(message = "Email must be correct")
         String email,
-        String username,
+//        String username,
         @NotBlank String password
         ) {
 }

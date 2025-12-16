@@ -28,17 +28,15 @@ public class UserAuthController {
             summary = "Регистрация пользователя",
             description = "Позволяет зарегистрировать нового пользователя"
     )
-    public ResponseEntity<RegisterUserResponse> register(
-            @RequestBody RegisterUserRequest request
-    ) {
-        String appURL = ServletUriComponentsBuilder
+    public ResponseEntity<RegisterUserResponse> register(@RequestBody RegisterUserRequest request) {
+        String applicationURL = ServletUriComponentsBuilder
                 .fromCurrentContextPath()
                 .path("/api/v1/users/auth/")
                 .build()
                 .toString();
 
-        RegisterUserResponse response = userAuthService.register(request, appURL);
-        URI location = URI.create(appURL + response.id());
+        RegisterUserResponse response = userAuthService.register(request, applicationURL);
+        URI location = URI.create(applicationURL + response.id());
 
         return ResponseEntity.created(location).body(response);
     }
@@ -80,7 +78,6 @@ public class UserAuthController {
 
     @GetMapping("/registrationConfirm")
     public ResponseEntity<Void> confirmEmail(
-//            @RequestHeader("Authorization") String accessToken,
             @RequestParam("token") String token
     ) {
 

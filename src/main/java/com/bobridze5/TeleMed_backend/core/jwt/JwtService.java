@@ -61,7 +61,7 @@ public class JwtService {
                 .getPayload();
     }
 
-    public String extractUsername(String token) {
+    public String extractEmail(String token) {
         Claims claims = parse(token);
         return claims.getSubject();
     }

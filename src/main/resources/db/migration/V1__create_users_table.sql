@@ -3,8 +3,8 @@ CREATE TABLE "users" (
     user_first_name VARCHAR(120),
     user_last_name VARCHAR(120),
     user_middle_name VARCHAR(120),
-    user_username VARCHAR(60) NOT NULL UNIQUE,
-    user_nickname VARCHAR(60) NOT NULL UNIQUE,
+--    user_username VARCHAR(60) NOT NULL UNIQUE,
+--    user_nickname VARCHAR(60) NOT NULL UNIQUE,
     user_email VARCHAR(255) NOT NULL UNIQUE,
     user_password_hash VARCHAR(255) NOT NULL,
     user_status VARCHAR(50) NOT NULL,
@@ -12,6 +12,4 @@ CREATE TABLE "users" (
     user_datetime_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
-CREATE INDEX idx_users_username ON users(user_username);
 CREATE INDEX idx_users_email ON users(user_email);
-CREATE INDEX idx_users_status ON users(user_status);

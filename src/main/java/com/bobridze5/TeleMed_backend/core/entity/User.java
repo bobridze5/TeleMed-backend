@@ -37,14 +37,6 @@ public class User implements UserDetails {
     @Column(name = "user_middle_name", length = 120)
     private String middleName;
 
-    @Column(name = "user_username", length = 60, unique = true)
-    @NotBlank(message = "Username is mandatory")
-    private String username;
-
-    @Column(name = "user_nickname", length = 60, unique = true)
-    @NotBlank(message = "Nickname is mandatory")
-    private String nickname;
-
     @Column(name = "user_email", unique = true, nullable = false)
     @Email(message = "Email must be correct")
     @NotBlank(message = "Email is mandatory")
@@ -54,10 +46,9 @@ public class User implements UserDetails {
     @NotBlank(message = "password is mandatory")
     private String passwordHash;
 
-    @Builder.Default
     @Column(name = "user_status", nullable = false)
     @Enumerated(EnumType.STRING)
-    private UserStatus status = UserStatus.INACTIVE;
+    private UserStatus status;
 
     @CreationTimestamp
     @Column(name = "user_datetime_created", nullable = false)
@@ -79,7 +70,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return username;
+        return email;
     }
 
     @Override

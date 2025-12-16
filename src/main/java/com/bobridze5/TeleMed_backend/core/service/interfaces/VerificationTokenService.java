@@ -14,10 +14,6 @@ public interface VerificationTokenService {
     boolean isTokenValid(String token);
 
     default LocalDateTime calculateExpiryDate(){
-//        Calendar calendar = Calendar.getInstance();
-//        calendar.setTime(new Timestamp(calendar.getTime().getTime()));
-//        calendar.add(Calendar.MINUTE, EXPIRATION);
-//        return new Date(calendar.getTime().getTime());
        return LocalDateTime.now().plusMinutes(EXPIRATION);
     }
 

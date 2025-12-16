@@ -50,12 +50,12 @@ public class UserServiceImpl {
         Pageable pageable = PageRequest.of(pageNumber, 5, Sort.by("id"));
         List<User> users = userRepository.findAll(pageable).toList();
 
-        List<UserResponse> data = users.stream().map(i -> new UserResponse(
-                i.getId(),
-                i.getFirstName(),
-                i.getLastName(),
-                i.getMiddleName(),
-                i.getStatus()
+        List<UserResponse> data = users.stream().map(user -> new UserResponse(
+                user.getId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getMiddleName(),
+                user.getStatus()
         )).toList();
 
         return new UsersResponse(data);
@@ -100,10 +100,6 @@ public class UserServiceImpl {
             user.setPasswordHash(password);
         }
 
-        if (request.nickname() != null && !userRepository.existsByNickname(request.nickname())) {
-            user.setNickname(request.nickname());
-        }
-
         if (request.status() != null) {
             user.setStatus(request.status());
         }
@@ -115,7 +111,6 @@ public class UserServiceImpl {
                 user.getFirstName(),
                 user.getLastName(),
                 user.getMiddleName(),
-                user.getNickname(),
                 user.getEmail(),
                 user.getStatus()
         );

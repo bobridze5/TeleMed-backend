@@ -7,6 +7,7 @@ import com.bobridze5.TeleMed_backend.api.dto.tokens.RefreshTokenRequest;
 import com.bobridze5.TeleMed_backend.api.dto.tokens.TokenResponse;
 import com.bobridze5.TeleMed_backend.core.entity.User;
 import com.bobridze5.TeleMed_backend.core.entity.UserStatus;
+import com.bobridze5.TeleMed_backend.core.entity.VerificationToken;
 import com.bobridze5.TeleMed_backend.core.event.OnRegistrationCompleteEvent;
 import com.bobridze5.TeleMed_backend.core.exceptions.*;
 import com.bobridze5.TeleMed_backend.core.jwt.JwtService;
@@ -42,15 +43,10 @@ public class UserAuthServiceImpl implements UserAuthService {
             throw new EntityAlreadyExistsException("User with email = " + request.email() + " already exists");
         }
 
-        String hash = getHashPassword(request.password1());
-
-
-        String username = request.email().split("@")[0];
         User user = User.builder()
                 .email(request.email())
-                .username(username)
-                .nickname(username)
-                .passwordHash(hash)
+                .passwordHash(getHashPassword(request.password1()))
+                .status(UserStatus.PENDING)
                 .build();
 
         user = userRepository.save(user);
@@ -62,15 +58,10 @@ public class UserAuthServiceImpl implements UserAuthService {
     @Transactional
     public TokenResponse login(LoginUserRequest request) {
         String email = request.email();
-        String username = request.username();
         String password = request.password();
 
         if (email == null || email.isBlank()) {
-            if (username == null || username.isBlank()) {
-                throw new MissingRequestBodyFieldException("Either email or username must be provided");
-            }
-        } else {
-            username = email.split("@")[0];
+            throw new MissingRequestBodyFieldException("Email must be provided");
         }
 
         if (password == null || password.isBlank()) {
@@ -78,17 +69,17 @@ public class UserAuthServiceImpl implements UserAuthService {
         }
 
 
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(
-                        () -> new EntityNotFoundException("User not found")
-                );
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        // TODO: add Exception
+        if (user.getStatus() == UserStatus.PENDING) {
+            throw new RuntimeException("Need to confirm registration");
+        }
 
         if (!passwordEncoder.matches(password, user.getPasswordHash())) {
             throw new PasswordsDoNotMatchException(HttpStatus.NOT_FOUND, "User login or password incorrect");
         }
-
-        user.setStatus(UserStatus.ACTIVE);
-        user = userRepository.save(user);
 
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
@@ -107,10 +98,10 @@ public class UserAuthServiceImpl implements UserAuthService {
         }
 
         Claims claims = jwtService.parse(token);
-        String username = claims.getSubject();
-        User user = userRepository.findByUsername(username)
+        String email = claims.getSubject();
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(
-                        () -> new EntityNotFoundException("User with username = " + username + " not found")
+                        () -> new EntityNotFoundException("User with username = " + email + " not found")
                 );
 
         String actualRefreshToken = refreshTokenStoreService.get(user.getId());
@@ -119,9 +110,6 @@ public class UserAuthServiceImpl implements UserAuthService {
         }
 
         String accessToken = jwtService.generateAccessToken(user);
-//        String refreshToken = jwtService.generateRefreshToken(user);
-
-//        refreshTokenStoreService.save(user.getId(), refreshToken, jwtService.getRefreshLifeTimeMs());
 
         return new TokenResponse(accessToken, token);
     }
@@ -135,27 +123,34 @@ public class UserAuthServiceImpl implements UserAuthService {
             throw new InvalidTokenException("Invalid access Token");
         }
 
-        String username = jwtService.extractUsername(accessToken);
-        User user = userRepository.findByUsername(username)
+        String email = jwtService.extractEmail(accessToken);
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(
-                        () -> new EntityNotFoundException("User with username = " + username + " not found")
+                        () -> new EntityNotFoundException("User with username = " + email + " not found")
                 );
 
         refreshTokenStoreService.delete(user.getId());
     }
 
-    private String getHashPassword(String password) {
-        return passwordEncoder.encode(password);
-    }
-
+    @Transactional
     public String confirmEmail(String token) {
         if (!verificationTokenService.isTokenValid(token)) {
             // TODO: TOKEN EXCEPTION
             throw new IllegalArgumentException("Token invalid");
         }
 
+        VerificationToken verificationToken = verificationTokenService.getToken(token);
+        User user = verificationToken.getUser();
+        user.setStatus(UserStatus.ACTIVE);
+        userRepository.save(user);
+
         // TODO: URL
         verificationTokenService.deleteToken(token);
+
         return "http://localhost:8083/api/v1/users/auth/login";
+    }
+
+    private String getHashPassword(String password) {
+        return passwordEncoder.encode(password);
     }
 }
