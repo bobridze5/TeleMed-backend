@@ -12,6 +12,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -36,6 +37,12 @@ public class User implements UserDetails {
 
     @Column(name = "user_middle_name", length = 120)
     private String middleName;
+
+    @Column(name = "user_date_of_birth")
+    private LocalDate dateOfBirth;
+
+    @Column(name = "user_gender", length = 1)
+    private Character gender;
 
     @Column(name = "user_email", unique = true, nullable = false)
     @Email(message = "Email must be correct")
