@@ -1,11 +1,14 @@
 package com.bobridze5.TeleMed_backend.core.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 @Entity
 @Table(name = "cities")
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class City {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

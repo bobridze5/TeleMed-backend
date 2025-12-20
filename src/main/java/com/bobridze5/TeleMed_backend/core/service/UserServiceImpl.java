@@ -9,6 +9,7 @@ import com.bobridze5.TeleMed_backend.core.entity.UserStatus;
 import com.bobridze5.TeleMed_backend.core.exceptions.EntityNotFoundException;
 import com.bobridze5.TeleMed_backend.core.exceptions.RequestParamInvalidException;
 import com.bobridze5.TeleMed_backend.core.repository.UserRepository;
+import com.bobridze5.TeleMed_backend.core.service.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,7 +24,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl {
+public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final RefreshTokenStoreServiceImpl refreshTokenStoreService;
