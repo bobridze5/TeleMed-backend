@@ -18,4 +18,6 @@ public class MedicalRecord {
     @Column(name = "record_id")
     private Long id;
 
+
+
 }

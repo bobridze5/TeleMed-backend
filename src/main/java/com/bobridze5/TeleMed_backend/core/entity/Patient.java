@@ -1,5 +1,6 @@
 package com.bobridze5.TeleMed_backend.core.entity;
 
+import com.bobridze5.TeleMed_backend.core.entity.auth.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,6 +19,8 @@ public class Patient {
     @Column(name = "patient_id")
     private Long id;
 
-
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
 }

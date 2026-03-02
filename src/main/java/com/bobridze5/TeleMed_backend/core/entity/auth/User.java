@@ -1,5 +1,6 @@
-package com.bobridze5.TeleMed_backend.core.entity;
+package com.bobridze5.TeleMed_backend.core.entity.auth;
 
+import com.bobridze5.TeleMed_backend.core.entity.Patient;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -28,6 +29,9 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long id;
+
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+    private Patient patient;
 
     @Column(name = "user_first_name", length = 120)
     private String firstName;

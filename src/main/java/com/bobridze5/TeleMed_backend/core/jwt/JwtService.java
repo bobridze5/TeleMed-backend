@@ -1,6 +1,6 @@
 package com.bobridze5.TeleMed_backend.core.jwt;
 
-import com.bobridze5.TeleMed_backend.core.entity.User;
+import com.bobridze5.TeleMed_backend.core.entity.auth.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;

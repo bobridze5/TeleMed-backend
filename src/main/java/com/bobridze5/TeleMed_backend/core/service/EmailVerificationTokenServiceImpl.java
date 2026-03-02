@@ -1,7 +1,7 @@
 package com.bobridze5.TeleMed_backend.core.service;
 
-import com.bobridze5.TeleMed_backend.core.entity.User;
-import com.bobridze5.TeleMed_backend.core.entity.VerificationToken;
+import com.bobridze5.TeleMed_backend.core.entity.auth.User;
+import com.bobridze5.TeleMed_backend.core.entity.auth.VerificationToken;
 import com.bobridze5.TeleMed_backend.core.exceptions.EntityNotFoundException;
 import com.bobridze5.TeleMed_backend.core.repository.VerificationTokenRepository;
 import com.bobridze5.TeleMed_backend.core.service.interfaces.VerificationTokenService;

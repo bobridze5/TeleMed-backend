@@ -1,6 +1,6 @@
 package com.bobridze5.TeleMed_backend.api.dto.users;
 
-import com.bobridze5.TeleMed_backend.core.entity.UserStatus;
+import com.bobridze5.TeleMed_backend.core.entity.auth.UserStatus;
 
 public record UserResponse(
         long id,

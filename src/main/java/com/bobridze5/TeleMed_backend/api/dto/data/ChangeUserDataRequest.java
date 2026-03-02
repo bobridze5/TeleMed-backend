@@ -1,6 +1,6 @@
 package com.bobridze5.TeleMed_backend.api.dto.data;
 
-import com.bobridze5.TeleMed_backend.core.entity.UserStatus;
+import com.bobridze5.TeleMed_backend.core.entity.auth.UserStatus;
 import jakarta.validation.constraints.Email;
 
 public record ChangeUserDataRequest(

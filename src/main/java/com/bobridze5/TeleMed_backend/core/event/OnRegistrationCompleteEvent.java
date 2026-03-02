@@ -1,6 +1,6 @@
 package com.bobridze5.TeleMed_backend.core.event;
 
-import com.bobridze5.TeleMed_backend.core.entity.User;
+import com.bobridze5.TeleMed_backend.core.entity.auth.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

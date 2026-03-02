@@ -1,7 +1,7 @@
 package com.bobridze5.TeleMed_backend.core.service.interfaces;
 
-import com.bobridze5.TeleMed_backend.core.entity.User;
-import com.bobridze5.TeleMed_backend.core.entity.VerificationToken;
+import com.bobridze5.TeleMed_backend.core.entity.auth.User;
+import com.bobridze5.TeleMed_backend.core.entity.auth.VerificationToken;
 
 import java.time.LocalDateTime;
 
