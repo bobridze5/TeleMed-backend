@@ -1,4 +1,4 @@
-package com.bobridze5.TeleMed_backend.core.service.interfaces;
+package com.bobridze5.TeleMed_backend.core.service.dish;
 
 import com.bobridze5.TeleMed_backend.api.dto.dish.DishRequest;
 import com.bobridze5.TeleMed_backend.api.dto.dish.DishResponse;

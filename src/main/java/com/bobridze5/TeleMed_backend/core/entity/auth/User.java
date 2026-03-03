@@ -30,7 +30,7 @@ public class User implements UserDetails {
     @Column(name = "user_id")
     private Long id;
 
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "user")
     private Patient patient;
 
     @Column(name = "user_first_name", length = 120)

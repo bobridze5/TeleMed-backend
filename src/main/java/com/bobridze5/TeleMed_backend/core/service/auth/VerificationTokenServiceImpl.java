@@ -1,36 +1,43 @@
-package com.bobridze5.TeleMed_backend.core.service;
+package com.bobridze5.TeleMed_backend.core.service.auth;
 
 import com.bobridze5.TeleMed_backend.core.entity.auth.User;
 import com.bobridze5.TeleMed_backend.core.entity.auth.VerificationToken;
 import com.bobridze5.TeleMed_backend.core.exceptions.EntityNotFoundException;
 import com.bobridze5.TeleMed_backend.core.repository.VerificationTokenRepository;
-import com.bobridze5.TeleMed_backend.core.service.interfaces.VerificationTokenService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-public class EmailVerificationTokenServiceImpl implements VerificationTokenService {
+public class VerificationTokenServiceImpl implements VerificationTokenService {
     private final VerificationTokenRepository verificationTokenRepository;
 
     @Override
-    public void createToken(User user, String token) {
+    @Transactional
+    public VerificationToken createToken(User user) {
+        log.info("Создание токена верификации для user_id = {}", user.getId());
         VerificationToken verificationToken = VerificationToken.builder()
                 .user(user)
-                .token(token)
+                .token(UUID.randomUUID().toString())
                 .expiryDate(calculateExpiryDate())
                 .build();
 
-        verificationTokenRepository.save(verificationToken);
+        log.info("Сохранение токена верификации: token = {}", verificationToken.getToken());
+        return verificationTokenRepository.save(verificationToken);
     }
 
     // TODO: exception
     @Override
+    @Transactional
     public void deleteToken(String token) {
         VerificationToken verificationToken = verificationTokenRepository.findByToken(token)
-                        .orElseThrow(() -> new EntityNotFoundException("Token not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Token not found"));
+        log.info("Удаление токена верификации: token = {}", verificationToken.getToken());
         verificationTokenRepository.delete(verificationToken);
     }
 
@@ -41,20 +48,4 @@ public class EmailVerificationTokenServiceImpl implements VerificationTokenServi
         return verificationTokenRepository.findByToken(token)
                 .orElseThrow(() -> new EntityNotFoundException("Token not found"));
     }
-
-    // TODO: Exception
-    @Override
-    public boolean isTokenValid(String token) {
-        VerificationToken verificationToken = verificationTokenRepository.findByToken(token)
-                .orElseThrow(() -> new EntityNotFoundException("Token not found"));
-
-        if (verificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-            verificationTokenRepository.delete(verificationToken);
-            return false;
-        }
-
-        return true;
-    }
-
-
 }

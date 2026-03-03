@@ -1,4 +1,4 @@
-package com.bobridze5.TeleMed_backend.core.service;
+package com.bobridze5.TeleMed_backend.core.service.city;
 
 import com.bobridze5.TeleMed_backend.api.dto.city.CityCreateRequest;
 import com.bobridze5.TeleMed_backend.api.dto.city.CityListResponse;
@@ -9,7 +9,6 @@ import com.bobridze5.TeleMed_backend.core.exceptions.EntityAlreadyExistsExceptio
 import com.bobridze5.TeleMed_backend.core.exceptions.EntityNotFoundException;
 import com.bobridze5.TeleMed_backend.core.exceptions.RequestParamInvalidException;
 import com.bobridze5.TeleMed_backend.core.repository.CityRepository;
-import com.bobridze5.TeleMed_backend.core.service.interfaces.CityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

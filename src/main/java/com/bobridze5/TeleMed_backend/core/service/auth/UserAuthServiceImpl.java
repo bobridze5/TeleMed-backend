@@ -1,27 +1,33 @@
-package com.bobridze5.TeleMed_backend.core.service;
+package com.bobridze5.TeleMed_backend.core.service.auth;
 
-import com.bobridze5.TeleMed_backend.api.dto.login.LoginUserRequest;
-import com.bobridze5.TeleMed_backend.api.dto.register.RegisterUserRequest;
-import com.bobridze5.TeleMed_backend.api.dto.register.RegisterUserResponse;
+import com.bobridze5.TeleMed_backend.api.dto.auth.LoginUserRequest;
+import com.bobridze5.TeleMed_backend.api.dto.auth.RegisterUserRequest;
+import com.bobridze5.TeleMed_backend.api.dto.auth.RegisterUserResponse;
 import com.bobridze5.TeleMed_backend.api.dto.tokens.RefreshTokenRequest;
 import com.bobridze5.TeleMed_backend.api.dto.tokens.TokenResponse;
+import com.bobridze5.TeleMed_backend.api.mappers.UserAuthMapper;
 import com.bobridze5.TeleMed_backend.core.entity.auth.User;
+import com.bobridze5.TeleMed_backend.core.entity.auth.UserRole;
 import com.bobridze5.TeleMed_backend.core.entity.auth.UserStatus;
 import com.bobridze5.TeleMed_backend.core.entity.auth.VerificationToken;
-import com.bobridze5.TeleMed_backend.core.event.OnRegistrationCompleteEvent;
 import com.bobridze5.TeleMed_backend.core.exceptions.*;
 import com.bobridze5.TeleMed_backend.core.jwt.JwtService;
 import com.bobridze5.TeleMed_backend.core.repository.UserRepository;
-import com.bobridze5.TeleMed_backend.core.service.interfaces.UserAuthService;
-import com.bobridze5.TeleMed_backend.core.service.interfaces.VerificationTokenService;
+import com.bobridze5.TeleMed_backend.core.service.profile.Profile;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
+import java.util.Optional;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserAuthServiceImpl implements UserAuthService {
@@ -31,53 +37,50 @@ public class UserAuthServiceImpl implements UserAuthService {
     private final RefreshTokenStoreServiceImpl refreshTokenStoreService;
     private final ApplicationEventPublisher eventPublisher;
     private final VerificationTokenService verificationTokenService;
+    private final EmailService emailService;
+    private final UserAuthMapper userAuthMapper;
+    private final Map<UserRole, Profile> profileMap;
 
+    @Override
     @Transactional
     public RegisterUserResponse register(RegisterUserRequest request, String url) {
+        log.info("Начало регистрации: email = {}, role = {}", request.email(), request.role());
 
         if (!request.password1().equals(request.password2())) {
+            log.warn("Ошибка регистрации: пароли не совпали для email = {}", request.email());
             throw new PasswordsDoNotMatchException();
         }
 
         if (userRepository.existsByEmail(request.email())) {
+            log.warn("Ошибка регистрации: email = {} уже существует", request.email());
             throw new EntityAlreadyExistsException("User with email = " + request.email() + " already exists");
         }
 
-        User user = User.builder()
-                .email(request.email())
-                .passwordHash(getHashPassword(request.password1()))
-                .status(UserStatus.PENDING)
-                .build();
+        User user = userRepository.save(userAuthMapper.mapToEntity(request));
 
-        user = userRepository.save(user);
-        eventPublisher.publishEvent(new OnRegistrationCompleteEvent(user, url));
+        Optional.ofNullable(profileMap.get(request.role()))
+                .orElseThrow(() -> new IllegalArgumentException("Роли не существует"))
+                .createProfile(user);
 
+
+        var verificationToken = verificationTokenService.createToken(user);
+        emailService.sendVerificationToken(user.getEmail(), url, verificationToken.getToken());
+
+        log.info("Пользователь с id = {} зарегистрирован", user.getId());
         return new RegisterUserResponse(user.getId());
     }
 
     @Transactional
     public TokenResponse login(LoginUserRequest request) {
-        String email = request.email();
-        String password = request.password();
-
-        if (email == null || email.isBlank()) {
-            throw new MissingRequestBodyFieldException("Email must be provided");
-        }
-
-        if (password == null || password.isBlank()) {
-            throw new MissingRequestBodyFieldException("Password must be provided");
-        }
-
-
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         // TODO: add Exception
         if (user.getStatus() == UserStatus.PENDING) {
-            throw new RuntimeException("Need to confirm registration");
+            throw new AccessDeniedException("Need to confirm registration");
         }
 
-        if (!passwordEncoder.matches(password, user.getPasswordHash())) {
+        if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
             throw new PasswordsDoNotMatchException(HttpStatus.NOT_FOUND, "User login or password incorrect");
         }
 
@@ -134,12 +137,14 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     @Transactional
     public String confirmEmail(String token) {
-        if (!verificationTokenService.isTokenValid(token)) {
+        VerificationToken verificationToken = verificationTokenService.getToken(token);
+
+        if (!verificationToken.isValid()) {
             // TODO: TOKEN EXCEPTION
-            throw new IllegalArgumentException("Token invalid");
+            verificationTokenService.deleteToken(token);
+            throw new IllegalArgumentException("Token expired");
         }
 
-        VerificationToken verificationToken = verificationTokenService.getToken(token);
         User user = verificationToken.getUser();
         user.setStatus(UserStatus.ACTIVE);
         userRepository.save(user);
@@ -150,7 +155,4 @@ public class UserAuthServiceImpl implements UserAuthService {
         return "http://localhost:8083/api/v1/users/auth/login";
     }
 
-    private String getHashPassword(String password) {
-        return passwordEncoder.encode(password);
-    }
 }

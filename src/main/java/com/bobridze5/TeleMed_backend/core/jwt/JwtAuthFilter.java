@@ -1,6 +1,6 @@
 package com.bobridze5.TeleMed_backend.core.jwt;
 
-import com.bobridze5.TeleMed_backend.core.service.CustomUserDetailsService;
+import com.bobridze5.TeleMed_backend.core.service.auth.CustomUserDetailsService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

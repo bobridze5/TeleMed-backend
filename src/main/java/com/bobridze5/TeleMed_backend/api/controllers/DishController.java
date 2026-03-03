@@ -3,7 +3,7 @@ package com.bobridze5.TeleMed_backend.api.controllers;
 import com.bobridze5.TeleMed_backend.api.dto.dish.DishRequest;
 import com.bobridze5.TeleMed_backend.api.dto.dish.DishResponse;
 import com.bobridze5.TeleMed_backend.core.entity.auth.User;
-import com.bobridze5.TeleMed_backend.core.service.interfaces.DishService;
+import com.bobridze5.TeleMed_backend.core.service.dish.DishService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

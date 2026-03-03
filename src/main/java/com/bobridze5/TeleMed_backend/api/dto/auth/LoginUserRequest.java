@@ -1,12 +1,14 @@
-package com.bobridze5.TeleMed_backend.api.dto.login;
+package com.bobridze5.TeleMed_backend.api.dto.auth;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 public record LoginUserRequest(
+        @NotBlank
         @Email(message = "Email must be correct")
         String email,
-//        String username,
-        @NotBlank String password
-        ) {
+
+        @NotBlank
+        String password
+) {
 }

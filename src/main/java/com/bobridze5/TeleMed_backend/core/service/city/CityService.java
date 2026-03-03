@@ -1,4 +1,4 @@
-package com.bobridze5.TeleMed_backend.core.service.interfaces;
+package com.bobridze5.TeleMed_backend.core.service.city;
 
 import com.bobridze5.TeleMed_backend.api.dto.city.CityCreateRequest;
 import com.bobridze5.TeleMed_backend.api.dto.city.CityListResponse;

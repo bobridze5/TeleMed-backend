@@ -4,7 +4,7 @@ import com.bobridze5.TeleMed_backend.api.dto.city.CityCreateRequest;
 import com.bobridze5.TeleMed_backend.api.dto.city.CityListResponse;
 import com.bobridze5.TeleMed_backend.api.dto.city.CityUpdateRequest;
 import com.bobridze5.TeleMed_backend.api.dto.city.CityResponse;
-import com.bobridze5.TeleMed_backend.core.service.interfaces.CityService;
+import com.bobridze5.TeleMed_backend.core.service.city.CityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -1,6 +1,5 @@
-package com.bobridze5.TeleMed_backend.core.service;
+package com.bobridze5.TeleMed_backend.core.service.auth;
 
-import com.bobridze5.TeleMed_backend.core.service.interfaces.RedisStoreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -27,7 +26,7 @@ public class RefreshTokenStoreServiceImpl implements RedisStoreService<Long, Str
 
     @Override
     public void delete(Long userId){
-        template.delete(get(userId));
+        template.delete(getKey(userId));
     }
 
     private String getKey(long userId){

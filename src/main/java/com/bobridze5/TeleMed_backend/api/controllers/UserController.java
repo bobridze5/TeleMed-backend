@@ -4,7 +4,7 @@ import com.bobridze5.TeleMed_backend.api.dto.data.ChangeUserDataRequest;
 import com.bobridze5.TeleMed_backend.api.dto.data.ChangeUserDataResponse;
 import com.bobridze5.TeleMed_backend.api.dto.users.UserResponse;
 import com.bobridze5.TeleMed_backend.api.dto.users.UsersResponse;
-import com.bobridze5.TeleMed_backend.core.service.UserServiceImpl;
+import com.bobridze5.TeleMed_backend.core.service.auth.UserServiceImpl;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping(API.USERS)
 @RequiredArgsConstructor
 @Tag(name = "Пользователи")
 public class UserController {

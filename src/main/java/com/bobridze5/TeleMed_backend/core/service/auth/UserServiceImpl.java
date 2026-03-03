@@ -1,4 +1,4 @@
-package com.bobridze5.TeleMed_backend.core.service;
+package com.bobridze5.TeleMed_backend.core.service.auth;
 
 import com.bobridze5.TeleMed_backend.api.dto.data.ChangeUserDataRequest;
 import com.bobridze5.TeleMed_backend.api.dto.data.ChangeUserDataResponse;
@@ -9,7 +9,6 @@ import com.bobridze5.TeleMed_backend.core.entity.auth.UserStatus;
 import com.bobridze5.TeleMed_backend.core.exceptions.EntityNotFoundException;
 import com.bobridze5.TeleMed_backend.core.exceptions.RequestParamInvalidException;
 import com.bobridze5.TeleMed_backend.core.repository.UserRepository;
-import com.bobridze5.TeleMed_backend.core.service.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

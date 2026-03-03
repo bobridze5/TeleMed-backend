@@ -1,4 +1,4 @@
-package com.bobridze5.TeleMed_backend.core.service.interfaces;
+package com.bobridze5.TeleMed_backend.core.service.auth;
 
 public interface RedisStoreService<K, V> {
     void save(K key, V value, long time);

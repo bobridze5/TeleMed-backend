@@ -1,6 +1,6 @@
 package com.bobridze5.TeleMed_backend.api.controllers;
 
-import com.bobridze5.TeleMed_backend.core.service.interfaces.DoctorService;
+import com.bobridze5.TeleMed_backend.core.service.doctor.DoctorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

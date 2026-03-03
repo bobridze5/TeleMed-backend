@@ -1,4 +1,4 @@
-package com.bobridze5.TeleMed_backend.core.service;
+package com.bobridze5.TeleMed_backend.core.service.dish;
 
 import com.bobridze5.TeleMed_backend.api.dto.dish.DishRequest;
 import com.bobridze5.TeleMed_backend.api.dto.dish.DishResponse;
@@ -8,7 +8,6 @@ import com.bobridze5.TeleMed_backend.core.entity.report.Dish;
 import com.bobridze5.TeleMed_backend.core.exceptions.EntityNotFoundException;
 import com.bobridze5.TeleMed_backend.core.repository.DishRepository;
 import com.bobridze5.TeleMed_backend.core.repository.PatientRepository;
-import com.bobridze5.TeleMed_backend.core.service.interfaces.DishService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
