@@ -35,7 +35,6 @@ public class UserAuthServiceImpl implements UserAuthService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final RefreshTokenStoreServiceImpl refreshTokenStoreService;
-    private final ApplicationEventPublisher eventPublisher;
     private final VerificationTokenService verificationTokenService;
     private final EmailService emailService;
     private final UserAuthMapper userAuthMapper;

@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PositiveOrZero;
 import org.hibernate.validator.constraints.URL;
 
-public record DishRequest(
+public record CreateDishRequest(
         @NotBlank(message = "Название обязательно")
         String name,
 

@@ -5,58 +5,54 @@ import com.bobridze5.TeleMed_backend.api.dto.city.CityListResponse;
 import com.bobridze5.TeleMed_backend.api.dto.city.CityUpdateRequest;
 import com.bobridze5.TeleMed_backend.api.dto.city.CityResponse;
 import com.bobridze5.TeleMed_backend.core.service.city.CityService;
+import com.bobridze5.TeleMed_backend.core.service.utils.UrlBuilder;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 
 @RestController
-@RequestMapping("/api/v1/city")
+@RequestMapping(API.CITY)
 @RequiredArgsConstructor
 public class CityController {
     private final CityService cityService;
+    private final UrlBuilder urlBuilder;
 
     @GetMapping("/{id}")
-    public ResponseEntity<CityResponse> getCity(@PathVariable Long id) {
-        CityResponse response = cityService.getCity(id);
-        return ResponseEntity.ok(response);
+    public CityResponse getCity(@PathVariable Long id) {
+        return cityService.getCity(id);
     }
 
     @GetMapping("/")
-    public ResponseEntity<CityListResponse> getCities(@RequestParam(value = "page") Integer pageNumber){
-        CityListResponse response = cityService.getCities(pageNumber);
-        return ResponseEntity.ok(response);
+    public CityListResponse getCities(@RequestParam(value = "page") Integer pageNumber){
+        return cityService.getCities(pageNumber);
     }
 
     @PostMapping("/")
-    public ResponseEntity<CityResponse> createCity(@RequestBody CityCreateRequest request) {
+    public ResponseEntity<CityResponse> createCity(
+            @RequestBody CityCreateRequest request,
+            HttpServletRequest servletRequest
+    ) {
         CityResponse response = cityService.createCity(request);
-        String applicationURL = ServletUriComponentsBuilder
-                .fromCurrentContextPath()
-                .path("/api/v1/city/")
-                .build()
-                .toString();
-
-        URI location = URI.create(applicationURL + response.id());
+        URI location = urlBuilder.buildAbsoluteUrl(servletRequest, API.CITY + response.id());
         return ResponseEntity.created(location).body(response);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CityResponse> updateCity(
+    public CityResponse updateCity(
             @PathVariable Long id,
             @RequestBody CityUpdateRequest request
     ) {
-        CityResponse response = cityService.updateCity(id, request);
-
-        return ResponseEntity.ok(response);
+        return cityService.updateCity(id, request);
     }
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCity(@PathVariable Long id) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteCity(@PathVariable Long id) {
         cityService.deleteCity(id);
-        return ResponseEntity.noContent().build();
     }
 }

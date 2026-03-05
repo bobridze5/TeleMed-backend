@@ -54,4 +54,8 @@ public class Dish {
 
     @Column(name = "dish_description", columnDefinition = "TEXT")
     private String description;
+
+    @Column(name = "dish_status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private DishStatus status;
 }

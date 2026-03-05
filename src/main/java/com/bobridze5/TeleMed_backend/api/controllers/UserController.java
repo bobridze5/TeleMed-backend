@@ -8,7 +8,7 @@ import com.bobridze5.TeleMed_backend.core.service.auth.UserServiceImpl;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,30 +20,27 @@ public class UserController {
     private final UserServiceImpl userService;
 
     @GetMapping("/")
-    public ResponseEntity<UsersResponse> getUsers(@RequestParam(value = "page") Integer pageNumber) {
-        UsersResponse response = userService.getUsers(pageNumber);
-        return ResponseEntity.ok(response);
+    public UsersResponse getUsers(@RequestParam(value = "page") Integer pageNumber) {
+        return userService.getUsers(pageNumber);
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<UserResponse> getUserById(@PathVariable("userId") Long id) {
-        UserResponse response = userService.getUserById(id);
-        return ResponseEntity.ok(response);
+    public UserResponse getUserById(@PathVariable("userId") Long id) {
+        return userService.getUserById(id);
     }
 
     @PatchMapping("/{userId}")
-    public ResponseEntity<ChangeUserDataResponse> patchUserById(
+    public ChangeUserDataResponse patchUserById(
             @PathVariable("userId") Long id,
             @Valid @RequestBody ChangeUserDataRequest request
     ) {
-        ChangeUserDataResponse response = userService.changeUserData(id, request);
-        return ResponseEntity.ok(response);
+        return userService.changeUserData(id, request);
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<Void> deleteUserById(@PathVariable("userId") Long id) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteUserById(@PathVariable("userId") Long id) {
         userService.deleteUserById(id);
-        return ResponseEntity.noContent().build();
     }
 
 }

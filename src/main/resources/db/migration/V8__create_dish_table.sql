@@ -8,6 +8,7 @@ CREATE TABLE "dish" (
     dish_fats_per_100 DOUBLE PRECISION NOT NULL,
     dish_photo_url VARCHAR(512),
     dish_description TEXT,
+    dish_status VARCHAR(50) NOT NULL,
 
     -- FK на таблицу пациентов
     CONSTRAINT fk_dish_patient

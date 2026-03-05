@@ -1,6 +1,5 @@
 package com.bobridze5.TeleMed_backend.core.entity.auth;
 
-import com.bobridze5.TeleMed_backend.core.exceptions.EntityNotFoundException;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
