@@ -1,5 +1,6 @@
 package com.bobridze5.TeleMed_backend.core.entity.report;
 
+import com.bobridze5.TeleMed_backend.core.entity.Ownable;
 import com.bobridze5.TeleMed_backend.core.entity.Patient;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -19,7 +20,7 @@ import org.hibernate.annotations.Check;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Dish {
+public class Dish implements Ownable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "dish_id")

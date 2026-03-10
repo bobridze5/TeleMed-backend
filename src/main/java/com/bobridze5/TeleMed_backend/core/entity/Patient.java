@@ -24,15 +24,10 @@ public class Patient {
     @JoinColumn(name = "user_id")
     private User user;
 
+    public boolean isOwner(Ownable entity) {
+        Patient owner = entity.getPatient();
 
-    public boolean isOwner(Dish dish) {
-        Patient patient = dish.getPatient();
-
-        if (patient == null) {
-            return false;
-        }
-
-        return this.id.equals(patient.getId());
+        return owner != null && this.id.equals(owner.getId());
     }
 
     public boolean canView(Dish dish) {

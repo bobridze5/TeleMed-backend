@@ -8,6 +8,8 @@ public final class API {
     public static final String CITY = V1 + "/city";
     public static final String DISH = V1 + "/dishes";
 
+    public static final String PARAMS_WEIGHT = V1 + "/weight";
+
     private API() {
     }
 }
