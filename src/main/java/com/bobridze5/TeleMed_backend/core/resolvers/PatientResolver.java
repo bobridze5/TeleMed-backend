@@ -5,6 +5,7 @@ import com.bobridze5.TeleMed_backend.core.entity.Patient;
 import com.bobridze5.TeleMed_backend.core.entity.auth.User;
 import com.bobridze5.TeleMed_backend.core.repository.PatientRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
@@ -15,6 +16,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class PatientResolver implements HandlerMethodArgumentResolver {
@@ -37,11 +39,9 @@ public class PatientResolver implements HandlerMethodArgumentResolver {
         Authentication auth = SecurityContextHolder
                 .getContext()
                 .getAuthentication();
-
+        // TODO: выбрасывает исключение. Anonymous.
         User user = (User) auth.getPrincipal();
 
-
-        // TODO: переделать?
         return patientRepository
                 .findByUserId(user.getId())
                 .orElseThrow(() -> new AccessDeniedException("Доступ ограничен"));

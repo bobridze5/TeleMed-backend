@@ -2,6 +2,7 @@ CREATE TABLE weight (
     weight_id BIGSERIAL PRIMARY KEY,
     patient_id BIGINT NOT NULL,
     weight_value DOUBLE PRECISION NOT NULL,
+    weight_updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     weight_created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
 
     CONSTRAINT fk_weight_patient
