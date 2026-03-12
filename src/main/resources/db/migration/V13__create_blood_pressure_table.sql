@@ -3,6 +3,7 @@ CREATE TABLE blood_pressures (
     patient_id BIGINT,
     blood_pressure_systolic INTEGER NOT NULL,
     blood_pressure_diastolic INTEGER NOT NULL,
+    blood_pressure_updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     blood_pressure_created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
 
     CONSTRAINT fk_blood_pressures_patient

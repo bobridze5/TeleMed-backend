@@ -1,4 +1,4 @@
-package com.bobridze5.TeleMed_backend.api.dto.weight;
+package com.bobridze5.TeleMed_backend.api.dto.params.weight;
 
 import java.time.LocalDateTime;
 

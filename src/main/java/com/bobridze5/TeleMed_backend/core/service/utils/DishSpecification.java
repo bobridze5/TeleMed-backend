@@ -11,7 +11,7 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DishSpecification {
+public final class DishSpecification {
     public static Specification<Dish> build(DishFilterRequest request, Long patientId) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
