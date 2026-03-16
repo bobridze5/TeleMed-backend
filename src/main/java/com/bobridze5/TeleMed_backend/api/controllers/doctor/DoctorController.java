@@ -1,4 +1,4 @@
-package com.bobridze5.TeleMed_backend.api.controllers;
+package com.bobridze5.TeleMed_backend.api.controllers.doctor;
 
 import com.bobridze5.TeleMed_backend.core.service.doctor.DoctorService;
 import lombok.RequiredArgsConstructor;

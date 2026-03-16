@@ -1,5 +1,6 @@
-package com.bobridze5.TeleMed_backend.api.controllers;
+package com.bobridze5.TeleMed_backend.api.controllers.user;
 
+import com.bobridze5.TeleMed_backend.api.controllers.API;
 import com.bobridze5.TeleMed_backend.api.dto.data.ChangeUserDataRequest;
 import com.bobridze5.TeleMed_backend.api.dto.data.ChangeUserDataResponse;
 import com.bobridze5.TeleMed_backend.api.dto.users.UserResponse;

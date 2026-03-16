@@ -1,5 +1,6 @@
-package com.bobridze5.TeleMed_backend.api.controllers;
+package com.bobridze5.TeleMed_backend.api.controllers.doctor;
 
+import com.bobridze5.TeleMed_backend.api.controllers.API;
 import com.bobridze5.TeleMed_backend.api.dto.city.CityCreateRequest;
 import com.bobridze5.TeleMed_backend.api.dto.city.CityListResponse;
 import com.bobridze5.TeleMed_backend.api.dto.city.CityUpdateRequest;

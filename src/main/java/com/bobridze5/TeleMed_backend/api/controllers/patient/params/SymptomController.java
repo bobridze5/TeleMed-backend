@@ -1,4 +1,4 @@
-package com.bobridze5.TeleMed_backend.api.controllers.params;
+package com.bobridze5.TeleMed_backend.api.controllers.patient.params;
 
 import com.bobridze5.TeleMed_backend.api.controllers.API;
 import com.bobridze5.TeleMed_backend.api.dto.params.symptom.SymptomFilterRequest;
