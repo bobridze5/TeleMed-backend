@@ -6,6 +6,9 @@ build/
 !**/src/test/**/build/
 .env
 
+src/main/resources/application-local.properties
+docker-compose.local.yml
+
 ### STS ###
 .apt_generated
 .classpath

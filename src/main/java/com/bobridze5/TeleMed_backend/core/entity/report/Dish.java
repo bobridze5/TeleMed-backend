@@ -1,7 +1,7 @@
 package com.bobridze5.TeleMed_backend.core.entity.report;
 
 import com.bobridze5.TeleMed_backend.core.entity.Ownable;
-import com.bobridze5.TeleMed_backend.core.entity.Patient;
+import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;

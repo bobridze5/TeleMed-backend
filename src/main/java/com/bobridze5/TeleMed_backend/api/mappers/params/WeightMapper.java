@@ -2,7 +2,7 @@ package com.bobridze5.TeleMed_backend.api.mappers.params;
 
 import com.bobridze5.TeleMed_backend.api.dto.params.weight.WeightRequest;
 import com.bobridze5.TeleMed_backend.api.dto.params.weight.WeightResponse;
-import com.bobridze5.TeleMed_backend.core.entity.Patient;
+import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
 import com.bobridze5.TeleMed_backend.core.entity.report.Weight;
 
 public class WeightMapper {

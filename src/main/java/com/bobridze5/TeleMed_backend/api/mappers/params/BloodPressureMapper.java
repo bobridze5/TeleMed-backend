@@ -2,7 +2,7 @@ package com.bobridze5.TeleMed_backend.api.mappers.params;
 
 import com.bobridze5.TeleMed_backend.api.dto.params.blood_pressure.BloodPressureRequest;
 import com.bobridze5.TeleMed_backend.api.dto.params.blood_pressure.BloodPressureResponse;
-import com.bobridze5.TeleMed_backend.core.entity.Patient;
+import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
 import com.bobridze5.TeleMed_backend.core.entity.report.BloodPressure;
 
 public class BloodPressureMapper {

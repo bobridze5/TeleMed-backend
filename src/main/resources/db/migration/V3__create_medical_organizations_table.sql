@@ -4,7 +4,7 @@ CREATE TABLE medical_organizations (
     organization_address VARCHAR(120) NOT NULL,
     organization_email VARCHAR(60) UNIQUE NOT NULL,
     organization_phone VARCHAR(60) UNIQUE NOT NULL,
-    organization_city BIGSERIAL REFERENCES cities(city_id)
+    organization_city BIGINT REFERENCES cities(city_id)
 );
 
 CREATE INDEX idx_organizations_email ON medical_organizations(organization_email);

@@ -4,7 +4,7 @@ import com.bobridze5.TeleMed_backend.api.dto.params.blood_pressure.BloodPressure
 import com.bobridze5.TeleMed_backend.api.dto.params.blood_pressure.BloodPressureRequest;
 import com.bobridze5.TeleMed_backend.api.dto.params.blood_pressure.BloodPressureResponse;
 import com.bobridze5.TeleMed_backend.api.mappers.params.BloodPressureMapper;
-import com.bobridze5.TeleMed_backend.core.entity.Patient;
+import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
 import com.bobridze5.TeleMed_backend.core.entity.report.BloodPressure;
 import com.bobridze5.TeleMed_backend.core.exceptions.EntityNotFoundException;
 import com.bobridze5.TeleMed_backend.core.repository.BloodPressureRepository;
@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class BloodPressureServiceImpl implements BloodPressureService {
+public class BloodPressureServiceImplPatient implements BloodPressureServicePatient {
     private final BloodPressureRepository bloodPressureRepository;
 
     @Override

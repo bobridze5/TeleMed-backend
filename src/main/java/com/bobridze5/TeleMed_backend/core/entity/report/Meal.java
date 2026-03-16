@@ -1,6 +1,6 @@
 package com.bobridze5.TeleMed_backend.core.entity.report;
 
-import com.bobridze5.TeleMed_backend.core.entity.Patient;
+import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

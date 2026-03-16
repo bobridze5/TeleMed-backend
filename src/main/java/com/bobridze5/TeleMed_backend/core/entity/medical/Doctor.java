@@ -1,4 +1,4 @@
-package com.bobridze5.TeleMed_backend.core.entity;
+package com.bobridze5.TeleMed_backend.core.entity.medical;
 
 import com.bobridze5.TeleMed_backend.core.entity.auth.User;
 import jakarta.persistence.*;
@@ -19,7 +19,7 @@ public class Doctor {
     @Column(name = "doctor_id")
     private Long doctorId;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "doctor_user_id", nullable = false, referencedColumnName = "user_id")
     private User user;
 

@@ -3,6 +3,7 @@ CREATE TABLE symptoms (
     patient_id BIGINT,
     symptom_severity VARCHAR(50) NOT NULL,
     symptom_description TEXT,
+    symptom_updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     symptom_created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
 
     CONSTRAINT fk_symptoms_patient

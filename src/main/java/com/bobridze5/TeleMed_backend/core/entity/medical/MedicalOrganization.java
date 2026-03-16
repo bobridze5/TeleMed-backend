@@ -1,4 +1,4 @@
-package com.bobridze5.TeleMed_backend.core.entity;
+package com.bobridze5.TeleMed_backend.core.entity.medical;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;

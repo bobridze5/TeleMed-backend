@@ -4,7 +4,7 @@ import com.bobridze5.TeleMed_backend.api.dto.params.weight.WeightFilterRequest;
 import com.bobridze5.TeleMed_backend.api.dto.params.weight.WeightRequest;
 import com.bobridze5.TeleMed_backend.api.dto.params.weight.WeightResponse;
 import com.bobridze5.TeleMed_backend.api.mappers.params.WeightMapper;
-import com.bobridze5.TeleMed_backend.core.entity.Patient;
+import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
 import com.bobridze5.TeleMed_backend.core.entity.report.Weight;
 import com.bobridze5.TeleMed_backend.core.exceptions.EntityNotFoundException;
 import com.bobridze5.TeleMed_backend.core.repository.WeightRepository;
@@ -14,7 +14,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,17 +25,18 @@ public class WeightServiceImpl implements WeightService {
 
     @Override
     public Page<WeightResponse> getWeightRecords(Patient patient, WeightFilterRequest request) {
-
         Pageable pageable = PageRequest.of(request.page(), request.size(), Sort.by("createdAt").descending());
 
         Page<Weight> weightPage;
 
+        Long patientId = patient.getId();
+
         if (request.isBetween()) {
             weightPage = weightRepository.findByPatientIdAndCreatedAtBetween(
-                    patient.getId(), request.startDate(), request.endDate(), pageable
+                    patientId, request.startDate(), request.endDate(), pageable
             );
         } else {
-            weightPage = weightRepository.findByPatientId(patient.getId(), pageable);
+            weightPage = weightRepository.findByPatientId(patientId, pageable);
         }
 
         return weightPage.map(WeightMapper::mapToResponse);
@@ -52,13 +52,8 @@ public class WeightServiceImpl implements WeightService {
 
     @Override
     public WeightResponse getWeightRecordById(Patient patient, Long weightId) {
-        Weight weight = weightRepository.findById(weightId).orElseThrow(
-                () -> new EntityNotFoundException("Not found")
-        );
-
-        if (!patient.isOwner(weight)) {
-            throw new AccessDeniedException("Forbidden");
-        }
+        Weight weight = weightRepository.findByIdAndPatientId(weightId, patient.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Запись не найдена"));
 
         return WeightMapper.mapToResponse(weight);
     }
@@ -66,14 +61,9 @@ public class WeightServiceImpl implements WeightService {
 
     @Override
     @Transactional
-    public WeightResponse updateWeightRecord(WeightRequest request, Patient patient, Long weightId) {
-        Weight weight = weightRepository.findById(weightId).orElseThrow(
-                () -> new EntityNotFoundException("Not found")
-        );
-
-        if (!patient.isOwner(weight)) {
-            throw new AccessDeniedException("Forbidden");
-        }
+    public WeightResponse updateWeightRecord(Patient patient, Long weightId, WeightRequest request) {
+        Weight weight = weightRepository.findByIdAndPatientId(weightId, patient.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Запись не найдена"));
 
         WeightMapper.updateEntity(request, weight);
 
@@ -83,13 +73,8 @@ public class WeightServiceImpl implements WeightService {
     @Override
     @Transactional
     public void deleteWeightRecord(Patient patient, Long weightId) {
-        Weight weight = weightRepository.findById(weightId).orElseThrow(
-                () -> new EntityNotFoundException("Not found")
-        );
-
-        if (!patient.isOwner(weight)) {
-            throw new AccessDeniedException("");
-        }
+        Weight weight = weightRepository.findByIdAndPatientId(weightId, patient.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Запись не найдена"));
 
         weightRepository.delete(weight);
     }

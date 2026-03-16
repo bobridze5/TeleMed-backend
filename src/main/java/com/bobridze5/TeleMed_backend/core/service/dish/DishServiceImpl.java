@@ -5,7 +5,7 @@ import com.bobridze5.TeleMed_backend.api.dto.dish.CreateDishRequest;
 import com.bobridze5.TeleMed_backend.api.dto.dish.DishResponse;
 import com.bobridze5.TeleMed_backend.api.dto.dish.UpdateDishRequest;
 import com.bobridze5.TeleMed_backend.api.mappers.DishMapper;
-import com.bobridze5.TeleMed_backend.core.entity.Patient;
+import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
 import com.bobridze5.TeleMed_backend.core.entity.report.Dish;
 import com.bobridze5.TeleMed_backend.core.entity.report.DishStatus;
 import com.bobridze5.TeleMed_backend.core.exceptions.EntityNotFoundException;

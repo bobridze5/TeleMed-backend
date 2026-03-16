@@ -4,6 +4,6 @@ import com.bobridze5.TeleMed_backend.api.dto.params.blood_pressure.BloodPressure
 import com.bobridze5.TeleMed_backend.api.dto.params.blood_pressure.BloodPressureRequest;
 import com.bobridze5.TeleMed_backend.api.dto.params.blood_pressure.BloodPressureResponse;
 
-public interface BloodPressureService extends CrudParamService<BloodPressureRequest, BloodPressureRequest,
+public interface BloodPressureServicePatient extends PatientCrudParamService<BloodPressureRequest, BloodPressureRequest,
         BloodPressureResponse, BloodPressureFilterRequest> {
 }

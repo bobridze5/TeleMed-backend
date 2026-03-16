@@ -1,6 +1,7 @@
 package com.bobridze5.TeleMed_backend.core.entity.auth;
 
-import com.bobridze5.TeleMed_backend.core.entity.Patient;
+import com.bobridze5.TeleMed_backend.core.entity.medical.Doctor;
+import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -24,7 +25,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User implements UserDetails {
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -32,6 +33,9 @@ public class User implements UserDetails {
 
     @OneToOne(mappedBy = "user")
     private Patient patient;
+
+    @OneToOne(mappedBy = "user")
+    private Doctor doctor;
 
     @Column(name = "user_first_name", length = 120)
     private String firstName;
@@ -69,23 +73,12 @@ public class User implements UserDetails {
     @Column(name = "user_datetime_updated", nullable = false)
     private LocalDateTime updatedAt;
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+    public boolean hasDoctorProfile() {
+        return this.doctor != null;
     }
 
-    @Override
-    public String getPassword() {
-        return passwordHash;
+    public boolean hasPatientProfile() {
+        return this.patient != null;
     }
 
-    @Override
-    public String getUsername() {
-        return email;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return this.status == UserStatus.ACTIVE;
-    }
 }

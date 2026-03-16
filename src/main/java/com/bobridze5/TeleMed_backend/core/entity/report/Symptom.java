@@ -1,12 +1,13 @@
 package com.bobridze5.TeleMed_backend.core.entity.report;
 
-import com.bobridze5.TeleMed_backend.core.entity.Patient;
+import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -32,6 +33,10 @@ public class Symptom {
 
     @Column(name = "symptom_description", columnDefinition = "TEXT")
     private String description;
+
+    @Column(name = "symptom_updated_at", nullable = false)
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 
     @Column(name = "symptom_created_at", nullable = false)
     @CreationTimestamp

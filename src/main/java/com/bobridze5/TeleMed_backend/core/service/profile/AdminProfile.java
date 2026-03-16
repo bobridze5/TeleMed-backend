@@ -17,4 +17,5 @@ public class AdminProfile implements Profile {
     public void createProfile(User user) {
         // TODO: добавить логику для админа
     }
+
 }

@@ -1,10 +1,11 @@
-package com.bobridze5.TeleMed_backend.api.controllers;
+package com.bobridze5.TeleMed_backend.api.controllers.params;
 
+import com.bobridze5.TeleMed_backend.api.controllers.API;
 import com.bobridze5.TeleMed_backend.api.dto.params.weight.WeightFilterRequest;
 import com.bobridze5.TeleMed_backend.api.dto.params.weight.WeightRequest;
 import com.bobridze5.TeleMed_backend.api.dto.params.weight.WeightResponse;
 import com.bobridze5.TeleMed_backend.core.annotations.CurrentPatient;
-import com.bobridze5.TeleMed_backend.core.entity.Patient;
+import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
 import com.bobridze5.TeleMed_backend.core.service.params.WeightService;
 import com.bobridze5.TeleMed_backend.core.service.utils.UrlBuilder;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 
 @RestController
-@RequestMapping(API.PARAMS_WEIGHT)
+@RequestMapping(API.PATIENT_OWNER_PARAMS_WEIGHT)
 @RequiredArgsConstructor
 public class WeightController {
     private final UrlBuilder urlBuilder;
@@ -26,24 +27,24 @@ public class WeightController {
 
     @GetMapping
     public Page<WeightResponse> getWeights(
-            @Valid @ModelAttribute WeightFilterRequest request,
-            @CurrentPatient Patient patient
+            @CurrentPatient Patient patient,
+            @Valid @ModelAttribute WeightFilterRequest request
     ) {
         return weightService.getWeightRecords(patient, request);
     }
 
     @GetMapping("/{weightId}")
     public WeightResponse getWeightById(
-            @PathVariable("weightId") Long id,
-            @CurrentPatient Patient patient
+            @CurrentPatient Patient patient,
+            @PathVariable("weightId") Long weightId
     ) {
-        return weightService.getWeightRecordById(patient, id);
+        return weightService.getWeightRecordById(patient, weightId);
     }
 
     @PostMapping
     public ResponseEntity<WeightResponse> addWeightRecord(
-            @Valid @RequestBody WeightRequest request,
             @CurrentPatient Patient patient,
+            @Valid @RequestBody WeightRequest request,
             HttpServletRequest servletRequest
     ) {
         WeightResponse response = weightService.addWeightRecord(patient, request);
@@ -54,21 +55,21 @@ public class WeightController {
 
     @PatchMapping("/{weightId}")
     public WeightResponse changeWeight(
-            @PathVariable("weightId") Long id,
-            @RequestBody WeightRequest request,
-            @CurrentPatient Patient patient
+            @CurrentPatient Patient patient,
+            @PathVariable("weightId") Long weightId,
+            @RequestBody WeightRequest request
     ) {
-        return weightService.updateWeightRecord(request, patient, id);
+        return weightService.updateWeightRecord(patient, weightId, request);
     }
 
 
     @DeleteMapping("/{weightId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteWeight(
-            @PathVariable("weightId") Long id,
-            @CurrentPatient Patient patient
+            @CurrentPatient Patient patient,
+            @PathVariable("weightId") Long weightId
     ) {
-        weightService.deleteWeightRecord(patient, id);
+        weightService.deleteWeightRecord(patient, weightId);
     }
 
 }

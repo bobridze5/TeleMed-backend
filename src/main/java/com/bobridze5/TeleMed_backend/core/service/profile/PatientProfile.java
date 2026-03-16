@@ -1,6 +1,6 @@
 package com.bobridze5.TeleMed_backend.core.service.profile;
 
-import com.bobridze5.TeleMed_backend.core.entity.Patient;
+import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
 import com.bobridze5.TeleMed_backend.core.entity.auth.User;
 import com.bobridze5.TeleMed_backend.core.entity.auth.UserRole;
 import com.bobridze5.TeleMed_backend.core.repository.PatientRepository;
@@ -19,9 +19,11 @@ public class PatientProfile implements Profile {
 
     @Override
     public void createProfile(User user) {
-        Patient patient = new Patient();
-        patient.setUser(user);
+        Patient patient = Patient.builder()
+                .user(user)
+                .build();
 
+        user.setPatient(patient);
         patientRepository.save(patient);
     }
 }

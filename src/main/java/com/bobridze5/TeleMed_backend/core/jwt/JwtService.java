@@ -35,7 +35,7 @@ public class JwtService {
 
     public String generateAccessToken(User user) {
         return Jwts.builder()
-                .subject(user.getUsername())
+                .subject(user.getEmail())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + accessLifeTimeMs))
                 .signWith(getKey())
@@ -45,7 +45,7 @@ public class JwtService {
 
     public String generateRefreshToken(User user) {
         return Jwts.builder()
-                .subject(user.getUsername())
+                .subject(user.getEmail())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + refreshLifeTimeMs))
                 .signWith(getKey())

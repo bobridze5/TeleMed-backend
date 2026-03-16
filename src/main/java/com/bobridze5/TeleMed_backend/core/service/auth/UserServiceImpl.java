@@ -9,7 +9,9 @@ import com.bobridze5.TeleMed_backend.core.entity.auth.UserStatus;
 import com.bobridze5.TeleMed_backend.core.exceptions.EntityNotFoundException;
 import com.bobridze5.TeleMed_backend.core.exceptions.RequestParamInvalidException;
 import com.bobridze5.TeleMed_backend.core.repository.UserRepository;
+import com.bobridze5.TeleMed_backend.core.service.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.security.SecurityUtil;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -63,22 +65,16 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     public ChangeUserDataResponse changeUserData(Long id, ChangeUserDataRequest request) {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
-            throw new AccessDeniedException("Access denied");
-        }
-
-        User currentUser = (User) authentication.getPrincipal();
+        User currentUser = SecurityUtils.getAuthCurrentUser();
 
         if (!currentUser.getId().equals(id)) {
             throw new AccessDeniedException("Access denied");
         }
 
-
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User with id = " + id + " not found"));
 
+        // TODO: вынести всё в маппер
         if (request.firstName() != null) {
             user.setFirstName(request.firstName());
         }
@@ -118,13 +114,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     public void deleteUserById(Long id) {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
-            throw new AccessDeniedException("Access denied");
-        }
-
-        User currentUser = (User) authentication.getPrincipal();
+        User currentUser = SecurityUtils.getAuthCurrentUser();
 
         if (!currentUser.getId().equals(id)) {
             throw new AccessDeniedException("Access denied");

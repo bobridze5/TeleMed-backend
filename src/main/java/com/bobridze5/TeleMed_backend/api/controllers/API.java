@@ -1,18 +1,31 @@
 package com.bobridze5.TeleMed_backend.api.controllers;
 
 public final class API {
-    public static final String V1 = "/api/v1/";
+    public static final String V1 = "/api/v1";
 
-    public static final String USERS = V1 + "users";
-    public static final String AUTH = V1 + "users/auth";
-    public static final String CITY = V1 + "city";
-    public static final String DISH = V1 + "dishes";
+    public static final String USERS = V1 + "/users";
+    public static final String AUTH = V1 + "/users/auth";
+    public static final String CITY = V1 + "/city";
+    public static final String DISH = V1 + "/dishes";
 
-    public static final String PARAMS_WEIGHT = V1 + "weight";
-    public static final String PARAMS_BLOOD_PRESSURE = V1 + "blood-pressure";
-    public static final String PARAMS_SYMPTOM = V1 + "symptom";
-    public static final String PARAMS_PHYSICAL_ACTIVITY = V1 + "physical-activity";
-    public static final String PARAMS_GLYCEMIA_RECORD = V1 + "glycemia-record";
+    public static final String PATIENTS = V1 + "/patients";
+    public static final String PATIENT_ID = PATIENTS + "/{patientId}";
+    public static final String PATIENT_OWNER = PATIENTS + "/me";
+
+    // Patient
+    public static final String PATIENT_OWNER_PARAMS_WEIGHT = PATIENT_OWNER + "/weights";
+    public static final String PATIENT_OWNER_PARAMS_SYMPTOM = PATIENT_OWNER + "/symptom";
+    public static final String PATIENT_OWNER_PARAMS_BLOOD_PRESSURE = PATIENT_OWNER + "/blood-pressure";
+    public static final String PATIENT_OWNER_PARAMS_PHYSICAL_ACTIVITY = PATIENT_OWNER + "/physical-activity";
+    public static final String PATIENT_OWNER_PARAMS_GLYCEMIA_RECORD = PATIENT_OWNER + "/glycemia-record";
+
+
+    // Doctor
+    public static final String PATIENT_PARAMS_WEIGHT = PATIENT_ID + "/weight";
+    public static final String PATIENT_PARAMS_BLOOD_PRESSURE = PATIENT_ID + "/blood-pressure";
+    public static final String PATIENT_PARAMS_SYMPTOM = PATIENT_ID + "/symptom";
+    public static final String PATIENT_PARAMS_PHYSICAL_ACTIVITY = PATIENT_ID + "/physical-activity";
+    public static final String PATIENT_PARAMS_GLYCEMIA_RECORD = PATIENT_ID + "/glycemia-record";
 
     private API() {
     }

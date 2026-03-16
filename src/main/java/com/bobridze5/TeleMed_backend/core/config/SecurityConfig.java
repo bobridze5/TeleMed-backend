@@ -31,11 +31,14 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/api/v1/users/auth/**").permitAll()
+
+                        .requestMatchers("/api/v1/patient/*/weight/**").authenticated()
                         .requestMatchers("/api/v1/dishes/**").authenticated()
                         .requestMatchers("/api/v1/blood-pressure/**").authenticated()
-                        .requestMatchers("/api/v1/weight/**").authenticated()
                         .requestMatchers("/api/v1/users/**").authenticated()
+
                         .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
