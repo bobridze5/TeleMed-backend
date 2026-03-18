@@ -14,10 +14,10 @@ public final class API {
 
     // Patient
     public static final String PATIENT_OWNER_PARAMS_WEIGHT = PATIENT_OWNER + "/weights";
-    public static final String PATIENT_OWNER_PARAMS_SYMPTOM = PATIENT_OWNER + "/symptom";
-    public static final String PATIENT_OWNER_PARAMS_BLOOD_PRESSURE = PATIENT_OWNER + "/blood-pressure";
-    public static final String PATIENT_OWNER_PARAMS_PHYSICAL_ACTIVITY = PATIENT_OWNER + "/physical-activity";
-    public static final String PATIENT_OWNER_PARAMS_GLYCEMIA_RECORD = PATIENT_OWNER + "/glycemia-record";
+    public static final String PATIENT_OWNER_PARAMS_SYMPTOM = PATIENT_OWNER + "/symptoms";
+    public static final String PATIENT_OWNER_PARAMS_BLOOD_PRESSURE = PATIENT_OWNER + "/blood-pressures";
+    public static final String PATIENT_OWNER_PARAMS_PHYSICAL_ACTIVITY = PATIENT_OWNER + "/physical-activities";
+    public static final String PATIENT_OWNER_PARAMS_GLYCEMIA_RECORD = PATIENT_OWNER + "/glycemia-records";
 
 
     // Doctor

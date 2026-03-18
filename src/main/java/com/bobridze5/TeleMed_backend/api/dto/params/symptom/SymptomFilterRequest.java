@@ -1,7 +1,6 @@
 package com.bobridze5.TeleMed_backend.api.dto.params.symptom;
 
 import com.bobridze5.TeleMed_backend.core.entity.report.SymptomSeverity;
-import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
