@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+@Deprecated
 public class PatientProfile implements Profile {
     private final PatientRepository patientRepository;
 
@@ -23,7 +24,7 @@ public class PatientProfile implements Profile {
                 .user(user)
                 .build();
 
-        user.setPatient(patient);
+//        user.setPatient(patient);
         patientRepository.save(patient);
     }
 }

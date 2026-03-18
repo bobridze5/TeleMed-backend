@@ -56,7 +56,7 @@ public class BloodPressureController {
 
 
     @PatchMapping("/{id}")
-    public BloodPressureResponse changeWeight(
+    public BloodPressureResponse changeBloodPressureRecord(
             @CurrentPatient Patient patient,
             @PathVariable("id") Long id,
             @Valid @RequestBody BloodPressureRequest request
@@ -67,7 +67,7 @@ public class BloodPressureController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteWeight(
+    public void deleteBloodPressureRecord(
             @CurrentPatient Patient patient,
             @PathVariable("id") Long id
     ) {

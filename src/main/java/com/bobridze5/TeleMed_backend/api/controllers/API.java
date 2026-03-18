@@ -17,7 +17,7 @@ public final class API {
     public static final String PATIENT_OWNER_PARAMS_SYMPTOM = PATIENT_OWNER + "/symptoms";
     public static final String PATIENT_OWNER_PARAMS_BLOOD_PRESSURE = PATIENT_OWNER + "/blood-pressures";
     public static final String PATIENT_OWNER_PARAMS_PHYSICAL_ACTIVITY = PATIENT_OWNER + "/physical-activities";
-    public static final String PATIENT_OWNER_PARAMS_GLYCEMIA_RECORD = PATIENT_OWNER + "/glycemia-records";
+    public static final String PATIENT_OWNER_PARAMS_GLYCEMIA = PATIENT_OWNER + "/glycemia-records";
 
 
     // Doctor

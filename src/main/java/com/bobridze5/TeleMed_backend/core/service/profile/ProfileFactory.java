@@ -8,6 +8,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Deprecated
 public class ProfileFactory {
     private final List<Profile> profiles;
 

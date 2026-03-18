@@ -3,7 +3,10 @@ package com.bobridze5.TeleMed_backend.core.resolvers;
 import com.bobridze5.TeleMed_backend.core.annotations.CurrentPatient;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
 import com.bobridze5.TeleMed_backend.core.entity.auth.User;
+import com.bobridze5.TeleMed_backend.core.repository.PatientRepository;
+import com.bobridze5.TeleMed_backend.core.repository.UserRepository;
 import com.bobridze5.TeleMed_backend.core.security.UserDetailsImpl;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.access.AccessDeniedException;
@@ -17,7 +20,10 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class PatientResolver implements HandlerMethodArgumentResolver {
+    private final PatientRepository patientRepository;
+
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -40,12 +46,11 @@ public class PatientResolver implements HandlerMethodArgumentResolver {
             throw new AccessDeniedException("Unauthorized");
         }
 
-        Patient patient = user.getPatient();
-        if (patient == null) {
-            log.warn("Пользователь {} не является пациентом", user.getEmail());
-            throw new AccessDeniedException("Пользователь не пациент");
-        }
 
-        return patient;
+        return patientRepository.findByUserId(user.getId())
+                .orElseThrow(() -> {
+                    log.warn("Пользователь {} не является пациентом", user.getEmail());
+                    return new AccessDeniedException("Пользователь не пациент");
+                });
     }
 }

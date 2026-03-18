@@ -31,11 +31,11 @@ public class User {
     @Column(name = "user_id")
     private Long id;
 
-    @OneToOne(mappedBy = "user")
-    private Patient patient;
-
-    @OneToOne(mappedBy = "user")
-    private Doctor doctor;
+//    @OneToOne(mappedBy = "user")
+//    private Patient patient;
+//
+//    @OneToOne(mappedBy = "user")
+//    private Doctor doctor;
 
     @Column(name = "user_first_name", length = 120)
     private String firstName;
@@ -72,13 +72,4 @@ public class User {
     @UpdateTimestamp
     @Column(name = "user_datetime_updated", nullable = false)
     private LocalDateTime updatedAt;
-
-    public boolean hasDoctorProfile() {
-        return this.doctor != null;
-    }
-
-    public boolean hasPatientProfile() {
-        return this.patient != null;
-    }
-
 }

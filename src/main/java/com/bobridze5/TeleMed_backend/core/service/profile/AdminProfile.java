@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+@Deprecated
 public class AdminProfile implements Profile {
     @Override
     public UserRole getRole() {

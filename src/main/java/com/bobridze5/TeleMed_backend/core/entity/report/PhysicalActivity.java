@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -28,7 +29,7 @@ public class PhysicalActivity {
 
     @Column(name = "physical_activity_type", nullable = false)
     @Enumerated(EnumType.STRING)
-    private PhysicalActivityType type;
+    private PhysicalActivityType activityType;
 
     @Column(name = "physical_activity_duration", nullable = false)
     private Integer duration;
@@ -36,6 +37,10 @@ public class PhysicalActivity {
     @Column(name = "physical_activity_intensity", nullable = false)
     @Enumerated(EnumType.STRING)
     private PhysicalActivityIntensityType intensityType;
+
+    @Column(name = "physical_activity_updated_at", nullable = false)
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 
     @Column(name = "physical_activity_created_at", nullable = false)
     @CreationTimestamp
