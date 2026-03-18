@@ -1,12 +1,11 @@
 package com.bobridze5.TeleMed_backend.core.entity.report;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum MealType {
     BREAKFAST("Завтрак"),
     BRUNCH("Поздний завтрак"),
@@ -15,6 +14,7 @@ public enum MealType {
     SUPPER("Поздний ужин"),
     SNACK("Перекус");
 
+    @JsonValue
     private final String label;
 
     public String getName() {
