@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 
 @RestController
-@RequestMapping(API.PATIENT_OWNER_PARAMS_PHYSICAL_ACTIVITY)
+@RequestMapping(API.PATIENT_ME_PARAMS_PHYSICAL_ACTIVITY)
 @RequiredArgsConstructor
 public class PhysicalActivityController {
     private final PhysicalActivityService physicalActivityService;
@@ -51,7 +51,7 @@ public class PhysicalActivityController {
         PhysicalActivityResponse response = physicalActivityService.addRecord(patient, request);
         URI location = urlBuilder.buildAbsoluteUrl(
                 servletRequest,
-                API.PATIENT_OWNER_PARAMS_PHYSICAL_ACTIVITY + response.id()
+                API.PATIENT_ME_PARAMS_PHYSICAL_ACTIVITY + response.id()
         );
         return ResponseEntity.created(location).body(response);
     }

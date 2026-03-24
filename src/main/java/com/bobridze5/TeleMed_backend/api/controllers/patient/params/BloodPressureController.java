@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 
 @RestController
-@RequestMapping(API.PATIENT_OWNER_PARAMS_BLOOD_PRESSURE)
+@RequestMapping(API.PATIENT_ME_PARAMS_BLOOD_PRESSURE)
 @RequiredArgsConstructor
 public class BloodPressureController {
     private final BloodPressureServicePatient bloodPressureService;

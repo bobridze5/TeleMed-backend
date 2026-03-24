@@ -23,14 +23,15 @@ public class Doctor {
     @JoinColumn(name = "doctor_user_id", nullable = false, referencedColumnName = "user_id")
     private User user;
 
-    @Column(name = "doctor_specialization")
-    private String specialization;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "doctor_specialization_id", referencedColumnName = "specialization_id")
+    private Specialization specialization;
 
     @Column(name = "doctor_experience")
     private Integer experience;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "doctor_organization", referencedColumnName = "organization_id")
+    @JoinColumn(name = "doctor_organization_id", referencedColumnName = "organization_id")
     private MedicalOrganization organization;
 
     @Column(name = "doctor_qualification")

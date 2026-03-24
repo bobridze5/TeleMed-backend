@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 
 @RestController
-@RequestMapping(API.PATIENT_OWNER_PARAMS_GLYCEMIA)
+@RequestMapping(API.PATIENT_ME_PARAMS_GLYCEMIA)
 @RequiredArgsConstructor
 public class GlycemiaController {
     private final GlycemiaService glycemiaService;
@@ -52,7 +52,7 @@ public class GlycemiaController {
         GlycemiaResponse response = glycemiaService.addRecord(patient, request);
         URI location = urlBuilder.buildAbsoluteUrl(
                 servletRequest,
-                API.PATIENT_OWNER_PARAMS_GLYCEMIA + response.id()
+                API.PATIENT_ME_PARAMS_GLYCEMIA + response.id()
         );
 
         return ResponseEntity.created(location).body(response);

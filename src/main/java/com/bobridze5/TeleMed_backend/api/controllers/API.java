@@ -10,14 +10,19 @@ public final class API {
 
     public static final String PATIENTS = V1 + "/patients";
     public static final String PATIENT_ID = PATIENTS + "/{patientId}";
-    public static final String PATIENT_OWNER = PATIENTS + "/me";
+    public static final String PATIENT_ME = PATIENTS + "/me";
 
     // Patient
-    public static final String PATIENT_OWNER_PARAMS_WEIGHT = PATIENT_OWNER + "/weights";
-    public static final String PATIENT_OWNER_PARAMS_SYMPTOM = PATIENT_OWNER + "/symptoms";
-    public static final String PATIENT_OWNER_PARAMS_BLOOD_PRESSURE = PATIENT_OWNER + "/blood-pressures";
-    public static final String PATIENT_OWNER_PARAMS_PHYSICAL_ACTIVITY = PATIENT_OWNER + "/physical-activities";
-    public static final String PATIENT_OWNER_PARAMS_GLYCEMIA = PATIENT_OWNER + "/glycemia";
+    public static final String PATIENT_ME_PARAMS_WEIGHT = PATIENT_ME + "/weights";
+    public static final String PATIENT_ME_PARAMS_SYMPTOM = PATIENT_ME + "/symptoms";
+    public static final String PATIENT_ME_PARAMS_BLOOD_PRESSURE = PATIENT_ME + "/blood-pressures";
+    public static final String PATIENT_ME_PARAMS_PHYSICAL_ACTIVITY = PATIENT_ME + "/physical-activities";
+    public static final String PATIENT_ME_PARAMS_GLYCEMIA = PATIENT_ME + "/glycemia";
+
+    public static final String PATIENT_ME_PROFILE = PATIENT_ME + "/profile";
+    public static final String PATIENT_ME_TEST = PATIENT_ME + "/test";
+    public static final String PATIENT_ME_MEDICAL_CARD = PATIENT_ME + "/card";
+    public static final String PATIENT_ME_APPOINTMENTS = PATIENT_ME + "/appointments";
 
 
     // Doctor

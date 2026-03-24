@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 
 @RestController
-@RequestMapping(API.PATIENT_OWNER_PARAMS_WEIGHT)
+@RequestMapping(API.PATIENT_ME_PARAMS_WEIGHT)
 @RequiredArgsConstructor
 public class WeightController {
     private final UrlBuilder urlBuilder;

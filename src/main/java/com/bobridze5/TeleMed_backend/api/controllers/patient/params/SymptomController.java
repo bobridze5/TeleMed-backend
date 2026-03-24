@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 
 @RestController
-@RequestMapping(API.PATIENT_OWNER_PARAMS_SYMPTOM)
+@RequestMapping(API.PATIENT_ME_PARAMS_SYMPTOM)
 @RequiredArgsConstructor
 public class SymptomController {
     private final SymptomServicePatient symptomService;
@@ -50,7 +50,7 @@ public class SymptomController {
             HttpServletRequest servletRequest
     ) {
         SymptomResponse response = symptomService.addRecord(patient, request);
-        URI location = urlBuilder.buildAbsoluteUrl(servletRequest, API.PATIENT_OWNER_PARAMS_SYMPTOM + "/" + response.id());
+        URI location = urlBuilder.buildAbsoluteUrl(servletRequest, API.PATIENT_ME_PARAMS_SYMPTOM + "/" + response.id());
         return ResponseEntity.created(location).body(response);
     }
 

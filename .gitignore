@@ -9,6 +9,8 @@ build/
 src/main/resources/application-local.properties
 docker-compose.local.yml
 
+CLAUDE.md
+
 ### STS ###
 .apt_generated
 .classpath

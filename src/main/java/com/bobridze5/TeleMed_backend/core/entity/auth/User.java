@@ -31,12 +31,6 @@ public class User {
     @Column(name = "user_id")
     private Long id;
 
-//    @OneToOne(mappedBy = "user")
-//    private Patient patient;
-//
-//    @OneToOne(mappedBy = "user")
-//    private Doctor doctor;
-
     @Column(name = "user_first_name", length = 120)
     private String firstName;
 
