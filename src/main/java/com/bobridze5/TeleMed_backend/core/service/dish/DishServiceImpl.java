@@ -36,7 +36,7 @@ public class DishServiceImpl implements DishService {
         Dish dish = dishMapper.mapCreateRequest(request);
         dish.setStatus(DishStatus.DRAFT);
 
-        Optional<Patient> patient = patientRepository.findByUserId(userId);
+        Optional<Patient> patient = patientRepository.findById(userId);
         patient.ifPresent(dish::setPatient);
 
         return dishMapper.mapToResponse(dishRepository.save(dish));
@@ -51,7 +51,7 @@ public class DishServiceImpl implements DishService {
         Dish dish = dishRepository.findById(dishId)
                 .orElseThrow(() -> new EntityNotFoundException("Блюдо не найдено"));
 
-        Patient patient = patientRepository.findByUserId(userId)
+        Patient patient = patientRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("Пациент не найден"));
 
         if (!patient.canView(dish)) {
@@ -65,7 +65,7 @@ public class DishServiceImpl implements DishService {
     @Override
     @Transactional(readOnly = true)
     public Page<DishResponse> getDishes(DishFilterRequest request, Long userId, Pageable pageable) {
-        Patient patient = patientRepository.findByUserId(userId)
+        Patient patient = patientRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("Пациент не найден"));
 
         Specification<Dish> spec = DishSpecification.build(request, patient.getId());
@@ -79,7 +79,7 @@ public class DishServiceImpl implements DishService {
         Dish dish = dishRepository.findById(dishId)
                 .orElseThrow(() -> new EntityNotFoundException("Блюдо не найдено"));
 
-        Patient patient = patientRepository.findByUserId(userId)
+        Patient patient = patientRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("Пациент не найден"));
 
         if (!patient.isOwner(dish)) {
@@ -98,7 +98,7 @@ public class DishServiceImpl implements DishService {
         Dish dish = dishRepository.findById(dishId)
                 .orElseThrow(() -> new EntityNotFoundException("Блюдо не найдено"));
 
-        Patient patient = patientRepository.findByUserId(userId)
+        Patient patient = patientRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("Пациент не найден"));
 
         if (!patient.isOwner(dish)) {

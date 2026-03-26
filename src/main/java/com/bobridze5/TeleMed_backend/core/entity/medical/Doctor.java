@@ -2,27 +2,19 @@ package com.bobridze5.TeleMed_backend.core.entity.medical;
 
 import com.bobridze5.TeleMed_backend.core.entity.auth.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name = "doctors")
-@Data
-@Builder
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Doctor {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "doctor_id")
-    private Long doctorId;
-
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "doctor_user_id", nullable = false, referencedColumnName = "user_id")
-    private User user;
-
+@SuperBuilder
+@PrimaryKeyJoinColumn(name = "doctor_id")
+@EqualsAndHashCode(callSuper = true)
+public class Doctor extends User {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "doctor_specialization_id", referencedColumnName = "specialization_id")
     private Specialization specialization;

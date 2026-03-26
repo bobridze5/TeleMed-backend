@@ -2,18 +2,16 @@ package com.bobridze5.TeleMed_backend.core.service.auth;
 
 import com.bobridze5.TeleMed_backend.api.dto.auth.LoginUserRequest;
 import com.bobridze5.TeleMed_backend.api.dto.auth.RegisterUserRequest;
-import com.bobridze5.TeleMed_backend.api.dto.auth.RegisterUserResponse;
+import com.bobridze5.TeleMed_backend.api.dto.auth.RegisterResponse;
 import com.bobridze5.TeleMed_backend.api.dto.tokens.RefreshTokenRequest;
 import com.bobridze5.TeleMed_backend.api.dto.tokens.TokenResponse;
 import com.bobridze5.TeleMed_backend.api.mappers.UserAuthMapper;
 import com.bobridze5.TeleMed_backend.core.entity.auth.User;
-import com.bobridze5.TeleMed_backend.core.entity.auth.UserRole;
 import com.bobridze5.TeleMed_backend.core.entity.auth.UserStatus;
 import com.bobridze5.TeleMed_backend.core.entity.auth.VerificationToken;
 import com.bobridze5.TeleMed_backend.core.exceptions.*;
 import com.bobridze5.TeleMed_backend.core.jwt.JwtService;
 import com.bobridze5.TeleMed_backend.core.repository.UserRepository;
-import com.bobridze5.TeleMed_backend.core.service.profile.Profile;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,9 +20,6 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Map;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -37,11 +32,10 @@ public class UserAuthServiceImpl implements UserAuthService {
     private final VerificationTokenService verificationTokenService;
     private final EmailService emailService;
     private final UserAuthMapper userAuthMapper;
-    private final Map<UserRole, Profile> profileMap;
 
     @Override
     @Transactional
-    public RegisterUserResponse register(RegisterUserRequest request, String url) {
+    public RegisterResponse register(RegisterUserRequest request, String url) {
         log.info("Начало регистрации: email = {}, role = {}", request.email(), request.role());
 
         if (!request.password1().equals(request.password2())) {
@@ -61,16 +55,16 @@ public class UserAuthServiceImpl implements UserAuthService {
         // Создать регистрацию для разных ролей (пациент / доктор / админ)
         // Создать общий метод для регистрации с передачей роли
         // Прописать в SecurityConfig пути и доступ
-        Optional.ofNullable(profileMap.get(request.role()))
-                .orElseThrow(() -> new IllegalArgumentException("Роли не существует"))
-                .createProfile(user);
+//        Optional.ofNullable(profileMap.get(request.role()))
+//                .orElseThrow(() -> new IllegalArgumentException("Роли не существует"))
+//                .createProfile(user);
 
 
         var verificationToken = verificationTokenService.createToken(user);
         emailService.sendVerificationToken(user.getEmail(), url, verificationToken.getToken());
 
         log.info("Пользователь с id = {} зарегистрирован", user.getId());
-        return new RegisterUserResponse(user.getId());
+        return new RegisterResponse(user.getId());
     }
 
     @Transactional

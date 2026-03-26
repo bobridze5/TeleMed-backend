@@ -24,6 +24,8 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 public class PatientResolver implements HandlerMethodArgumentResolver {
     private final PatientRepository patientRepository;
 
+    private static final String RESOLVED_PATIENT_ATTRIBUTE = "RESOLVED_PATIENT_ENTITY";
+
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -38,6 +40,15 @@ public class PatientResolver implements HandlerMethodArgumentResolver {
             NativeWebRequest webRequest,
             WebDataBinderFactory binderFactory
     ) {
+
+        // TODO: проверить кеширование
+        Object cachedPatient = webRequest.getAttribute(RESOLVED_PATIENT_ATTRIBUTE, NativeWebRequest.SCOPE_REQUEST);
+        if (cachedPatient != null) {
+            log.trace("Patient взят из кеша запроса");
+            return cachedPatient;
+        }
+
+
         Authentication auth = SecurityContextHolder
                 .getContext()
                 .getAuthentication();
@@ -46,11 +57,15 @@ public class PatientResolver implements HandlerMethodArgumentResolver {
             throw new AccessDeniedException("Unauthorized");
         }
 
-
-        return patientRepository.findByUserId(user.getId())
+        Patient patient = patientRepository.findById(user.getId())
                 .orElseThrow(() -> {
                     log.warn("Пользователь {} не является пациентом", user.getEmail());
                     return new AccessDeniedException("Пользователь не пациент");
                 });
+
+        webRequest.setAttribute(RESOLVED_PATIENT_ATTRIBUTE, patient, NativeWebRequest.SCOPE_REQUEST);
+
+
+        return patient;
     }
 }
