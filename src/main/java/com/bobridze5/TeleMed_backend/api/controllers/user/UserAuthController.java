@@ -3,7 +3,7 @@ package com.bobridze5.TeleMed_backend.api.controllers.user;
 import com.bobridze5.TeleMed_backend.api.controllers.API;
 import com.bobridze5.TeleMed_backend.api.dto.auth.LoginUserRequest;
 import com.bobridze5.TeleMed_backend.api.dto.auth.RegisterUserRequest;
-import com.bobridze5.TeleMed_backend.api.dto.auth.RegisterUserResponse;
+import com.bobridze5.TeleMed_backend.api.dto.auth.RegisterResponse;
 import com.bobridze5.TeleMed_backend.api.dto.tokens.RefreshTokenRequest;
 import com.bobridze5.TeleMed_backend.api.dto.tokens.TokenResponse;
 import com.bobridze5.TeleMed_backend.core.service.auth.UserAuthService;
@@ -21,7 +21,7 @@ import java.net.URI;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(API.AUTH)
+@RequestMapping(API.AUTH_OLD)
 @Tag(name = "Регистрация, Аутентификация и авторизация")
 public class UserAuthController {
     private final UrlBuilder urlBuilder;
@@ -32,13 +32,13 @@ public class UserAuthController {
             summary = "Регистрация пользователя",
             description = "Позволяет зарегистрировать нового пользователя"
     )
-    public ResponseEntity<RegisterUserResponse> register(
+    public ResponseEntity<RegisterResponse> register(
             @Valid @RequestBody RegisterUserRequest request,
             HttpServletRequest servletRequest
     ) {
-        URI authBase = urlBuilder.buildAbsoluteUrl(servletRequest, API.AUTH);
+        URI authBase = urlBuilder.buildAbsoluteUrl(servletRequest, API.AUTH_OLD);
 
-        RegisterUserResponse response = userAuthService.register(request, authBase.toString());
+        RegisterResponse response = userAuthService.register(request, authBase.toString());
         URI location = urlBuilder.buildAbsoluteUrl(servletRequest, API.USERS + response.id());
 
         return ResponseEntity.created(location).body(response);

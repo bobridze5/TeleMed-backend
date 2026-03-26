@@ -1,9 +1,11 @@
 package com.bobridze5.TeleMed_backend.core.service.auth;
 
-import com.bobridze5.TeleMed_backend.api.dto.data.ChangeUserDataRequest;
-import com.bobridze5.TeleMed_backend.api.dto.data.ChangeUserDataResponse;
+import com.bobridze5.TeleMed_backend.api.dto.profile.UserProfileUpdateRequest;
+import com.bobridze5.TeleMed_backend.api.dto.user.ChangeUserDataRequest;
+import com.bobridze5.TeleMed_backend.api.dto.user.ChangeUserDataResponse;
 import com.bobridze5.TeleMed_backend.api.dto.users.UserResponse;
 import com.bobridze5.TeleMed_backend.api.dto.users.UsersResponse;
+import com.bobridze5.TeleMed_backend.api.mappers.profile.UserMapper;
 import com.bobridze5.TeleMed_backend.core.entity.auth.User;
 import com.bobridze5.TeleMed_backend.core.entity.auth.UserStatus;
 import com.bobridze5.TeleMed_backend.core.exceptions.EntityNotFoundException;
@@ -11,12 +13,10 @@ import com.bobridze5.TeleMed_backend.core.exceptions.RequestParamInvalidExceptio
 import com.bobridze5.TeleMed_backend.core.repository.UserRepository;
 import com.bobridze5.TeleMed_backend.core.service.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.security.SecurityUtil;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +26,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+    private final UserMapper userMapper;
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final RefreshTokenStoreServiceImpl refreshTokenStoreService;
@@ -126,6 +127,30 @@ public class UserServiceImpl implements UserService {
         user.setStatus(UserStatus.INACTIVE);
         user = userRepository.save(user);
         refreshTokenStoreService.delete(user.getId());
+    }
+
+    @Override
+    @Transactional
+    public User updateProfile(User user, UserProfileUpdateRequest request) {
+        String email = request.getEmail();
+
+        if (email != null && !email.equals(user.getEmail())) {
+            if (userRepository.existsByEmail(email)) {
+                throw new IllegalStateException("Email: " + email + " занят");
+            }
+        }
+
+        userMapper.update(user, request);
+
+        String password = request.getPassword();
+
+        if (password != null) {
+            if (!passwordEncoder.matches(password, user.getPasswordHash())) {
+                user.setPasswordHash(passwordEncoder.encode(password));
+            }
+        }
+
+        return user;
     }
 
 }
