@@ -40,6 +40,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/blood-pressure/**").authenticated()
                         .requestMatchers("/api/v1/users/**").authenticated()
 
+                        .requestMatchers("/api/users/auth/**").permitAll()
+                        .requestMatchers("/api/users/*/").authenticated()
                         .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
