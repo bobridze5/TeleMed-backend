@@ -42,8 +42,10 @@ dependencies {
 	implementation("io.jsonwebtoken:jjwt-api:0.13.0")
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.13.0")
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.13.0")
-	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.14") // TODO: 2.6.0
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6")
 	implementation("org.springframework.boot:spring-boot-starter-data-redis:3.5.7")
+	implementation("org.springframework.boot:spring-boot-starter-mail:3.5.7")
+	implementation("org.springframework.retry:spring-retry:2.0.12")
 }
 
 tasks.withType<Test> {

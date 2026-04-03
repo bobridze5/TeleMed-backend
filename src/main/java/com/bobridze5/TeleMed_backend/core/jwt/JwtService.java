@@ -1,6 +1,6 @@
 package com.bobridze5.TeleMed_backend.core.jwt;
 
-import com.bobridze5.TeleMed_backend.core.entity.User;
+import com.bobridze5.TeleMed_backend.core.entity.auth.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -35,7 +35,7 @@ public class JwtService {
 
     public String generateAccessToken(User user) {
         return Jwts.builder()
-                .subject(user.getUsername())
+                .subject(user.getEmail())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + accessLifeTimeMs))
                 .signWith(getKey())
@@ -45,7 +45,7 @@ public class JwtService {
 
     public String generateRefreshToken(User user) {
         return Jwts.builder()
-                .subject(user.getUsername())
+                .subject(user.getEmail())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + refreshLifeTimeMs))
                 .signWith(getKey())
@@ -53,7 +53,7 @@ public class JwtService {
                 .compact();
     }
 
-    public Claims parse(String token) {
+    public Claims parse(String token) throws IllegalArgumentException, JwtException {
         return Jwts.parser()
                 .verifyWith(getKey())
                 .build()
@@ -61,7 +61,7 @@ public class JwtService {
                 .getPayload();
     }
 
-    public String extractUsername(String token) {
+    public String extractEmail(String token) {
         Claims claims = parse(token);
         return claims.getSubject();
     }

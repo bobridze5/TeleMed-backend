@@ -1,0 +1,5 @@
+mail:
+  verification:
+    subject: "Подтверждение регистрации"
+    message: "Перейдите по ссылке ниже, чтобы подтвердить электронную почту: \n%s"
+    template: "%sregistrationConfirm?token=%s"
