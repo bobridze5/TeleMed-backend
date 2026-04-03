@@ -14,6 +14,14 @@ public record UserDetailsImpl(User user) implements UserDetails {
         return List.of();
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public Long getUserId() {
+        return user.getId();
+    }
+
     @Override
     public String getPassword() {
         return user.getPasswordHash();

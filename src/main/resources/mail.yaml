@@ -3,3 +3,7 @@ mail:
     subject: "Подтверждение регистрации"
     message: "Перейдите по ссылке ниже, чтобы подтвердить электронную почту: \n%s"
     template: "%sregistrationConfirm?token=%s"
+  appointment:
+    reminder:
+      subject: "Напоминание о приёме у врача"
+      body: "Напоминаем вам о приёме у врача %s %s"
