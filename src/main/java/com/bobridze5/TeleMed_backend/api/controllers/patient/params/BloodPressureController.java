@@ -10,6 +10,7 @@ import com.bobridze5.TeleMed_backend.core.service.params.BloodPressureServicePat
 import com.bobridze5.TeleMed_backend.core.service.utils.UrlBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springdoc.core.annotations.ParameterObject;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,7 @@ public class BloodPressureController {
     @Operation(summary = "Получить список записей давления", description = "Возвращает страницу записей артериального давления с фильтрацией по дате")
     public Page<BloodPressureResponse> getBloodPressureRecords(
             @CurrentPatient Patient patient,
-            @Valid @ModelAttribute BloodPressureFilterRequest request
+            @ParameterObject @Valid @ModelAttribute BloodPressureFilterRequest request
     ) {
         return bloodPressureService.getRecords(patient, request);
     }

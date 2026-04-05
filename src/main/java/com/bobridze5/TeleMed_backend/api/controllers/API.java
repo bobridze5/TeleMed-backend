@@ -13,14 +13,10 @@ public final class API {
     public static final String CITY = V1 + "/city";
     public static final String DISH = V1 + "/dishes";
 
+    // Admin
     public static final String ADMIN = V1 + "/admin";
     public static final String ADMIN_DOCTORS = ADMIN + "/doctors";
     public static final String ADMIN_DOCTORS_PENDING = ADMIN_DOCTORS + "/pending";
-
-    public static final String DOCTORS = V1 + "/doctors";
-    public static final String DOCTOR_ME = DOCTORS + "/me";
-    public static final String DOCTOR_ME_PROFILE = DOCTOR_ME + "/profile";
-    public static final String DOCTOR_ME_PATIENTS = DOCTOR_ME + "/patients";
 
     public static final String PATIENTS = V1 + "/patients";
     public static final String PATIENT_ID = PATIENTS + "/{patientId}";
@@ -40,6 +36,10 @@ public final class API {
 
 
     // Doctor
+    public static final String DOCTORS = V1 + "/doctors";
+    public static final String DOCTOR_ME = DOCTORS + "/me";
+    public static final String DOCTOR_ME_PROFILE = DOCTOR_ME + "/profile";
+    public static final String DOCTOR_ME_PATIENTS = DOCTOR_ME + "/patients";
     public static final String PATIENT_PARAMS_WEIGHT = PATIENT_ID + "/weight";
     public static final String PATIENT_PARAMS_BLOOD_PRESSURE = PATIENT_ID + "/blood-pressure";
     public static final String PATIENT_PARAMS_SYMPTOM = PATIENT_ID + "/symptom";

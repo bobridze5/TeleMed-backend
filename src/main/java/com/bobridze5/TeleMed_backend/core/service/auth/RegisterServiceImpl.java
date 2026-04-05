@@ -12,7 +12,7 @@ import com.bobridze5.TeleMed_backend.core.repository.AdminRepository;
 import com.bobridze5.TeleMed_backend.core.repository.MedicalOrganizationRepository;
 import com.bobridze5.TeleMed_backend.core.repository.SpecializationRepository;
 import com.bobridze5.TeleMed_backend.core.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
+import com.bobridze5.TeleMed_backend.core.exceptions.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

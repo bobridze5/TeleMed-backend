@@ -10,6 +10,7 @@ import com.bobridze5.TeleMed_backend.core.service.params.WeightService;
 import com.bobridze5.TeleMed_backend.core.service.utils.UrlBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springdoc.core.annotations.ParameterObject;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,7 @@ public class WeightController {
     @Operation(summary = "Получить список записей о весе", description = "Возвращает страницу записей веса текущего пациента с фильтрацией по дате")
     public Page<WeightResponse> getWeights(
             @CurrentPatient Patient patient,
-            @Valid @ModelAttribute WeightFilterRequest request
+            @ParameterObject @Valid @ModelAttribute WeightFilterRequest request
     ) {
         return weightService.getWeightRecords(patient, request);
     }
@@ -54,7 +55,7 @@ public class WeightController {
             HttpServletRequest servletRequest
     ) {
         WeightResponse response = weightService.addWeightRecord(patient, request);
-        URI location = urlBuilder.buildAbsoluteUrl(servletRequest, API.USERS + response.id());
+        URI location = urlBuilder.buildAbsoluteUrl(servletRequest, API.PATIENT_ME_PARAMS_WEIGHT + "/" + response.id());
         return ResponseEntity.created(location).body(response);
     }
 
@@ -64,7 +65,7 @@ public class WeightController {
     public WeightResponse changeWeight(
             @CurrentPatient Patient patient,
             @PathVariable("weightId") Long weightId,
-            @RequestBody WeightRequest request
+            @Valid @RequestBody WeightRequest request
     ) {
         return weightService.updateWeightRecord(patient, weightId, request);
     }

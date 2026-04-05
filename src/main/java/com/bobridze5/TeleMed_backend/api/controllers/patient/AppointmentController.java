@@ -10,6 +10,7 @@ import com.bobridze5.TeleMed_backend.core.service.appointment.AppointmentService
 import com.bobridze5.TeleMed_backend.core.service.utils.UrlBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springdoc.core.annotations.ParameterObject;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +43,7 @@ public class AppointmentController {
     @Operation(summary = "Получить список записей на приём", description = "Возвращает страницу записей пациента к врачу с фильтрацией по статусу и дате")
     public Page<AppointmentResponse> getAppointments(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @Valid @ModelAttribute AppointmentFilterRequest filter
+            @ParameterObject @Valid @ModelAttribute AppointmentFilterRequest filter
     ) {
         return appointmentService.getAppointments(userDetails.getUserId(), filter);
     }

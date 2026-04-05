@@ -10,6 +10,7 @@ import com.bobridze5.TeleMed_backend.core.service.utils.UrlBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +41,7 @@ public class CityController {
     @PostMapping("/")
     @Operation(summary = "Создать город")
     public ResponseEntity<CityResponse> createCity(
-            @RequestBody CityCreateRequest request,
+            @Valid @RequestBody CityCreateRequest request,
             HttpServletRequest servletRequest
     ) {
         CityResponse response = cityService.createCity(request);
@@ -48,11 +49,11 @@ public class CityController {
         return ResponseEntity.created(location).body(response);
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @Operation(summary = "Обновить город")
     public CityResponse updateCity(
             @PathVariable Long id,
-            @RequestBody CityUpdateRequest request
+            @Valid @RequestBody CityUpdateRequest request
     ) {
         return cityService.updateCity(id, request);
     }

@@ -9,6 +9,7 @@ import com.bobridze5.TeleMed_backend.core.entity.auth.User;
 import com.bobridze5.TeleMed_backend.core.service.dish.DishService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springdoc.core.annotations.ParameterObject;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -48,7 +49,7 @@ public class DishController {
     @GetMapping
     @Operation(summary = "Получить список блюд", description = "Возвращает страницу блюд с фильтрацией по названию и нутриентам")
     public Page<DishResponse> getDishes(
-            @ModelAttribute DishFilterRequest request,
+            @ParameterObject @ModelAttribute DishFilterRequest request,
             @PageableDefault(sort = "name", direction = Sort.Direction.ASC, size = 20) Pageable pageable,
             @AuthenticationPrincipal User user
     ) {

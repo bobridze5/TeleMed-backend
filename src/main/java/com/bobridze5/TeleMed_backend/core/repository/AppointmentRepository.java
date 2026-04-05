@@ -1,13 +1,15 @@
 package com.bobridze5.TeleMed_backend.core.repository;
 
 import com.bobridze5.TeleMed_backend.core.entity.Appointment;
-import io.lettuce.core.dynamic.annotation.Param;
+import com.bobridze5.TeleMed_backend.core.entity.AppointmentStatus;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,9 +41,10 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     @Query("SELECT a FROM Appointment a " +
             "WHERE a.dateTime BETWEEN :startTime AND :endTime " +
-            "AND (a.status = 'CREATED' OR a.status = 'CONFIRMED')")
+            "AND a.status IN :statuses")
     List<Appointment> findAppointmentsInTimeRangeForNotifications(
             @Param("startTime") LocalDateTime startTime,
-            @Param("endTime") LocalDateTime endTime
+            @Param("endTime") LocalDateTime endTime,
+            @Param("statuses") Collection<AppointmentStatus> statuses
     );
 }

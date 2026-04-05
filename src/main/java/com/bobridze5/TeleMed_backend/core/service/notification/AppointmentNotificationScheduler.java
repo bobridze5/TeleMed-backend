@@ -1,6 +1,7 @@
 package com.bobridze5.TeleMed_backend.core.service.notification;
 
 import com.bobridze5.TeleMed_backend.core.entity.Appointment;
+import com.bobridze5.TeleMed_backend.core.entity.AppointmentStatus;
 import com.bobridze5.TeleMed_backend.core.repository.AppointmentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -28,7 +30,10 @@ public class AppointmentNotificationScheduler {
         LocalDateTime searchStart = now.plusHours(23).minusMinutes(30);
         LocalDateTime searchEnd = now.plusHours(24).plusMinutes(30);
 
-        List<Appointment> upcomingAppointments = appointmentRepository.findAppointmentsInTimeRangeForNotifications(searchStart, searchEnd);
+        List<Appointment> upcomingAppointments = appointmentRepository.findAppointmentsInTimeRangeForNotifications(
+                searchStart, searchEnd,
+                Set.of(AppointmentStatus.CREATED, AppointmentStatus.CONFIRMED)
+        );
 
         if (upcomingAppointments.isEmpty()) {
             log.info("Нет приёмов для отправки напоминаний в интервале {} - {}", searchStart, searchEnd);

@@ -11,6 +11,7 @@ import com.bobridze5.TeleMed_backend.core.service.params.GlycemiaService;
 import com.bobridze5.TeleMed_backend.core.service.utils.UrlBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springdoc.core.annotations.ParameterObject;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +34,7 @@ public class GlycemiaController {
     @Operation(summary = "Получить список записей гликемии", description = "Возвращает страницу записей уровня глюкозы с фильтрацией по дате")
     public Page<GlycemiaResponse> getGlycemiaRecords(
             @CurrentPatient Patient patient,
-            @Valid @ModelAttribute GlycemiaFilterRequest request
+            @ParameterObject @Valid @ModelAttribute GlycemiaFilterRequest request
     ) {
         return glycemiaService.getRecords(patient, request);
     }

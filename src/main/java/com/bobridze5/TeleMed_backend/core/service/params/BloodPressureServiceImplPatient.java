@@ -50,6 +50,7 @@ public class BloodPressureServiceImplPatient implements BloodPressureServicePati
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BloodPressureResponse getRecordById(Patient patient, Long id) {
         BloodPressure bloodPressure = bloodPressureRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Запись не найдена"));
@@ -62,6 +63,7 @@ public class BloodPressureServiceImplPatient implements BloodPressureServicePati
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<BloodPressureResponse> getRecords(Patient patient, BloodPressureFilterRequest request) {
         Pageable pageable = PageRequest.of(request.page(), request.size(), Sort.by("createdAt").descending());
 

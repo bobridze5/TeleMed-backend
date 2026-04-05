@@ -7,7 +7,7 @@ import com.bobridze5.TeleMed_backend.core.entity.auth.UserStatus;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Doctor;
 import com.bobridze5.TeleMed_backend.core.repository.DoctorRepository;
 import com.bobridze5.TeleMed_backend.core.service.auth.EmailService;
-import jakarta.persistence.EntityNotFoundException;
+import com.bobridze5.TeleMed_backend.core.exceptions.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

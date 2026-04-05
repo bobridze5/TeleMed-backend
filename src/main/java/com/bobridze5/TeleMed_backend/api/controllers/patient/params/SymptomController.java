@@ -11,6 +11,7 @@ import com.bobridze5.TeleMed_backend.core.service.params.SymptomServicePatient;
 import com.bobridze5.TeleMed_backend.core.service.utils.UrlBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springdoc.core.annotations.ParameterObject;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +44,7 @@ public class SymptomController {
     @Operation(summary = "Получить список симптомов", description = "Возвращает страницу записей симптомов с фильтрацией по дате")
     public Page<SymptomResponse> getSymptomRecords(
             @CurrentPatient Patient patient,
-            @Valid @ModelAttribute SymptomFilterRequest request
+            @ParameterObject @Valid @ModelAttribute SymptomFilterRequest request
     ) {
         return symptomService.getRecords(patient, request);
     }

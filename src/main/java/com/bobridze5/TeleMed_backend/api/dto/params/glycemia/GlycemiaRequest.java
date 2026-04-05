@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 public record GlycemiaRequest(
+        @NotNull(message = "Уровень гликемии обязателен")
         @Positive(message = "Уровень гликемии не может быть отрицательным")
         Double level,
 
