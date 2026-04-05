@@ -7,6 +7,10 @@ import com.bobridze5.TeleMed_backend.api.dto.auth.RegisterPatientRequest;
 import com.bobridze5.TeleMed_backend.api.dto.auth.RegisterResponse;
 import com.bobridze5.TeleMed_backend.core.service.auth.RegisterService;
 import com.bobridze5.TeleMed_backend.core.service.utils.UrlBuilder;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +25,21 @@ import java.net.URI;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(API.AUTH_REGISTER)
+@Tag(
+        name = "Регистрация пользователей",
+        description = "Представлены три ручки для регистрации разных ролей"
+)
 public class RegisterController {
     private final RegisterService registerService;
     private final UrlBuilder urlBuilder;
 
     @PostMapping("/patient")
+    @Operation(summary = "Регистрация пациента", description = "Создаёт учётную запись пациента и отправляет письмо для подтверждения email")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Пациент зарегистрирован"),
+            @ApiResponse(responseCode = "400", description = "Ошибка валидации данных"),
+            @ApiResponse(responseCode = "409", description = "Пользователь с таким email уже существует")
+    })
     public ResponseEntity<RegisterResponse> registerPatient(
             @Valid @RequestBody RegisterPatientRequest request,
             HttpServletRequest servletRequest
@@ -37,6 +51,8 @@ public class RegisterController {
     }
 
     @PostMapping("/doctor")
+    @Operation(summary = "Регистрация врача", description = "Создаёт учётную запись врача")
+    @ApiResponse(responseCode = "400", description = "Ошибка валидации данных")
     public RegisterResponse registerDoctor(
             @Valid @RequestBody RegisterDoctorRequest request
     ) {
@@ -44,6 +60,8 @@ public class RegisterController {
     }
 
     @PostMapping("/admin")
+    @Operation(summary = "Регистрация администратора", description = "Создаёт учётную запись администратора")
+    @ApiResponse(responseCode = "400", description = "Ошибка валидации данных")
     public RegisterResponse registerAdmin(
             @Valid @RequestBody RegisterAdminRequest request
     ) {

@@ -8,8 +8,6 @@ import com.bobridze5.TeleMed_backend.api.mappers.AppointmentMapper;
 import com.bobridze5.TeleMed_backend.core.entity.Appointment;
 import com.bobridze5.TeleMed_backend.core.entity.AppointmentStatus;
 import com.bobridze5.TeleMed_backend.core.entity.auth.User;
-import com.bobridze5.TeleMed_backend.core.entity.medical.Doctor;
-import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
 import com.bobridze5.TeleMed_backend.core.exceptions.EntityNotFoundException;
 import com.bobridze5.TeleMed_backend.core.repository.AppointmentRepository;
 import com.bobridze5.TeleMed_backend.core.repository.UserRepository;

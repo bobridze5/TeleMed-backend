@@ -9,6 +9,8 @@ import com.bobridze5.TeleMed_backend.core.annotations.CurrentPatient;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
 import com.bobridze5.TeleMed_backend.core.service.params.PhysicalActivityService;
 import com.bobridze5.TeleMed_backend.core.service.utils.UrlBuilder;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,11 +24,13 @@ import java.net.URI;
 @RestController
 @RequestMapping(API.PATIENT_ME_PARAMS_PHYSICAL_ACTIVITY)
 @RequiredArgsConstructor
+@Tag(name = "Физическая активность пациента", description = "Управление записями о физической активности текущего пациента")
 public class PhysicalActivityController {
     private final PhysicalActivityService physicalActivityService;
     private final UrlBuilder urlBuilder;
 
     @GetMapping
+    @Operation(summary = "Получить список записей активности", description = "Возвращает страницу записей физической активности с фильтрацией по дате")
     public Page<PhysicalActivityResponse> getPhysicalActivityRecords(
             @CurrentPatient Patient patient,
             @Valid @ModelAttribute PhysicalActivityFilterRequest request
@@ -35,6 +39,7 @@ public class PhysicalActivityController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Получить запись активности по ID")
     public PhysicalActivityResponse getPhysicalActivityRecordById(
             @CurrentPatient Patient patient,
             @PathVariable("id") Long id
@@ -43,6 +48,7 @@ public class PhysicalActivityController {
     }
 
     @PostMapping
+    @Operation(summary = "Добавить запись активности", description = "Создаёт новую запись физической активности для текущего пациента")
     public ResponseEntity<PhysicalActivityResponse> addPhysicalActivityRecord(
             @CurrentPatient Patient patient,
             @Valid @RequestBody PhysicalActivityRequest request,
@@ -58,6 +64,7 @@ public class PhysicalActivityController {
 
 
     @PatchMapping("/{id}")
+    @Operation(summary = "Обновить запись активности")
     public PhysicalActivityResponse changePhysicalActivityRecord(
             @CurrentPatient Patient patient,
             @PathVariable("id") Long id,
@@ -69,6 +76,7 @@ public class PhysicalActivityController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Удалить запись активности")
     public void deleteWeight(
             @CurrentPatient Patient patient,
             @PathVariable("id") Long id

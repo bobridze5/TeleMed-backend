@@ -2,47 +2,25 @@ package com.bobridze5.TeleMed_backend.api.controllers.user;
 
 import com.bobridze5.TeleMed_backend.api.controllers.API;
 import com.bobridze5.TeleMed_backend.api.dto.auth.LoginUserRequest;
-import com.bobridze5.TeleMed_backend.api.dto.auth.RegisterUserRequest;
-import com.bobridze5.TeleMed_backend.api.dto.auth.RegisterResponse;
 import com.bobridze5.TeleMed_backend.api.dto.tokens.RefreshTokenRequest;
 import com.bobridze5.TeleMed_backend.api.dto.tokens.TokenResponse;
 import com.bobridze5.TeleMed_backend.core.service.auth.UserAuthService;
-import com.bobridze5.TeleMed_backend.core.service.utils.UrlBuilder;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(API.AUTH_OLD)
-@Tag(name = "Регистрация, Аутентификация и авторизация")
-public class UserAuthController {
-    private final UrlBuilder urlBuilder;
+@Tag(name = "Аутентификация и авторизация пользователей")
+public class AuthController {
     private final UserAuthService userAuthService;
-
-    @PostMapping("/register")
-    @Operation(
-            summary = "Регистрация пользователя",
-            description = "Позволяет зарегистрировать нового пользователя"
-    )
-    public ResponseEntity<RegisterResponse> register(
-            @Valid @RequestBody RegisterUserRequest request,
-            HttpServletRequest servletRequest
-    ) {
-        URI authBase = urlBuilder.buildAbsoluteUrl(servletRequest, API.AUTH_OLD);
-
-        RegisterResponse response = userAuthService.register(request, authBase.toString());
-        URI location = urlBuilder.buildAbsoluteUrl(servletRequest, API.USERS + response.id());
-
-        return ResponseEntity.created(location).body(response);
-    }
 
     @PostMapping("/login")
     @Operation(
@@ -54,6 +32,7 @@ public class UserAuthController {
     }
 
     @GetMapping("/login")
+    @Operation(summary = "Страница логина", description = "Заглушка — возвращает текстовое сообщение")
     public String loginPage() {
         return "Здесь должна быть страница логина";
     }
@@ -78,6 +57,11 @@ public class UserAuthController {
     }
 
     @GetMapping("/registrationConfirm")
+    @Operation(summary = "Подтверждение email", description = "Верификация адреса электронной почты по одноразовому токену из письма. Перенаправляет на страницу входа.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "302", description = "Email подтверждён, редирект на страницу входа"),
+            @ApiResponse(responseCode = "400", description = "Токен недействителен или истёк")
+    })
     public ResponseEntity<Void> confirmEmail(
             @RequestParam("token") String token
     ) {

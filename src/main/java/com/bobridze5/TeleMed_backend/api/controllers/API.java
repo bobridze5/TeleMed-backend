@@ -36,6 +36,7 @@ public final class API {
     public static final String PATIENT_PARAMS_SYMPTOM = PATIENT_ID + "/symptom";
     public static final String PATIENT_PARAMS_PHYSICAL_ACTIVITY = PATIENT_ID + "/physical-activity";
     public static final String PATIENT_PARAMS_GLYCEMIA_RECORD = PATIENT_ID + "/glycemia";
+//    public static final String PATIENT
 
     private API() {
     }

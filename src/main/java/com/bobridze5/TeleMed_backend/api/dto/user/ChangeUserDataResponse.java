@@ -8,7 +8,6 @@ public record ChangeUserDataResponse(
         String firstName,
         String lastName,
         String middleName,
-        String nickname,
         @Email(message = "Email must be correct")
         String email,
         UserStatus status

@@ -9,6 +9,8 @@ import com.bobridze5.TeleMed_backend.core.annotations.CurrentPatient;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
 import com.bobridze5.TeleMed_backend.core.service.params.GlycemiaService;
 import com.bobridze5.TeleMed_backend.core.service.utils.UrlBuilder;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,11 +24,13 @@ import java.net.URI;
 @RestController
 @RequestMapping(API.PATIENT_ME_PARAMS_GLYCEMIA)
 @RequiredArgsConstructor
+@Tag(name = "Гликемия пациента", description = "Управление записями уровня глюкозы в крови текущего пациента")
 public class GlycemiaController {
     private final GlycemiaService glycemiaService;
     private final UrlBuilder urlBuilder;
 
     @GetMapping
+    @Operation(summary = "Получить список записей гликемии", description = "Возвращает страницу записей уровня глюкозы с фильтрацией по дате")
     public Page<GlycemiaResponse> getGlycemiaRecords(
             @CurrentPatient Patient patient,
             @Valid @ModelAttribute GlycemiaFilterRequest request
@@ -35,6 +39,7 @@ public class GlycemiaController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Получить запись гликемии по ID")
     public GlycemiaResponse getGlycemiaRecord(
             @CurrentPatient Patient patient,
             @PathVariable("id") Long id
@@ -44,6 +49,7 @@ public class GlycemiaController {
 
 
     @PostMapping
+    @Operation(summary = "Добавить запись гликемии", description = "Создаёт новую запись уровня глюкозы для текущего пациента")
     public ResponseEntity<GlycemiaResponse> addGlycemiaRecord(
             @CurrentPatient Patient patient,
             @Valid @RequestBody GlycemiaRequest request,
@@ -59,6 +65,7 @@ public class GlycemiaController {
     }
 
     @PatchMapping("/{id}")
+    @Operation(summary = "Обновить запись гликемии")
     public GlycemiaResponse changeGlycemiaRecord(
             @CurrentPatient Patient patient,
             @PathVariable("id") Long id,
@@ -69,6 +76,7 @@ public class GlycemiaController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Удалить запись гликемии")
     public void deleteGlycemiaRecord(
             @CurrentPatient Patient patient,
             @PathVariable("id") Long id
