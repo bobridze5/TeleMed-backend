@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.util.List;
+
 @Entity
 @Table(name = "doctors")
 @Getter
@@ -28,4 +30,10 @@ public class Doctor extends User {
 
     @Column(name = "doctor_qualification")
     private String qualification;
+
+    @Column(name = "doctor_about", columnDefinition = "TEXT")
+    private String about;
+
+    @OneToMany(mappedBy = "doctor", fetch = FetchType.LAZY)
+    private List<PatientDoctorAssignment> patientAssignments;
 }

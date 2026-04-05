@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -51,12 +52,20 @@ public class RegisterController {
     }
 
     @PostMapping("/doctor")
-    @Operation(summary = "Регистрация врача", description = "Создаёт учётную запись врача")
-    @ApiResponse(responseCode = "400", description = "Ошибка валидации данных")
-    public RegisterResponse registerDoctor(
+    @Operation(
+            summary = "Регистрация врача",
+            description = "Создаёт заявку врача. После регистрации статус — AWAITING_APPROVAL. Войти можно только после одобрения администратором."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Заявка врача принята на рассмотрение"),
+            @ApiResponse(responseCode = "400", description = "Ошибка валидации данных"),
+            @ApiResponse(responseCode = "409", description = "Пользователь с таким email уже существует")
+    })
+    public ResponseEntity<RegisterResponse> registerDoctor(
             @Valid @RequestBody RegisterDoctorRequest request
     ) {
-        return registerService.register(request);
+        RegisterResponse response = registerService.register(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/admin")

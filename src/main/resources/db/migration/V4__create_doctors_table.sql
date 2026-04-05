@@ -11,6 +11,7 @@ CREATE TABLE doctors (
     doctor_qualification VARCHAR(120) NOT NULL,
     doctor_user_id BIGINT NOT NULL UNIQUE REFERENCES users(user_id),
     doctor_organization_id BIGINT REFERENCES medical_organizations(organization_id),
+    doctor_about TEXT,
 
     CONSTRAINT fk_doctor_user FOREIGN KEY (doctor_id) REFERENCES users (user_id) ON DELETE CASCADE
 );

@@ -6,9 +6,13 @@ import com.bobridze5.TeleMed_backend.api.dto.auth.RegisterPatientRequest;
 import com.bobridze5.TeleMed_backend.api.dto.auth.RegisterResponse;
 import com.bobridze5.TeleMed_backend.api.mappers.auth.RegisterMapper;
 import com.bobridze5.TeleMed_backend.core.entity.auth.VerificationToken;
-import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
+import com.bobridze5.TeleMed_backend.core.entity.medical.*;
 import com.bobridze5.TeleMed_backend.core.exceptions.EntityAlreadyExistsException;
+import com.bobridze5.TeleMed_backend.core.repository.AdminRepository;
+import com.bobridze5.TeleMed_backend.core.repository.MedicalOrganizationRepository;
+import com.bobridze5.TeleMed_backend.core.repository.SpecializationRepository;
 import com.bobridze5.TeleMed_backend.core.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,19 +23,19 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class RegisterServiceImpl implements RegisterService {
     private final UserRepository userRepository;
+    private final AdminRepository adminRepository;
     private final RegisterMapper registerMapper;
     private final VerificationTokenService verificationTokenService;
     private final EmailService emailService;
+    private final SpecializationRepository specializationRepository;
+    private final MedicalOrganizationRepository organizationRepository;
 
     @Override
     @Transactional
     public RegisterResponse register(RegisterPatientRequest request, String url) {
-        log.info("Начало регистрации: email = {}", request.email());
+        log.info("Начало регистрации пациента: email = {}", request.email());
 
-        if (userRepository.existsByEmail(request.email())) {
-            log.warn("Ошибка регистрации: email = {} уже существует", request.email());
-            throw new EntityAlreadyExistsException("User with email = " + request.email() + " already exists");
-        }
+        checkEmailExists(request.email());
 
         Patient patient = registerMapper.mapToInitialPatient(request);
         patient = userRepository.save(patient);
@@ -39,20 +43,54 @@ public class RegisterServiceImpl implements RegisterService {
         VerificationToken verificationToken = verificationTokenService.createToken(patient);
         emailService.sendVerificationToken(patient.getEmail(), url, verificationToken.getToken());
 
-        log.info("Пользователь с id = {} зарегистрирован", patient.getId());
+        log.info("Пациент с id = {} зарегистрирован", patient.getId());
         return new RegisterResponse(patient.getId());
     }
 
     @Override
     @Transactional
     public RegisterResponse register(RegisterDoctorRequest request) {
-        return null;
+        log.info("Начало регистрации врача: email = {}", request.email());
+
+        checkEmailExists(request.email());
+
+        Specialization specialization = specializationRepository.findById(request.specializationId())
+                .orElseThrow(() -> new EntityNotFoundException("Специализация не найдена"));
+
+        MedicalOrganization organization = null;
+        if (request.organizationId() != null) {
+            organization = organizationRepository.findById(request.organizationId())
+                    .orElseThrow(() -> new EntityNotFoundException("Организация не найдена"));
+        }
+
+        Doctor doctor = registerMapper.mapToInitialDoctor(request, specialization, organization);
+        doctor = userRepository.save(doctor);
+
+        String doctorName = request.lastName() != null ? request.lastName() : request.email();
+        emailService.sendDoctorApplicationReceived(doctor.getEmail(), doctorName);
+
+        log.info("Врач с id = {} зарегистрирован, ожидает проверки", doctor.getId());
+        return new RegisterResponse(doctor.getId());
     }
 
     @Override
     @Transactional
     public RegisterResponse register(RegisterAdminRequest request) {
-        return null;
+        log.info("Начало регистрации администратора: email = {}", request.email());
+
+        checkEmailExists(request.email());
+
+        Admin admin = registerMapper.mapToInitialAdmin(request);
+        admin = adminRepository.save(admin);
+
+        log.info("Администратор с id = {} зарегистрирован, ожидает проверки", admin.getId());
+        return new RegisterResponse(admin.getId());
     }
 
+    private void checkEmailExists(String email) {
+        if (userRepository.existsByEmail(email)) {
+            log.warn("Ошибка регистрации: email = {} уже существует", email);
+            throw new EntityAlreadyExistsException("User with email = " + email + " already exists");
+        }
+    }
 }

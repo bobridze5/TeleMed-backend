@@ -1,13 +1,11 @@
 package com.bobridze5.TeleMed_backend.api.dto.profile;
 
-import com.bobridze5.TeleMed_backend.core.entity.auth.UserStatus;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;

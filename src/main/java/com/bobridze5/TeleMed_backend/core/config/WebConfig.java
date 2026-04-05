@@ -1,5 +1,6 @@
 package com.bobridze5.TeleMed_backend.core.config;
 
+import com.bobridze5.TeleMed_backend.core.resolvers.DoctorResolver;
 import com.bobridze5.TeleMed_backend.core.resolvers.PatientResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -12,9 +13,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
     private final PatientResolver patientResolver;
+    private final DoctorResolver doctorResolver;
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(patientResolver);
+        resolvers.add(doctorResolver);
     }
 }

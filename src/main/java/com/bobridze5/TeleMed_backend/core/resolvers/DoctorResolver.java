@@ -1,9 +1,9 @@
 package com.bobridze5.TeleMed_backend.core.resolvers;
 
-import com.bobridze5.TeleMed_backend.core.annotations.CurrentPatient;
+import com.bobridze5.TeleMed_backend.core.annotations.CurrentDoctor;
 import com.bobridze5.TeleMed_backend.core.entity.auth.User;
-import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
-import com.bobridze5.TeleMed_backend.core.repository.PatientRepository;
+import com.bobridze5.TeleMed_backend.core.entity.medical.Doctor;
+import com.bobridze5.TeleMed_backend.core.repository.DoctorRepository;
 import com.bobridze5.TeleMed_backend.core.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,16 +20,15 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class PatientResolver implements HandlerMethodArgumentResolver {
-    private final PatientRepository patientRepository;
+public class DoctorResolver implements HandlerMethodArgumentResolver {
+    private final DoctorRepository doctorRepository;
 
-    private static final String RESOLVED_PATIENT_ATTRIBUTE = "RESOLVED_PATIENT_ENTITY";
-
+    private static final String RESOLVED_DOCTOR_ATTRIBUTE = "RESOLVED_DOCTOR_ENTITY";
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.hasParameterAnnotation(CurrentPatient.class)
-                && parameter.getParameterType().equals(Patient.class);
+        return parameter.hasParameterAnnotation(CurrentDoctor.class)
+                && parameter.getParameterType().equals(Doctor.class);
     }
 
     @Override
@@ -39,32 +38,25 @@ public class PatientResolver implements HandlerMethodArgumentResolver {
             NativeWebRequest webRequest,
             WebDataBinderFactory binderFactory
     ) {
-
-        // TODO: проверить кеширование
-        Object cachedPatient = webRequest.getAttribute(RESOLVED_PATIENT_ATTRIBUTE, NativeWebRequest.SCOPE_REQUEST);
-        if (cachedPatient != null) {
-            log.trace("Patient взят из кеша запроса");
-            return cachedPatient;
+        Object cached = webRequest.getAttribute(RESOLVED_DOCTOR_ATTRIBUTE, NativeWebRequest.SCOPE_REQUEST);
+        if (cached != null) {
+            log.trace("Доктор взят из кеша запроса");
+            return cached;
         }
 
-
-        Authentication auth = SecurityContextHolder
-                .getContext()
-                .getAuthentication();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (auth == null || !(auth.getPrincipal() instanceof UserDetailsImpl(User user))) {
             throw new AccessDeniedException("Unauthorized");
         }
 
-        Patient patient = patientRepository.findById(user.getId())
+        Doctor doctor = doctorRepository.findById(user.getId())
                 .orElseThrow(() -> {
-                    log.warn("Пользователь {} не является пациентом", user.getEmail());
-                    return new AccessDeniedException("Пользователь не пациент");
+                    log.warn("Пользователь {} не является врачом", user.getEmail());
+                    return new AccessDeniedException("Пользователь не является врачом");
                 });
 
-        webRequest.setAttribute(RESOLVED_PATIENT_ATTRIBUTE, patient, NativeWebRequest.SCOPE_REQUEST);
-
-
-        return patient;
+        webRequest.setAttribute(RESOLVED_DOCTOR_ATTRIBUTE, doctor, NativeWebRequest.SCOPE_REQUEST);
+        return doctor;
     }
 }

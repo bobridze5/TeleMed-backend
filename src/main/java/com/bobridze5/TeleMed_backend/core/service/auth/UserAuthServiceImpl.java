@@ -1,15 +1,18 @@
 package com.bobridze5.TeleMed_backend.core.service.auth;
 
 import com.bobridze5.TeleMed_backend.api.dto.auth.LoginUserRequest;
-import com.bobridze5.TeleMed_backend.api.dto.auth.RegisterUserRequest;
 import com.bobridze5.TeleMed_backend.api.dto.auth.RegisterResponse;
+import com.bobridze5.TeleMed_backend.api.dto.auth.RegisterUserRequest;
 import com.bobridze5.TeleMed_backend.api.dto.tokens.RefreshTokenRequest;
 import com.bobridze5.TeleMed_backend.api.dto.tokens.TokenResponse;
 import com.bobridze5.TeleMed_backend.api.mappers.UserAuthMapper;
 import com.bobridze5.TeleMed_backend.core.entity.auth.User;
 import com.bobridze5.TeleMed_backend.core.entity.auth.UserStatus;
 import com.bobridze5.TeleMed_backend.core.entity.auth.VerificationToken;
-import com.bobridze5.TeleMed_backend.core.exceptions.*;
+import com.bobridze5.TeleMed_backend.core.exceptions.EntityAlreadyExistsException;
+import com.bobridze5.TeleMed_backend.core.exceptions.EntityNotFoundException;
+import com.bobridze5.TeleMed_backend.core.exceptions.InvalidTokenException;
+import com.bobridze5.TeleMed_backend.core.exceptions.PasswordsDoNotMatchException;
 import com.bobridze5.TeleMed_backend.core.jwt.JwtService;
 import com.bobridze5.TeleMed_backend.core.repository.UserRepository;
 import io.jsonwebtoken.Claims;
@@ -36,7 +39,7 @@ public class UserAuthServiceImpl implements UserAuthService {
     @Override
     @Transactional
     public RegisterResponse register(RegisterUserRequest request, String url) {
-        log.info("Начало регистрации: email = {}, role = {}", request.email(), request.role());
+        log.info("Начало регистрации: email = {}", request.email());
 
         if (!request.password1().equals(request.password2())) {
             log.warn("Ошибка регистрации: пароли не совпали для email = {}", request.email());
@@ -72,9 +75,20 @@ public class UserAuthServiceImpl implements UserAuthService {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-        // TODO: add Exception
         if (user.getStatus() == UserStatus.PENDING) {
-            throw new AccessDeniedException("Need to confirm registration");
+            throw new AccessDeniedException("Необходимо подтвердить email");
+        }
+
+        if (user.getStatus() == UserStatus.AWAITING_APPROVAL) {
+            throw new AccessDeniedException("Ваша заявка находится на проверке у администратора");
+        }
+
+        if (user.getStatus() == UserStatus.INACTIVE) {
+            throw new AccessDeniedException("Ваша заявка отклонена. Свяжитесь с поддержкой");
+        }
+
+        if (user.getStatus() == UserStatus.BANNED) {
+            throw new AccessDeniedException("Аккаунт заблокирован");
         }
 
         if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
