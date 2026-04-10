@@ -1,8 +1,8 @@
 package com.bobridze5.TeleMed_backend.core.service.appointment;
 
 import com.bobridze5.TeleMed_backend.api.dto.appointment.AppointmentRequest;
-import com.bobridze5.TeleMed_backend.core.entity.Appointment;
-import com.bobridze5.TeleMed_backend.core.entity.AppointmentStatus;
+import com.bobridze5.TeleMed_backend.core.entity.medical.Appointment;
+import com.bobridze5.TeleMed_backend.core.entity.medical.AppointmentStatus;
 import com.bobridze5.TeleMed_backend.core.entity.auth.User;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Doctor;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;

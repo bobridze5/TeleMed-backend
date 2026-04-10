@@ -5,12 +5,13 @@ import com.bobridze5.TeleMed_backend.api.dto.appointment.AppointmentRequest;
 import com.bobridze5.TeleMed_backend.api.dto.appointment.AppointmentResponse;
 import com.bobridze5.TeleMed_backend.api.dto.appointment.AppointmentUpdateRequest;
 import com.bobridze5.TeleMed_backend.api.mappers.AppointmentMapper;
-import com.bobridze5.TeleMed_backend.core.entity.Appointment;
-import com.bobridze5.TeleMed_backend.core.entity.AppointmentStatus;
+import com.bobridze5.TeleMed_backend.core.entity.medical.Appointment;
+import com.bobridze5.TeleMed_backend.core.entity.medical.AppointmentStatus;
 import com.bobridze5.TeleMed_backend.core.entity.auth.User;
 import com.bobridze5.TeleMed_backend.core.exceptions.EntityNotFoundException;
 import com.bobridze5.TeleMed_backend.core.repository.AppointmentRepository;
 import com.bobridze5.TeleMed_backend.core.repository.UserRepository;
+import com.bobridze5.TeleMed_backend.core.service.schedule.DoctorScheduleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -29,6 +30,7 @@ public class AppointmentService {
     private final UserRepository userRepository;
     private final AppointmentRepository appointmentRepository;
     private final AppointmentMapper mapper;
+    private final DoctorScheduleService scheduleService;
 
     public AppointmentResponse getAppointmentById(Long appointmentId, Long userId) {
         Appointment appointment = appointmentRepository.findByIdAndUserId(appointmentId, userId)
@@ -67,9 +69,11 @@ public class AppointmentService {
         User target = userRepository.findById(request.targetId())
                 .orElseThrow(() -> new EntityNotFoundException("Пользователь-цель не найден"));
 
-        // TODO: Проверка времени (свободный слот)
         AppointmentCreationStrategy strategy = appointmentStrategyFactory.getStrategy(initiator);
         Appointment appointment = strategy.create(initiator, target, request);
+
+        scheduleService.validateSlot(appointment.getDoctor().getId(), request.dateTime());
+
         Appointment savedAppointment = appointmentRepository.save(appointment);
 
         log.info("Создана новая запись ID: {} от пользователя ID: {} к пользователю ID: {}",

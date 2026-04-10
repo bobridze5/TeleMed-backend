@@ -1,7 +1,7 @@
 package com.bobridze5.TeleMed_backend.core.service.notification;
 
-import com.bobridze5.TeleMed_backend.core.entity.Appointment;
-import com.bobridze5.TeleMed_backend.core.entity.AppointmentStatus;
+import com.bobridze5.TeleMed_backend.core.entity.medical.Appointment;
+import com.bobridze5.TeleMed_backend.core.entity.medical.AppointmentStatus;
 import com.bobridze5.TeleMed_backend.core.repository.AppointmentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

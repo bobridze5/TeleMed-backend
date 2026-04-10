@@ -1,6 +1,6 @@
 package com.bobridze5.TeleMed_backend.core.service.notification;
 
-import com.bobridze5.TeleMed_backend.core.entity.Appointment;
+import com.bobridze5.TeleMed_backend.core.entity.medical.Appointment;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Doctor;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
 import lombok.RequiredArgsConstructor;

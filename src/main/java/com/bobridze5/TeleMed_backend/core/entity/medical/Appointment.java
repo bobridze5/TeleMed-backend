@@ -1,7 +1,5 @@
-package com.bobridze5.TeleMed_backend.core.entity;
+package com.bobridze5.TeleMed_backend.core.entity.medical;
 
-import com.bobridze5.TeleMed_backend.core.entity.medical.Doctor;
-import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;

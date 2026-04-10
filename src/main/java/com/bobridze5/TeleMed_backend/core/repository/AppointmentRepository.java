@@ -1,7 +1,7 @@
 package com.bobridze5.TeleMed_backend.core.repository;
 
-import com.bobridze5.TeleMed_backend.core.entity.Appointment;
-import com.bobridze5.TeleMed_backend.core.entity.AppointmentStatus;
+import com.bobridze5.TeleMed_backend.core.entity.medical.Appointment;
+import com.bobridze5.TeleMed_backend.core.entity.medical.AppointmentStatus;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -47,4 +47,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             @Param("endTime") LocalDateTime endTime,
             @Param("statuses") Collection<AppointmentStatus> statuses
     );
+
+    boolean existsByDoctorIdAndDateTimeAndStatusNot(Long doctorId, LocalDateTime dateTime, AppointmentStatus status);
 }

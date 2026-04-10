@@ -1,4 +1,4 @@
-package com.bobridze5.TeleMed_backend.core.entity;
+package com.bobridze5.TeleMed_backend.core.entity.medical;
 
 public enum AppointmentStatus {
     CREATED,

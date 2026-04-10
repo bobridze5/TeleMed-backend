@@ -39,6 +39,8 @@ public final class API {
     public static final String DOCTOR_ME = DOCTORS + "/me";
     public static final String DOCTOR_ME_PROFILE = DOCTOR_ME + "/profile";
     public static final String DOCTOR_ME_PATIENTS = DOCTOR_ME + "/patients";
+    public static final String DOCTOR_ME_SCHEDULE = DOCTOR_ME + "/schedule";
+    public static final String DOCTOR_ME_APPOINTMENTS = DOCTOR_ME + "/appointments";
     public static final String PATIENT_PARAMS_WEIGHT = PATIENT_ID + "/weight";
     public static final String PATIENT_PARAMS_BLOOD_PRESSURE = PATIENT_ID + "/blood-pressure";
     public static final String PATIENT_PARAMS_SYMPTOM = PATIENT_ID + "/symptom";
