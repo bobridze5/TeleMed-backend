@@ -10,7 +10,7 @@ public class UserMapper {
         if (request.getFirstName() != null) user.setFirstName(request.getFirstName());
         if (request.getLastName() != null) user.setLastName(request.getLastName());
         if (request.getMiddleName() != null) user.setMiddleName(request.getMiddleName());
-        if (request.getGender() != null) user.setGender(request.getGender());
+        if (request.getGender() != null) user.setGender(request.getGender().charAt(0));
         if (request.getDateBirth() != null) user.setDateOfBirth(request.getDateBirth());
         if (request.getEmail() != null) user.setEmail(request.getEmail());
     }

@@ -32,6 +32,7 @@ public final class API {
     public static final String PATIENT_ME_TEST = PATIENT_ME + "/test";
     public static final String PATIENT_ME_MEDICAL_CARD = PATIENT_ME + "/card";
     public static final String PATIENT_ME_APPOINTMENTS = PATIENT_ME + "/appointments";
+    public static final String PATIENT_ME_REPORT = PATIENT_ME + "/report";
 
 
     // Doctor

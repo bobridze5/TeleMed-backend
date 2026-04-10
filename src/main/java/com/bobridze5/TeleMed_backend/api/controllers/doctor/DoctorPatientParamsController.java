@@ -16,13 +16,21 @@ import com.bobridze5.TeleMed_backend.core.entity.medical.Doctor;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
 import com.bobridze5.TeleMed_backend.core.service.doctor.DoctorPatientAccessService;
 import com.bobridze5.TeleMed_backend.core.service.params.*;
+import com.bobridze5.TeleMed_backend.core.service.report.PatientReportService;
+import com.bobridze5.TeleMed_backend.core.service.report.ReportType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping(API.PATIENT_ID)
@@ -35,6 +43,7 @@ public class DoctorPatientParamsController {
     private final GlycemiaService glycemiaService;
     private final SymptomServicePatient symptomService;
     private final PhysicalActivityService physicalActivityService;
+    private final PatientReportService reportService;
 
     @GetMapping("/weights")
     @Operation(summary = "Вес пациента — список")
@@ -144,5 +153,23 @@ public class DoctorPatientParamsController {
     ) {
         Patient patient = accessService.getPatientForDoctor(doctor, patientId);
         return physicalActivityService.getRecordById(patient, id);
+    }
+
+    @GetMapping(value = "/report", produces = MediaType.APPLICATION_PDF_VALUE)
+    @Operation(summary = "PDF-отчёт пациента", description = "type: GENERAL | WEIGHT | GLYCEMIA | BLOOD_PRESSURE")
+    public ResponseEntity<byte[]> getPatientReport(
+            @CurrentDoctor Doctor doctor,
+            @PathVariable Long patientId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+            @RequestParam(defaultValue = "GENERAL") ReportType type
+    ) {
+        Patient patient = accessService.getPatientForDoctor(doctor, patientId);
+        byte[] pdf = reportService.generateReport(patient, from, to, type);
+        String filename = "report_" + type.name().toLowerCase() + "_patient_" + patientId + "_" + from + "_" + to + ".pdf";
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdf);
     }
 }

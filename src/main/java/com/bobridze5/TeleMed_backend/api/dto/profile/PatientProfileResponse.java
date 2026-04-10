@@ -10,7 +10,7 @@ public record PatientProfileResponse(
         String lastName,
         String middleName,
         LocalDate dateBirth,
-        Character gender,
+        String gender,
         String email,
         DiabetesType diabetesType,
         LocalDate diagnosisDate,

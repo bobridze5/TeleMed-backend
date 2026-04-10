@@ -14,7 +14,7 @@ public class PatientProfileMapper {
                 patient.getLastName(),
                 patient.getMiddleName(),
                 patient.getDateOfBirth(),
-                patient.getGender(),
+                patient.getGender() != null ? String.valueOf(patient.getGender()) : null,
                 patient.getEmail(),
                 patient.getDiabetesType(),
                 patient.getDiagnosisDate(),

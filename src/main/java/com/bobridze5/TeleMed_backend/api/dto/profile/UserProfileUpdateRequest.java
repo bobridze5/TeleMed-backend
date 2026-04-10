@@ -27,7 +27,7 @@ public abstract class UserProfileUpdateRequest {
     private LocalDate dateBirth;
 
     @Pattern(regexp = "[MF]", message = "Допустимые значения: M, F")
-    private Character gender;
+    private String gender;
 
     @Email(message = "Невалидный email")
     private String email;

@@ -11,11 +11,16 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface SymptomRepository extends JpaRepository<Symptom, Long>, JpaSpecificationExecutor<Symptom> {
     Optional<Symptom> findByIdAndPatientId(Long id, Long patientId);
+
+    List<Symptom> findByPatientIdAndCreatedAtBetweenOrderByCreatedAtAsc(
+            Long patientId, LocalDateTime start, LocalDateTime end
+    );
 
 
     @Query("SELECT s FROM Symptom s WHERE s.patient.id = :patientId " +

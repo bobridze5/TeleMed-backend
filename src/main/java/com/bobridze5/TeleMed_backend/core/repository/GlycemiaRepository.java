@@ -10,11 +10,16 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface GlycemiaRepository extends JpaRepository<Glycemia, Long> {
     Optional<Glycemia> findByIdAndPatientId(Long id, Long patientId);
+
+    List<Glycemia> findByPatientIdAndCreatedAtBetweenOrderByCreatedAtAsc(
+            Long patientId, LocalDateTime start, LocalDateTime end
+    );
 
     @Query("SELECT g FROM Glycemia g WHERE g.patient.id = :patientId " +
             "AND (:type IS NULL OR g.type = :type) " +

@@ -46,6 +46,9 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-redis:3.5.7")
 	implementation("org.springframework.boot:spring-boot-starter-mail:3.5.7")
 	implementation("org.springframework.retry:spring-retry:2.0.12")
+
+	implementation("com.github.librepdf:openpdf:1.3.30")
+	implementation("org.jfree:jfreechart:1.5.4")
 }
 
 tasks.withType<Test> {
