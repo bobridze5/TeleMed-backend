@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserAuthServiceImpl implements UserAuthService {
+public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtService jwtService;
@@ -35,40 +35,6 @@ public class UserAuthServiceImpl implements UserAuthService {
     private final VerificationTokenService verificationTokenService;
     private final EmailService emailService;
     private final UserAuthMapper userAuthMapper;
-
-    @Override
-    @Transactional
-    public RegisterResponse register(RegisterUserRequest request, String url) {
-        log.info("Начало регистрации: email = {}", request.email());
-
-        if (!request.password1().equals(request.password2())) {
-            log.warn("Ошибка регистрации: пароли не совпали для email = {}", request.email());
-            throw new PasswordsDoNotMatchException();
-        }
-
-        if (userRepository.existsByEmail(request.email())) {
-            log.warn("Ошибка регистрации: email = {} уже существует", request.email());
-            throw new EntityAlreadyExistsException("User with email = " + request.email() + " already exists");
-        }
-
-        User user = userRepository.save(userAuthMapper.mapToEntity(request));
-
-        // TODO: изменить логику:
-        // Перенести в сервис регистраций
-        // Создать регистрацию для разных ролей (пациент / доктор / админ)
-        // Создать общий метод для регистрации с передачей роли
-        // Прописать в SecurityConfig пути и доступ
-//        Optional.ofNullable(profileMap.get(request.role()))
-//                .orElseThrow(() -> new IllegalArgumentException("Роли не существует"))
-//                .createProfile(user);
-
-
-        var verificationToken = verificationTokenService.createToken(user);
-        emailService.sendVerificationToken(user.getEmail(), url, verificationToken.getToken());
-
-        log.info("Пользователь с id = {} зарегистрирован", user.getId());
-        return new RegisterResponse(user.getId());
-    }
 
     @Transactional
     public TokenResponse login(LoginUserRequest request) {
@@ -163,7 +129,7 @@ public class UserAuthServiceImpl implements UserAuthService {
         // TODO: URL
         verificationTokenService.deleteToken(token);
 
-        return "http://localhost:8080/api/v1/users/auth/login";
+        return "http://localhost:8080/api/v1/auth/login";
     }
 
 }

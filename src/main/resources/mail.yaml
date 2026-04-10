@@ -7,6 +7,11 @@ mail:
     reminder:
       subject: "Напоминание о приёме у врача"
       body: "Напоминаем вам о приёме у врача %s %s"
+  password:
+    reset:
+      subject: "Сброс пароля"
+      message: "Перейдите по ссылке, чтобы сбросить пароль: %s\n\nЕсли Вы не запрашивали сброс пароля, то проигнорируйте это письмо."
+      template: "%s/reset-password?token=%s"
   doctor:
     application:
       subject: "Заявка на регистрацию получена"

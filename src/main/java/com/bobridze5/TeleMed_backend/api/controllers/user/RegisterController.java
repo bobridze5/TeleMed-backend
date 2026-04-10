@@ -46,7 +46,7 @@ public class RegisterController {
             HttpServletRequest servletRequest
     ) {
 
-        URI authBase = urlBuilder.buildAbsoluteUrl(servletRequest, API.AUTH_OLD);
+        URI authBase = urlBuilder.buildAbsoluteUrl(servletRequest, API.AUTH);
         RegisterResponse response = registerService.register(request, authBase.toString());
         return ResponseEntity.created(authBase).body(response); // TODO: временно authBase
     }

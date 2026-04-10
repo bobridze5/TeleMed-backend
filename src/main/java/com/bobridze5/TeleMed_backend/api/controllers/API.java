@@ -9,7 +9,6 @@ public final class API {
 
 
     public static final String USERS = V1 + "/users";
-    public static final String AUTH_OLD = V1 + "/users/auth"; // TODO: переделать
     public static final String CITY = V1 + "/city";
     public static final String DISH = V1 + "/dishes";
 

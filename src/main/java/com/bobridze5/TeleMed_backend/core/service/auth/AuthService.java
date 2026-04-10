@@ -6,9 +6,7 @@ import com.bobridze5.TeleMed_backend.api.dto.auth.RegisterUserRequest;
 import com.bobridze5.TeleMed_backend.api.dto.tokens.RefreshTokenRequest;
 import com.bobridze5.TeleMed_backend.api.dto.tokens.TokenResponse;
 
-public interface UserAuthService {
-    RegisterResponse register(RegisterUserRequest request, String url);
-
+public interface AuthService {
     TokenResponse login(LoginUserRequest request);
 
     TokenResponse refresh(RefreshTokenRequest request);
