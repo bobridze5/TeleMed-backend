@@ -41,11 +41,11 @@ public final class API {
     public static final String DOCTOR_ME_PATIENTS = DOCTOR_ME + "/patients";
     public static final String DOCTOR_ME_SCHEDULE = DOCTOR_ME + "/schedule";
     public static final String DOCTOR_ME_APPOINTMENTS = DOCTOR_ME + "/appointments";
-    public static final String PATIENT_PARAMS_WEIGHT = PATIENT_ID + "/weight";
-    public static final String PATIENT_PARAMS_BLOOD_PRESSURE = PATIENT_ID + "/blood-pressure";
-    public static final String PATIENT_PARAMS_SYMPTOM = PATIENT_ID + "/symptom";
-    public static final String PATIENT_PARAMS_PHYSICAL_ACTIVITY = PATIENT_ID + "/physical-activity";
-    public static final String PATIENT_PARAMS_GLYCEMIA_RECORD = PATIENT_ID + "/glycemia";
+    public static final String PATIENT_PARAMS_WEIGHT = PATIENT_ID + "/weights";
+    public static final String PATIENT_PARAMS_BLOOD_PRESSURE = PATIENT_ID + "/blood-pressures";
+    public static final String PATIENT_PARAMS_SYMPTOM = PATIENT_ID + "/symptoms";
+    public static final String PATIENT_PARAMS_PHYSICAL_ACTIVITY = PATIENT_ID + "/physical-activities";
+    public static final String PATIENT_PARAMS_GLYCEMIA = PATIENT_ID + "/glycemia";
 //    public static final String PATIENT
 
     private API() {
