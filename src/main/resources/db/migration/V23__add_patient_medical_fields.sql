@@ -1,0 +1,2 @@
+-- MERGED INTO V5__create_patients_table.sql
+-- This migration was neutralized: its changes have been moved into V5__create_patients_table.sql

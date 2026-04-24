@@ -1,0 +1,2 @@
+-- MERGED INTO V26__create_medical_event_table.sql
+-- This migration was neutralized: its changes have been moved into V26__create_medical_event_table.sql

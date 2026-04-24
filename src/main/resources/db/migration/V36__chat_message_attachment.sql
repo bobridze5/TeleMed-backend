@@ -1,0 +1,2 @@
+-- MERGED INTO V27__create_chat_tables.sql
+-- This migration was neutralized: chat_messages changes were merged into V27__create_chat_tables.sql
