@@ -33,6 +33,7 @@ public class DishMapperImpl implements DishMapper {
         if (request.calories() != null) dish.setCalories(request.calories());
         if (request.fats() != null) dish.setFats(request.fats());
         if (request.carbs() != null) dish.setCarbs(request.carbs());
+        if (request.protein() != null) dish.setProtein(request.protein());
         if (request.description() != null) dish.setDescription(request.description());
         if (request.photoURL() != null) dish.setPhotoURL(request.photoURL());
     }

@@ -64,20 +64,16 @@ public class AuthController {
     }
 
     @GetMapping("/registrationConfirm")
-    @Operation(summary = "Подтверждение email", description = "Верификация адреса электронной почты по одноразовому токену из письма. Перенаправляет на страницу входа.")
+    @Operation(summary = "Подтверждение email", description = "Верификация адреса электронной почты по одноразовому токену из письма.")
     @ApiResponses({
-            @ApiResponse(responseCode = "302", description = "Email подтверждён, редирект на страницу входа"),
+            @ApiResponse(responseCode = "204", description = "Email подтверждён"),
             @ApiResponse(responseCode = "400", description = "Токен недействителен или истёк")
     })
-    public ResponseEntity<Void> confirmEmail(
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void confirmEmail(
             @RequestParam("token") String token
     ) {
-        String url = authService.confirmEmail(token);
-
-        return ResponseEntity
-                .status(302)
-                .header("Location", url)
-                .build();
+        authService.confirmEmail(token);
     }
 
     @PostMapping("/forgot-password")

@@ -1,6 +1,11 @@
 package com.bobridze5.TeleMed_backend.api.controllers.doctor;
 
 import com.bobridze5.TeleMed_backend.api.controllers.API;
+import com.bobridze5.TeleMed_backend.api.dto.meal.MealFilterRequest;
+import com.bobridze5.TeleMed_backend.api.dto.meal.MealResponse;
+import com.bobridze5.TeleMed_backend.api.dto.medcard.AllergyResponse;
+import com.bobridze5.TeleMed_backend.api.dto.medcard.MedicalEventResponse;
+import com.bobridze5.TeleMed_backend.api.dto.medcard.MedicationResponse;
 import com.bobridze5.TeleMed_backend.api.dto.params.blood_pressure.BloodPressureFilterRequest;
 import com.bobridze5.TeleMed_backend.api.dto.params.blood_pressure.BloodPressureResponse;
 import com.bobridze5.TeleMed_backend.api.dto.params.glycemia.GlycemiaFilterRequest;
@@ -11,11 +16,17 @@ import com.bobridze5.TeleMed_backend.api.dto.params.symptom.SymptomFilterRequest
 import com.bobridze5.TeleMed_backend.api.dto.params.symptom.SymptomResponse;
 import com.bobridze5.TeleMed_backend.api.dto.params.weight.WeightFilterRequest;
 import com.bobridze5.TeleMed_backend.api.dto.params.weight.WeightResponse;
+import com.bobridze5.TeleMed_backend.api.dto.profile.PatientProfileResponse;
 import com.bobridze5.TeleMed_backend.core.annotations.CurrentDoctor;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Doctor;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
 import com.bobridze5.TeleMed_backend.core.service.doctor.DoctorPatientAccessService;
+import com.bobridze5.TeleMed_backend.core.service.meal.MealService;
+import com.bobridze5.TeleMed_backend.core.service.medcard.AllergyService;
+import com.bobridze5.TeleMed_backend.core.service.medcard.MedicalEventService;
+import com.bobridze5.TeleMed_backend.core.service.medcard.MedicationService;
 import com.bobridze5.TeleMed_backend.core.service.params.*;
+import com.bobridze5.TeleMed_backend.core.service.profile.PatientProfileService;
 import com.bobridze5.TeleMed_backend.core.service.report.PatientReportService;
 import com.bobridze5.TeleMed_backend.core.service.report.ReportType;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,6 +35,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -44,6 +56,11 @@ public class DoctorPatientParamsController {
     private final SymptomServicePatient symptomService;
     private final PhysicalActivityService physicalActivityService;
     private final PatientReportService reportService;
+    private final MealService mealService;
+    private final PatientProfileService patientProfileService;
+    private final AllergyService allergyService;
+    private final MedicationService medicationService;
+    private final MedicalEventService medicalEventService;
 
     @GetMapping("/weights")
     @Operation(summary = "Вес пациента — список")
@@ -153,6 +170,75 @@ public class DoctorPatientParamsController {
     ) {
         Patient patient = accessService.getPatientForDoctor(doctor, patientId);
         return physicalActivityService.getRecordById(patient, id);
+    }
+
+    @GetMapping("/profile")
+    @Operation(summary = "Профиль пациента")
+    public PatientProfileResponse getProfile(
+            @CurrentDoctor Doctor doctor,
+            @PathVariable Long patientId
+    ) {
+        Patient patient = accessService.getPatientForDoctor(doctor, patientId);
+        return patientProfileService.getProfile(patient);
+    }
+
+    @GetMapping("/meals")
+    @Operation(summary = "Приёмы пищи пациента — список")
+    public Page<MealResponse> getMeals(
+            @CurrentDoctor Doctor doctor,
+            @PathVariable Long patientId,
+            @ParameterObject @ModelAttribute MealFilterRequest filter,
+            Pageable pageable
+    ) {
+        Patient patient = accessService.getPatientForDoctor(doctor, patientId);
+        return mealService.getMeals(patient, filter, pageable);
+    }
+
+    @GetMapping("/meals/{mealId}")
+    @Operation(summary = "Приём пищи пациента — по ID")
+    public MealResponse getMealById(
+            @CurrentDoctor Doctor doctor,
+            @PathVariable Long patientId,
+            @PathVariable Long mealId
+    ) {
+        Patient patient = accessService.getPatientForDoctor(doctor, patientId);
+        return mealService.getMealById(patient, mealId);
+    }
+
+    @GetMapping("/allergies")
+    @Operation(summary = "Аллергии пациента — список")
+    public Page<AllergyResponse> getAllergies(
+            @CurrentDoctor Doctor doctor,
+            @PathVariable Long patientId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size
+    ) {
+        Patient patient = accessService.getPatientForDoctor(doctor, patientId);
+        return allergyService.getAll(patient, page, size);
+    }
+
+    @GetMapping("/medications")
+    @Operation(summary = "Препараты пациента — список")
+    public Page<MedicationResponse> getMedications(
+            @CurrentDoctor Doctor doctor,
+            @PathVariable Long patientId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size
+    ) {
+        Patient patient = accessService.getPatientForDoctor(doctor, patientId);
+        return medicationService.getAll(patient, page, size);
+    }
+
+    @GetMapping("/medical-events")
+    @Operation(summary = "История болезней пациента — список")
+    public Page<MedicalEventResponse> getMedicalEvents(
+            @CurrentDoctor Doctor doctor,
+            @PathVariable Long patientId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size
+    ) {
+        Patient patient = accessService.getPatientForDoctor(doctor, patientId);
+        return medicalEventService.getAll(patient, page, size);
     }
 
     @GetMapping(value = "/report", produces = MediaType.APPLICATION_PDF_VALUE)

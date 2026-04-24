@@ -3,6 +3,7 @@ package com.bobridze5.TeleMed_backend.core.security;
 import com.bobridze5.TeleMed_backend.core.entity.auth.User;
 import com.bobridze5.TeleMed_backend.core.entity.auth.UserStatus;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
@@ -11,7 +12,7 @@ import java.util.List;
 public record UserDetailsImpl(User user) implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
     }
 
     public User getUser() {

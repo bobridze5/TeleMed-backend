@@ -4,6 +4,7 @@ import com.bobridze5.TeleMed_backend.api.dto.doctor.DoctorPatientResponse;
 import com.bobridze5.TeleMed_backend.api.dto.doctor.DoctorProfileUpdateRequest;
 import com.bobridze5.TeleMed_backend.api.dto.doctor.DoctorResponse;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Doctor;
+import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
 import com.bobridze5.TeleMed_backend.core.entity.medical.PatientDoctorAssignment;
 import org.springframework.stereotype.Component;
 
@@ -42,6 +43,18 @@ public class DoctorProfileMapper {
                 patient.getDiabetesType(),
                 patient.getDiagnosisDate(),
                 assignment.getAssignedAt()
+        );
+    }
+
+    public DoctorPatientResponse mapPatientToResponse(Patient patient) {
+        return new DoctorPatientResponse(
+                patient.getId(),
+                patient.getFirstName(),
+                patient.getLastName(),
+                patient.getMiddleName(),
+                patient.getDiabetesType(),
+                patient.getDiagnosisDate(),
+                null
         );
     }
 

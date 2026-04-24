@@ -6,8 +6,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 
 public record SymptomFilterRequest(
-        int page,
-        int size,
+        Integer page,
+        Integer size,
 
         SymptomSeverity severity,
 

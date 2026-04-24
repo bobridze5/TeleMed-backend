@@ -7,22 +7,37 @@ import com.bobridze5.TeleMed_backend.core.entity.medical.Appointment;
 import com.bobridze5.TeleMed_backend.core.entity.medical.AppointmentStatus;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Doctor;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
+import com.bobridze5.TeleMed_backend.core.entity.auth.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 @RequiredArgsConstructor
 public final class AppointmentMapper {
+
+    private String buildName(User user) {
+        if (user == null) return null;
+        return Stream.of(user.getLastName(), user.getFirstName(), user.getMiddleName())
+                .filter(s -> s != null && !s.isBlank())
+                .collect(Collectors.joining(" "));
+    }
+
     public AppointmentResponse mapToResponse(Appointment appointment) {
         return new AppointmentResponse(
                 appointment.getId(),
                 appointment.getPatient().getId(),
                 appointment.getDoctor().getId(),
+                buildName(appointment.getPatient()),
+                buildName(appointment.getDoctor()),
                 appointment.getDateTime(),
                 appointment.getConsultationType(),
                 appointment.getStatus(),
                 appointment.getMeetingLink(),
                 appointment.getReason(),
+                appointment.getConfirmedBy(),
                 appointment.getUpdatedAt()
         );
     }

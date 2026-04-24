@@ -8,6 +8,7 @@ import com.bobridze5.TeleMed_backend.api.mappers.doctor.DoctorProfileMapper;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Doctor;
 import com.bobridze5.TeleMed_backend.core.repository.DoctorRepository;
 import com.bobridze5.TeleMed_backend.core.repository.PatientDoctorAssignmentRepository;
+import com.bobridze5.TeleMed_backend.core.repository.PatientRepository;
 import com.bobridze5.TeleMed_backend.core.service.auth.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class DoctorServiceImpl implements DoctorService {
     private final DoctorRepository doctorRepository;
     private final PatientDoctorAssignmentRepository assignmentRepository;
+    private final PatientRepository patientRepository;
     private final DoctorProfileMapper doctorProfileMapper;
     private final UserService userService;
 
@@ -63,5 +65,12 @@ public class DoctorServiceImpl implements DoctorService {
         return assignmentRepository
                 .findActiveByDoctorId(doctor.getId(), pageable)
                 .map(doctorProfileMapper::mapToPatientResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<DoctorPatientResponse> getAllPatients(Pageable pageable) {
+        return patientRepository.findAll(pageable)
+                .map(doctorProfileMapper::mapPatientToResponse);
     }
 }

@@ -14,4 +14,5 @@ public interface DoctorService {
     DoctorResponse getMyProfile(Doctor doctor);
     DoctorResponse updateMyProfile(Doctor doctor, DoctorProfileUpdateRequest request);
     Page<DoctorPatientResponse> getMyPatients(Doctor doctor, Pageable pageable);
+    Page<DoctorPatientResponse> getAllPatients(Pageable pageable);
 }

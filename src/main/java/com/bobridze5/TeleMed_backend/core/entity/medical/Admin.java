@@ -21,4 +21,8 @@ import lombok.experimental.SuperBuilder;
 @PrimaryKeyJoinColumn(name = "admin_id")
 @EqualsAndHashCode(callSuper = true)
 public class Admin extends User {
+    @Override
+    public String getRole() {
+        return "ADMIN";
+    }
 }

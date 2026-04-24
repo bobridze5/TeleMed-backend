@@ -13,5 +13,5 @@ public interface AuthService {
 
     void logout(String accessToken);
 
-    String confirmEmail(String token);
+    void confirmEmail(String token);
 }

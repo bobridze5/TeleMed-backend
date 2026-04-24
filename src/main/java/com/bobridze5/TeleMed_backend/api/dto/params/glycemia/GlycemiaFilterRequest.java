@@ -6,8 +6,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 
 public record GlycemiaFilterRequest(
-        int page,
-        int size,
+        Integer page,
+        Integer size,
 
         GlycemiaType type,
 

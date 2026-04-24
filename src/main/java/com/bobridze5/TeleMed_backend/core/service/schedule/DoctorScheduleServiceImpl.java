@@ -1,11 +1,14 @@
 package com.bobridze5.TeleMed_backend.core.service.schedule;
 
+import com.bobridze5.TeleMed_backend.api.dto.schedule.AvailableSlotDto;
 import com.bobridze5.TeleMed_backend.api.dto.schedule.DoctorScheduleRequest;
 import com.bobridze5.TeleMed_backend.api.dto.schedule.DoctorScheduleResponse;
 import com.bobridze5.TeleMed_backend.api.mappers.DoctorScheduleMapper;
 import com.bobridze5.TeleMed_backend.core.entity.medical.AppointmentStatus;
+import com.bobridze5.TeleMed_backend.core.entity.medical.ConsultationType;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Doctor;
 import com.bobridze5.TeleMed_backend.core.entity.medical.DoctorSchedule;
+import com.bobridze5.TeleMed_backend.core.entity.medical.ScheduleSlot;
 import com.bobridze5.TeleMed_backend.core.exceptions.EntityNotFoundException;
 import com.bobridze5.TeleMed_backend.core.exceptions.InvalidSlotException;
 import com.bobridze5.TeleMed_backend.core.repository.AppointmentRepository;
@@ -20,6 +23,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Slf4j
@@ -62,7 +66,7 @@ public class DoctorScheduleServiceImpl implements DoctorScheduleService {
     }
 
     @Override
-    public List<LocalDateTime> getAvailableSlots(Long doctorId, LocalDate date) {
+    public List<AvailableSlotDto> getAvailableSlots(Long doctorId, LocalDate date) {
         return scheduleRepository
                 .findByDoctorIdAndDayOfWeek(doctorId, date.getDayOfWeek())
                 .map(schedule -> filterAvailableSlots(doctorId, date, schedule))
@@ -70,12 +74,14 @@ public class DoctorScheduleServiceImpl implements DoctorScheduleService {
     }
 
     @Override
-    public void validateSlot(Long doctorId, LocalDateTime dateTime) {
+    public void validateSlot(Long doctorId, LocalDateTime dateTime, ConsultationType consultationType) {
         DoctorSchedule schedule = scheduleRepository
                 .findByDoctorIdAndDayOfWeek(doctorId, dateTime.getDayOfWeek())
                 .orElseThrow(() -> new InvalidSlotException("Врач не ведёт приём в этот день недели"));
 
-        boolean isValidSlot = generateSlots(dateTime.toLocalDate(), schedule).contains(dateTime);
+        boolean isValidSlot = generateSlots(dateTime.toLocalDate(), schedule).stream()
+                .anyMatch(slot -> slot.startDateTime().equals(dateTime)
+                        && slot.consultationType() == consultationType);
         if (!isValidSlot) {
             throw new InvalidSlotException("Выбранное время не соответствует доступным слотам врача");
         }
@@ -86,27 +92,44 @@ public class DoctorScheduleServiceImpl implements DoctorScheduleService {
         }
     }
 
-    private List<LocalDateTime> filterAvailableSlots(Long doctorId, LocalDate date, DoctorSchedule schedule) {
+    private List<AvailableSlotDto> filterAvailableSlots(Long doctorId, LocalDate date, DoctorSchedule schedule) {
         LocalDateTime now = LocalDateTime.now();
         return generateSlots(date, schedule).stream()
-                .filter(slot -> slot.isAfter(now))
+                .filter(slot -> slot.startDateTime().isAfter(now))
                 .filter(slot -> !appointmentRepository.existsByDoctorIdAndDateTimeAndStatusNot(
-                        doctorId, slot, AppointmentStatus.CANCELED))
+                        doctorId, slot.startDateTime(), AppointmentStatus.CANCELED))
                 .toList();
     }
 
-    // Генерирует все слоты для дня по расписанию.
-    // Слот добавляется, если слот + его длительность не выходит за конец рабочего дня.
-    // Пример: 09:00–12:00, 30 мин => [09:00, 09:30, 10:00, 10:30, 11:00, 11:30]
-    private List<LocalDateTime> generateSlots(LocalDate date, DoctorSchedule schedule) {
-        List<LocalDateTime> slots = new ArrayList<>();
+    // Если у расписания есть кастомные слоты — используем их (с их startTime/endTime/типом).
+    // Иначе — генерируем по диапазону startTime–endTime с шагом slotDurationMinutes
+    // (все сгенерированные слоты по умолчанию имеют тип VIDEO).
+    private List<AvailableSlotDto> generateSlots(LocalDate date, DoctorSchedule schedule) {
+        if (schedule.getCustomSlots() != null && !schedule.getCustomSlots().isEmpty()) {
+            return schedule.getCustomSlots().stream()
+                    .sorted(Comparator.comparing(ScheduleSlot::getStartTime)
+                            .thenComparing(ScheduleSlot::getConsultationType))
+                    .map(s -> new AvailableSlotDto(
+                            LocalDateTime.of(date, s.getStartTime()),
+                            LocalDateTime.of(date, s.getEndTime()),
+                            s.getConsultationType()
+                    ))
+                    .toList();
+        }
+
+        List<AvailableSlotDto> slots = new ArrayList<>();
         LocalTime current = schedule.getStartTime();
         LocalTime end = schedule.getEndTime();
         int duration = schedule.getSlotDurationMinutes();
 
         while (!current.plusMinutes(duration).isAfter(end)) {
-            slots.add(LocalDateTime.of(date, current));
-            current = current.plusMinutes(duration);
+            LocalTime slotEnd = current.plusMinutes(duration);
+            slots.add(new AvailableSlotDto(
+                    LocalDateTime.of(date, current),
+                    LocalDateTime.of(date, slotEnd),
+                    ConsultationType.VIDEO
+            ));
+            current = slotEnd;
         }
 
         return slots;

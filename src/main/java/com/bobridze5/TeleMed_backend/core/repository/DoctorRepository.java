@@ -23,4 +23,6 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
     );
 
     Page<Doctor> findByStatus(UserStatus status, Pageable pageable);
+
+    long countByStatus(UserStatus status);
 }

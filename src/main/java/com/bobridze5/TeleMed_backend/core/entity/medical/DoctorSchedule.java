@@ -5,6 +5,8 @@ import lombok.*;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "doctor_schedules",
@@ -37,4 +39,12 @@ public class DoctorSchedule {
 
     @Column(name = "schedule_slot_duration_minutes", nullable = false)
     private int slotDurationMinutes;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "doctor_schedule_slots",
+            joinColumns = @JoinColumn(name = "schedule_id")
+    )
+    @Builder.Default
+    private List<ScheduleSlot> customSlots = new ArrayList<>();
 }

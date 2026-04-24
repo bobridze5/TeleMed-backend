@@ -2,7 +2,7 @@ mail:
   verification:
     subject: "Подтверждение регистрации"
     message: "Перейдите по ссылке ниже, чтобы подтвердить электронную почту: \n%s"
-    template: "%sregistrationConfirm?token=%s"
+    template: "%s/confirm-email?token=%s"
   appointment:
     reminder:
       subject: "Напоминание о приёме у врача"

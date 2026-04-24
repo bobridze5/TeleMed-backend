@@ -7,8 +7,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 
 public record PhysicalActivityFilterRequest(
-        int page,
-        int size,
+        Integer page,
+        Integer size,
 
         PhysicalActivityType activityType,
         PhysicalActivityIntensityType intensityType,

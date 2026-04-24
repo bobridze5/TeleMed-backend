@@ -64,6 +64,8 @@ public abstract class User {
     @Column(name = "user_datetime_updated", nullable = false)
     protected LocalDateTime updatedAt;
 
+    public abstract String getRole();
+
     public String getFullName() {
         StringBuilder name = new StringBuilder();
         if (lastName != null && !lastName.isBlank()) {

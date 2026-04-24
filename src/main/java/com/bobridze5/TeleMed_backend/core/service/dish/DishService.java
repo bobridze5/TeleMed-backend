@@ -6,6 +6,9 @@ import com.bobridze5.TeleMed_backend.api.dto.dish.DishResponse;
 import com.bobridze5.TeleMed_backend.api.dto.dish.UpdateDishRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 public interface DishService {
     DishResponse createDish(CreateDishRequest request, Long userId);
@@ -17,5 +20,9 @@ public interface DishService {
     DishResponse changeDish(UpdateDishRequest request, Long dishId, Long userId);
 
     void deleteDish(Long dishId, Long userId);
+
+    DishResponse uploadImage(Long dishId, Long userId, MultipartFile file) throws IOException;
+
+    byte[] getImage(Long dishId) throws IOException;
 
 }

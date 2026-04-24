@@ -25,7 +25,9 @@ public class WeightServiceImpl implements WeightService {
 
     @Override
     public Page<WeightResponse> getWeightRecords(Patient patient, WeightFilterRequest request) {
-        Pageable pageable = PageRequest.of(request.page(), request.size(), Sort.by("createdAt").descending());
+        int page = request.page() != null ? request.page() : 0;
+        int size = request.size() != null && request.size() > 0 ? request.size() : 20;
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
         Page<Weight> weightPage;
 

@@ -113,11 +113,10 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Transactional
-    public String confirmEmail(String token) {
+    public void confirmEmail(String token) {
         VerificationToken verificationToken = verificationTokenService.getToken(token);
 
         if (!verificationToken.isValid()) {
-            // TODO: TOKEN EXCEPTION
             verificationTokenService.deleteToken(token);
             throw new IllegalArgumentException("Token expired");
         }
@@ -126,10 +125,7 @@ public class AuthServiceImpl implements AuthService {
         user.setStatus(UserStatus.ACTIVE);
         userRepository.save(user);
 
-        // TODO: URL
         verificationTokenService.deleteToken(token);
-
-        return "http://localhost:8080/api/v1/auth/login";
     }
 
 }

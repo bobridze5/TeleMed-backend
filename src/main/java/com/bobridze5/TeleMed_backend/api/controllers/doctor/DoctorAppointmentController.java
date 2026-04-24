@@ -5,6 +5,7 @@ import com.bobridze5.TeleMed_backend.api.dto.appointment.AppointmentFilterReques
 import com.bobridze5.TeleMed_backend.api.dto.appointment.AppointmentRequest;
 import com.bobridze5.TeleMed_backend.api.dto.appointment.AppointmentResponse;
 import com.bobridze5.TeleMed_backend.api.dto.appointment.AppointmentUpdateRequest;
+import com.bobridze5.TeleMed_backend.api.dto.appointment.CancelAppointmentRequest;
 import com.bobridze5.TeleMed_backend.core.annotations.CurrentDoctor;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Doctor;
 import com.bobridze5.TeleMed_backend.core.service.appointment.AppointmentService;
@@ -89,7 +90,7 @@ public class DoctorAppointmentController {
             @PathVariable Long id,
             @CurrentDoctor Doctor doctor
     ) {
-        appointmentService.confirmAppointment(id, doctor.getId());
+        appointmentService.confirmAppointment(id, doctor.getId(), "DOCTOR");
         return appointmentService.getAppointmentById(id, doctor.getId());
     }
 
@@ -97,9 +98,10 @@ public class DoctorAppointmentController {
     @Operation(summary = "Отменить запись", description = "Переводит запись в статус CANCELED")
     public AppointmentResponse cancelAppointment(
             @PathVariable Long id,
+            @RequestBody(required = false) CancelAppointmentRequest request,
             @CurrentDoctor Doctor doctor
     ) {
-        appointmentService.cancelAppointment(id, doctor.getId());
+        appointmentService.cancelAppointment(id, doctor.getId(), request != null ? request.reason() : null);
         return appointmentService.getAppointmentById(id, doctor.getId());
     }
 }

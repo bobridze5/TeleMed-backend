@@ -11,11 +11,15 @@ public final class API {
     public static final String USERS = V1 + "/users";
     public static final String CITY = V1 + "/city";
     public static final String DISH = V1 + "/dishes";
+    public static final String CHATS = V1 + "/chats";
 
     // Admin
     public static final String ADMIN = V1 + "/admin";
     public static final String ADMIN_DOCTORS = ADMIN + "/doctors";
     public static final String ADMIN_DOCTORS_PENDING = ADMIN_DOCTORS + "/pending";
+    public static final String ADMIN_PATIENTS = ADMIN + "/patients";
+    public static final String ADMIN_STATS = ADMIN + "/stats";
+    public static final String ADMIN_USERS = ADMIN + "/users";
 
     public static final String PATIENTS = V1 + "/patients";
     public static final String PATIENT_ID = PATIENTS + "/{patientId}";
@@ -31,8 +35,15 @@ public final class API {
     public static final String PATIENT_ME_PROFILE = PATIENT_ME + "/profile";
     public static final String PATIENT_ME_TEST = PATIENT_ME + "/test";
     public static final String PATIENT_ME_MEDICAL_CARD = PATIENT_ME + "/card";
+    public static final String PATIENT_ME_ALLERGIES = PATIENT_ME + "/allergies";
+    public static final String PATIENT_ME_MEDICATIONS = PATIENT_ME + "/medications";
+    public static final String PATIENT_ME_MEDICAL_EVENTS = PATIENT_ME + "/medical-events";
     public static final String PATIENT_ME_APPOINTMENTS = PATIENT_ME + "/appointments";
     public static final String PATIENT_ME_REPORT = PATIENT_ME + "/report";
+    public static final String PATIENT_ME_MEALS = PATIENT_ME + "/meals";
+    public static final String PATIENT_ME_MEAL_ID = PATIENT_ME_MEALS + "/{mealId}";
+    public static final String PATIENT_ME_MEAL_ITEMS = PATIENT_ME_MEAL_ID + "/items";
+    public static final String PATIENT_ME_MEAL_ITEM_ID = PATIENT_ME_MEAL_ITEMS + "/{itemId}";
 
 
     // Doctor
@@ -47,7 +58,11 @@ public final class API {
     public static final String PATIENT_PARAMS_SYMPTOM = PATIENT_ID + "/symptoms";
     public static final String PATIENT_PARAMS_PHYSICAL_ACTIVITY = PATIENT_ID + "/physical-activities";
     public static final String PATIENT_PARAMS_GLYCEMIA = PATIENT_ID + "/glycemia";
-//    public static final String PATIENT
+    public static final String PATIENT_MEALS = PATIENT_ID + "/meals";
+    public static final String PATIENT_PROFILE = PATIENT_ID + "/profile";
+    public static final String PATIENT_ALLERGIES = PATIENT_ID + "/allergies";
+    public static final String PATIENT_MEDICATIONS = PATIENT_ID + "/medications";
+    public static final String PATIENT_MEDICAL_EVENTS = PATIENT_ID + "/medical-events";
 
     private API() {
     }

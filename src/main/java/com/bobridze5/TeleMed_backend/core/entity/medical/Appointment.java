@@ -45,6 +45,9 @@ public class Appointment {
     @Column(name = "appointment_reason", columnDefinition = "TEXT")
     private String reason;
 
+    @Column(name = "appointment_confirmed_by", length = 16)
+    private String confirmedBy;
+
     @UpdateTimestamp
     @Column(name = "appointment_updated_at", nullable = false)
     private LocalDateTime updatedAt;

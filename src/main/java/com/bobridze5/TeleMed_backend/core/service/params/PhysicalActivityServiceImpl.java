@@ -51,7 +51,9 @@ public class PhysicalActivityServiceImpl implements PhysicalActivityService {
 
     @Override
     public Page<PhysicalActivityResponse> getRecords(Patient patient, PhysicalActivityFilterRequest filter) {
-        Pageable pageable = PageRequest.of(filter.page(), filter.size(), Sort.by("createdAt").descending());
+        int page = filter.page() != null ? filter.page() : 0;
+        int size = filter.size() != null && filter.size() > 0 ? filter.size() : 20;
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
         return physicalActivityRepository.findWithFilter(
                 patient.getId(),

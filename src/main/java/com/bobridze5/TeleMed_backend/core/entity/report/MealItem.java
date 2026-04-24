@@ -2,11 +2,19 @@ package com.bobridze5.TeleMed_backend.core.entity.report;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.PositiveOrZero;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Check;
 
 @Entity
 @Table(name = "meal_item")
 @Check(constraints = "meal_item_portion_grams >= 0")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class MealItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

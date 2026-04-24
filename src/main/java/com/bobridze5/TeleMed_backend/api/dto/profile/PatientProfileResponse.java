@@ -16,6 +16,9 @@ public record PatientProfileResponse(
         LocalDate diagnosisDate,
         Boolean isInsulinDependency,
         Double targetLow,
-        Double targetHigh
+        Double targetHigh,
+        String bloodType,
+        Integer heightCm,
+        Double hba1c
 ) {
 }

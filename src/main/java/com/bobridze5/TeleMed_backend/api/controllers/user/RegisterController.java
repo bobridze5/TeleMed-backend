@@ -6,14 +6,12 @@ import com.bobridze5.TeleMed_backend.api.dto.auth.RegisterDoctorRequest;
 import com.bobridze5.TeleMed_backend.api.dto.auth.RegisterPatientRequest;
 import com.bobridze5.TeleMed_backend.api.dto.auth.RegisterResponse;
 import com.bobridze5.TeleMed_backend.core.service.auth.RegisterService;
-import com.bobridze5.TeleMed_backend.core.service.utils.UrlBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,10 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URI;
-
 @RestController
-@RequiredArgsConstructor
 @RequestMapping(API.AUTH_REGISTER)
 @Tag(
         name = "Регистрация пользователей",
@@ -32,7 +27,13 @@ import java.net.URI;
 )
 public class RegisterController {
     private final RegisterService registerService;
-    private final UrlBuilder urlBuilder;
+    private final String frontendUrl;
+
+    public RegisterController(RegisterService registerService,
+                              @Value("${app.frontend.url}") String frontendUrl) {
+        this.registerService = registerService;
+        this.frontendUrl = frontendUrl;
+    }
 
     @PostMapping("/patient")
     @Operation(summary = "Регистрация пациента", description = "Создаёт учётную запись пациента и отправляет письмо для подтверждения email")
@@ -42,13 +43,10 @@ public class RegisterController {
             @ApiResponse(responseCode = "409", description = "Пользователь с таким email уже существует")
     })
     public ResponseEntity<RegisterResponse> registerPatient(
-            @Valid @RequestBody RegisterPatientRequest request,
-            HttpServletRequest servletRequest
+            @Valid @RequestBody RegisterPatientRequest request
     ) {
-
-        URI authBase = urlBuilder.buildAbsoluteUrl(servletRequest, API.AUTH);
-        RegisterResponse response = registerService.register(request, authBase.toString());
-        return ResponseEntity.created(authBase).body(response); // TODO: временно authBase
+        RegisterResponse response = registerService.register(request, frontendUrl);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/doctor")

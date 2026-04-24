@@ -5,8 +5,12 @@ import com.bobridze5.TeleMed_backend.api.dto.appointment.AppointmentFilterReques
 import com.bobridze5.TeleMed_backend.api.dto.appointment.AppointmentRequest;
 import com.bobridze5.TeleMed_backend.api.dto.appointment.AppointmentResponse;
 import com.bobridze5.TeleMed_backend.api.dto.appointment.AppointmentUpdateRequest;
+import com.bobridze5.TeleMed_backend.api.dto.appointment.CancelAppointmentRequest;
+import com.bobridze5.TeleMed_backend.api.dto.review.ReviewRequest;
+import com.bobridze5.TeleMed_backend.api.dto.review.ReviewResponse;
 import com.bobridze5.TeleMed_backend.core.security.UserDetailsImpl;
 import com.bobridze5.TeleMed_backend.core.service.appointment.AppointmentService;
+import com.bobridze5.TeleMed_backend.core.service.review.ReviewService;
 import com.bobridze5.TeleMed_backend.core.service.utils.UrlBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,6 +32,7 @@ import java.net.URI;
 @Tag(name = "Запись к врачу")
 public class AppointmentController {
     private final AppointmentService appointmentService;
+    private final ReviewService reviewService;
     private final UrlBuilder urlBuilder;
 
     @GetMapping("/{id}")
@@ -86,7 +91,7 @@ public class AppointmentController {
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        appointmentService.confirmAppointment(id, userDetails.getUserId());
+        appointmentService.confirmAppointment(id, userDetails.getUserId(), "PATIENT");
         return appointmentService.getAppointmentById(id, userDetails.getUserId());
     }
 
@@ -94,9 +99,31 @@ public class AppointmentController {
     @Operation(summary = "Отменить запись на приём", description = "Переводит запись в статус CANCELED")
     public AppointmentResponse cancelAppointment(
             @PathVariable Long id,
+            @RequestBody(required = false) CancelAppointmentRequest request,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        appointmentService.cancelAppointment(id, userDetails.getUserId());
+        appointmentService.cancelAppointment(id, userDetails.getUserId(), request != null ? request.reason() : null);
         return appointmentService.getAppointmentById(id, userDetails.getUserId());
+    }
+
+    @PostMapping("/{id}/complete")
+    @Operation(summary = "Завершить консультацию", description = "Переводит запись в статус COMPLETED")
+    public AppointmentResponse completeAppointment(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        appointmentService.completeAppointment(id, userDetails.getUserId());
+        return appointmentService.getAppointmentById(id, userDetails.getUserId());
+    }
+
+    @PostMapping("/{id}/review")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Оставить отзыв", description = "Оставить отзыв после завершённой консультации")
+    public ReviewResponse createReview(
+            @PathVariable Long id,
+            @Valid @RequestBody ReviewRequest request,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        return reviewService.createReview(id, userDetails.getUserId(), request);
     }
 }

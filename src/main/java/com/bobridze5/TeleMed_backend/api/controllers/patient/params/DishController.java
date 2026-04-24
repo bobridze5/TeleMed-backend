@@ -5,7 +5,7 @@ import com.bobridze5.TeleMed_backend.api.dto.dish.CreateDishRequest;
 import com.bobridze5.TeleMed_backend.api.dto.dish.DishFilterRequest;
 import com.bobridze5.TeleMed_backend.api.dto.dish.DishResponse;
 import com.bobridze5.TeleMed_backend.api.dto.dish.UpdateDishRequest;
-import com.bobridze5.TeleMed_backend.core.entity.auth.User;
+import com.bobridze5.TeleMed_backend.core.security.UserDetailsImpl;
 import com.bobridze5.TeleMed_backend.core.service.dish.DishService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,8 +17,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping(API.DISH)
@@ -31,19 +36,18 @@ public class DishController {
     @Operation(summary = "Создать блюдо", description = "Добавляет новое блюдо в справочник текущего пользователя")
     public DishResponse createDish(
             @RequestBody @Valid CreateDishRequest request,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        // TODO: 201 location
-        return dishService.createDish(request, user.getId());
+        return dishService.createDish(request, userDetails.getUserId());
     }
 
     @GetMapping("/{dishId}")
     @Operation(summary = "Получить блюдо по ID")
     public DishResponse getDishById(
             @PathVariable("dishId") Long id,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        return dishService.getDishById(id, user.getId());
+        return dishService.getDishById(id, userDetails.getUserId());
     }
 
     @GetMapping
@@ -51,9 +55,9 @@ public class DishController {
     public Page<DishResponse> getDishes(
             @ParameterObject @ModelAttribute DishFilterRequest request,
             @PageableDefault(sort = "name", direction = Sort.Direction.ASC, size = 20) Pageable pageable,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        return dishService.getDishes(request, user.getId(), pageable);
+        return dishService.getDishes(request, userDetails.getUserId(), pageable);
     }
 
     @PatchMapping("/{dishId}")
@@ -61,10 +65,9 @@ public class DishController {
     public DishResponse changeDish(
             @PathVariable("dishId") Long id,
             @RequestBody @Valid UpdateDishRequest request,
-            @AuthenticationPrincipal User user
-
+            @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        return dishService.changeDish(request, id, user.getId());
+        return dishService.changeDish(request, id, userDetails.getUserId());
     }
 
     @DeleteMapping("/{dishId}")
@@ -72,8 +75,29 @@ public class DishController {
     @Operation(summary = "Удалить блюдо")
     public void deleteDish(
             @PathVariable("dishId") Long id,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        dishService.deleteDish(id, user.getId());
+        dishService.deleteDish(id, userDetails.getUserId());
+    }
+
+    @PostMapping(value = "/{dishId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Загрузить фото блюда")
+    public DishResponse uploadImage(
+            @PathVariable("dishId") Long id,
+            @RequestParam("file") MultipartFile file,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) throws IOException {
+        return dishService.uploadImage(id, userDetails.getUserId(), file);
+    }
+
+    @GetMapping("/{dishId}/image")
+    @Operation(summary = "Получить фото блюда")
+    public ResponseEntity<byte[]> getImage(
+            @PathVariable("dishId") Long id
+    ) throws IOException {
+        byte[] data = dishService.getImage(id);
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(data);
     }
 }

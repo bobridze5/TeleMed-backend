@@ -50,7 +50,9 @@ public class GlycemiaServiceImpl implements GlycemiaService {
 
     @Override
     public Page<GlycemiaResponse> getRecords(Patient patient, GlycemiaFilterRequest filter) {
-        Pageable pageable = PageRequest.of(filter.page(), filter.size(), Sort.by("updatedAt").descending());
+        int page = filter.page() != null ? filter.page() : 0;
+        int size = filter.size() != null && filter.size() > 0 ? filter.size() : 20;
+        Pageable pageable = PageRequest.of(page, size, Sort.by("updatedAt").descending());
 
         return glycemiaRepository.findWithFilter(
                 patient.getId(),

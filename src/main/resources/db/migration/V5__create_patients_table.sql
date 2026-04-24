@@ -3,6 +3,9 @@ CREATE TABLE patients (
 
     patient_diabetes_type VARCHAR(50),
     patient_diagnosis_date DATE,
+    patient_blood_type  VARCHAR(10),
+    patient_height_cm   SMALLINT,
+    patient_hba1c       DOUBLE PRECISION,
 
     patient_insulin_dependency BOOLEAN NOT NULL DEFAULT FALSE,
     patient_target_low DOUBLE PRECISION NOT NULL DEFAULT 3.9,

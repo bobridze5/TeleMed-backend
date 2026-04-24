@@ -3,6 +3,7 @@ package com.bobridze5.TeleMed_backend.api.controllers.doctor;
 import com.bobridze5.TeleMed_backend.api.controllers.API;
 import com.bobridze5.TeleMed_backend.api.dto.doctor.DoctorFilterRequest;
 import com.bobridze5.TeleMed_backend.api.dto.doctor.DoctorResponse;
+import com.bobridze5.TeleMed_backend.api.dto.schedule.AvailableSlotDto;
 import com.bobridze5.TeleMed_backend.core.service.doctor.DoctorService;
 import com.bobridze5.TeleMed_backend.core.service.schedule.DoctorScheduleService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,7 +18,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -48,7 +48,7 @@ public class DoctorController {
             summary = "Получить свободные слоты врача",
             description = "Возвращает список доступных для записи дат и времени на указанный день."
     )
-    public List<LocalDateTime> getAvailableSlots(
+    public List<AvailableSlotDto> getAvailableSlots(
             @PathVariable Long id,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {

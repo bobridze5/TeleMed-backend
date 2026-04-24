@@ -51,7 +51,9 @@ public class SymptomServiceImplPatient implements SymptomServicePatient {
 
     @Override
     public Page<SymptomResponse> getRecords(Patient patient, SymptomFilterRequest filter) {
-        Pageable pageable = PageRequest.of(filter.page(), filter.size(), Sort.by("createdAt").descending());
+        int page = filter.page() != null ? filter.page() : 0;
+        int size = filter.size() != null && filter.size() > 0 ? filter.size() : 20;
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
         return symptomRepository.findWithFilter(
                 patient.getId(),

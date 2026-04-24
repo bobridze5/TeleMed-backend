@@ -8,13 +8,18 @@ import com.bobridze5.TeleMed_backend.core.entity.TestFindRisc;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
 import com.bobridze5.TeleMed_backend.core.exceptions.EntityNotFoundException;
 import com.bobridze5.TeleMed_backend.core.repository.TestFindRiscRepository;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -35,12 +40,21 @@ public class TestFindRiscService {
                 Sort.by(filterRequest.getSortDirection(), filterRequest.getSortField())
         );
 
-        return testFindRiscRepository.findAllByUserId(
-                patient.getId(),
-                filterRequest.startDate(),
-                filterRequest.endDate(),
-                pageable
-        ).map(testFindRiscMapper::mapToResponse);
+        Long patientId = patient.getId();
+        Specification<TestFindRisc> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(cb.equal(root.get("patient").get("id"), patientId));
+            if (filterRequest.startDate() != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), filterRequest.startDate()));
+            }
+            if (filterRequest.endDate() != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("createdAt"), filterRequest.endDate()));
+            }
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        return testFindRiscRepository.findAll(spec, pageable)
+                .map(testFindRiscMapper::mapToResponse);
     }
 
     @Transactional(readOnly = true)

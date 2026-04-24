@@ -29,13 +29,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleValidationException(MethodArgumentNotValidException e) {
         String message = e.getBindingResult().getFieldErrors().stream()
                 .findFirst()
-                .map(error -> error.getField() + ":" + error.getDefaultMessage())
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .orElse("Invalid Request");
 
         Map<String, Object> response = Map.of(
                 "timestamp", Instant.now(),
                 "status", HttpStatus.BAD_REQUEST.value(),
-                "error", e.getCause().getMessage(),
+                "error", HttpStatus.BAD_REQUEST.getReasonPhrase(),
                 "message", message
         );
 
@@ -51,7 +51,7 @@ public class GlobalExceptionHandler {
         Map<String, Object> response = Map.of(
                 "timestamp", Instant.now(),
                 "status", HttpStatus.BAD_REQUEST.value(),
-                "error", e.getCause().getMessage(),
+                "error", HttpStatus.BAD_REQUEST.getReasonPhrase(),
                 "message", message
         );
 

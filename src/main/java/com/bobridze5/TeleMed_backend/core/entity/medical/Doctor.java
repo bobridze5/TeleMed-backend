@@ -36,4 +36,9 @@ public class Doctor extends User {
 
     @OneToMany(mappedBy = "doctor", fetch = FetchType.LAZY)
     private List<PatientDoctorAssignment> patientAssignments;
+
+    @Override
+    public String getRole() {
+        return "DOCTOR";
+    }
 }

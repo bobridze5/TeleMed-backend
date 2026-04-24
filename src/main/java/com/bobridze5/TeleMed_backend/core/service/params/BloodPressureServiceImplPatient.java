@@ -65,7 +65,9 @@ public class BloodPressureServiceImplPatient implements BloodPressureServicePati
     @Override
     @Transactional(readOnly = true)
     public Page<BloodPressureResponse> getRecords(Patient patient, BloodPressureFilterRequest request) {
-        Pageable pageable = PageRequest.of(request.page(), request.size(), Sort.by("createdAt").descending());
+        int page = request.page() != null ? request.page() : 0;
+        int size = request.size() != null && request.size() > 0 ? request.size() : 20;
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
         Specification<BloodPressure> spec = ParamSpecification.byPatientAndDateTimeBetween(
                 patient.getId(), request

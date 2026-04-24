@@ -31,4 +31,13 @@ public class DoctorPatientsController {
     ) {
         return doctorService.getMyPatients(doctor, pageable);
     }
+
+    @GetMapping("/search")
+    @Operation(summary = "Поиск среди всех пациентов", description = "Возвращает всех пациентов системы (для создания чата)")
+    public Page<DoctorPatientResponse> getAllPatients(
+            @CurrentDoctor Doctor doctor,
+            @PageableDefault(sort = "user_id", size = 100) Pageable pageable
+    ) {
+        return doctorService.getAllPatients(pageable);
+    }
 }

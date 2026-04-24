@@ -1,7 +1,7 @@
 package com.bobridze5.TeleMed_backend.api.dto.profile;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -22,7 +22,7 @@ public abstract class UserProfileUpdateRequest {
     @Size(min = 2, max = 120, message = "Длина должна быть от 2 до 120 символов")
     private String middleName;
 
-    @Past(message = "Дата должна быть в прошлом")
+    @PastOrPresent(message = "Дата рождения не может быть в будущем")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate dateBirth;
 

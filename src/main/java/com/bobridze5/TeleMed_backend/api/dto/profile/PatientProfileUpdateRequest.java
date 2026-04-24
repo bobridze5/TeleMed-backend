@@ -23,4 +23,12 @@ public class PatientProfileUpdateRequest extends UserProfileUpdateRequest {
 
     @Positive
     private Double targetHigh;
+
+    private String bloodType;
+
+    @Positive
+    private Integer heightCm;
+
+    @Positive
+    private Double hba1c;
 }

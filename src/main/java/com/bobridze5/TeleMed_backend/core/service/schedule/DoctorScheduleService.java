@@ -1,7 +1,9 @@
 package com.bobridze5.TeleMed_backend.core.service.schedule;
 
+import com.bobridze5.TeleMed_backend.api.dto.schedule.AvailableSlotDto;
 import com.bobridze5.TeleMed_backend.api.dto.schedule.DoctorScheduleRequest;
 import com.bobridze5.TeleMed_backend.api.dto.schedule.DoctorScheduleResponse;
+import com.bobridze5.TeleMed_backend.core.entity.medical.ConsultationType;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -12,7 +14,7 @@ public interface DoctorScheduleService {
 
     List<DoctorScheduleResponse> setSchedule(Long doctorId, List<DoctorScheduleRequest> requests);
 
-    List<LocalDateTime> getAvailableSlots(Long doctorId, LocalDate date);
+    List<AvailableSlotDto> getAvailableSlots(Long doctorId, LocalDate date);
 
-    void validateSlot(Long doctorId, LocalDateTime dateTime);
+    void validateSlot(Long doctorId, LocalDateTime dateTime, ConsultationType consultationType);
 }
