@@ -1,7 +1,7 @@
 package com.bobridze5.TeleMed_backend.core.repository;
 
-import com.bobridze5.TeleMed_backend.core.entity.report.Glycemia;
-import com.bobridze5.TeleMed_backend.core.entity.report.GlycemiaType;
+import com.bobridze5.TeleMed_backend.core.entity.report.glycemia.Glycemia;
+import com.bobridze5.TeleMed_backend.core.entity.report.glycemia.GlycemiaType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

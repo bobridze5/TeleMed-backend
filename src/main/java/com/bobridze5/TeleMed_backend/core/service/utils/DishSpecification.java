@@ -2,7 +2,7 @@ package com.bobridze5.TeleMed_backend.core.service.utils;
 
 
 import com.bobridze5.TeleMed_backend.api.dto.dish.DishFilterRequest;
-import com.bobridze5.TeleMed_backend.core.entity.report.Dish;
+import com.bobridze5.TeleMed_backend.core.entity.report.eat.Dish;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
@@ -32,12 +32,6 @@ public final class DishSpecification {
             addRangePredicate(predicates, cb, root.get("protein"), request.minProt(), request.maxProt());
             addRangePredicate(predicates, cb, root.get("fats"), request.minFat(), request.maxFat());
             addRangePredicate(predicates, cb, root.get("carbs"), request.minCarb(), request.maxCarb());
-
-            // 3. Фильтр по статусу
-            if (request.status() != null) {
-                predicates.add(cb.equal(root.get("status"), request.status()));
-            }
-
 
             return cb.and(predicates.toArray(new Predicate[0]));
         };

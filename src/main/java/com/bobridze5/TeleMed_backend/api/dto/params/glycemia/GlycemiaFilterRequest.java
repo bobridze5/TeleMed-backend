@@ -1,6 +1,6 @@
 package com.bobridze5.TeleMed_backend.api.dto.params.glycemia;
 
-import com.bobridze5.TeleMed_backend.core.entity.report.GlycemiaType;
+import com.bobridze5.TeleMed_backend.core.entity.report.glycemia.GlycemiaType;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;

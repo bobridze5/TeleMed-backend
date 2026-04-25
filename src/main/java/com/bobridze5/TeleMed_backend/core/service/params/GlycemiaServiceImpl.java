@@ -6,7 +6,7 @@ import com.bobridze5.TeleMed_backend.api.dto.params.glycemia.GlycemiaResponse;
 import com.bobridze5.TeleMed_backend.api.dto.params.glycemia.GlycemiaUpdateRequest;
 import com.bobridze5.TeleMed_backend.api.mappers.params.GlycemiaMapper;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
-import com.bobridze5.TeleMed_backend.core.entity.report.Glycemia;
+import com.bobridze5.TeleMed_backend.core.entity.report.glycemia.Glycemia;
 import com.bobridze5.TeleMed_backend.core.exceptions.EntityNotFoundException;
 import com.bobridze5.TeleMed_backend.core.repository.GlycemiaRepository;
 import lombok.RequiredArgsConstructor;

@@ -6,7 +6,7 @@ import com.bobridze5.TeleMed_backend.api.dto.params.symptom.SymptomResponse;
 import com.bobridze5.TeleMed_backend.api.dto.params.symptom.SymptomUpdateRequest;
 import com.bobridze5.TeleMed_backend.api.mappers.params.SymptomMapper;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
-import com.bobridze5.TeleMed_backend.core.entity.report.Symptom;
+import com.bobridze5.TeleMed_backend.core.entity.report.symptom.Symptom;
 import com.bobridze5.TeleMed_backend.core.exceptions.EntityNotFoundException;
 import com.bobridze5.TeleMed_backend.core.repository.SymptomRepository;
 import lombok.RequiredArgsConstructor;

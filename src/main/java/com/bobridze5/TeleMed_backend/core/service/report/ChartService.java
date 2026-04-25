@@ -1,8 +1,8 @@
 package com.bobridze5.TeleMed_backend.core.service.report;
 
-import com.bobridze5.TeleMed_backend.core.entity.report.BloodPressure;
-import com.bobridze5.TeleMed_backend.core.entity.report.Glycemia;
-import com.bobridze5.TeleMed_backend.core.entity.report.Weight;
+import com.bobridze5.TeleMed_backend.core.entity.report.pressure.BloodPressure;
+import com.bobridze5.TeleMed_backend.core.entity.report.glycemia.Glycemia;
+import com.bobridze5.TeleMed_backend.core.entity.report.weight.Weight;
 import lombok.extern.slf4j.Slf4j;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;

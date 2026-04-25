@@ -1,7 +1,7 @@
 package com.bobridze5.TeleMed_backend.core.repository;
 
-import com.bobridze5.TeleMed_backend.core.entity.report.Meal;
-import com.bobridze5.TeleMed_backend.core.entity.report.MealType;
+import com.bobridze5.TeleMed_backend.core.entity.report.eat.Meal;
+import com.bobridze5.TeleMed_backend.core.entity.report.eat.MealType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

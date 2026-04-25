@@ -1,8 +1,8 @@
 package com.bobridze5.TeleMed_backend.core.repository;
 
-import com.bobridze5.TeleMed_backend.core.entity.report.PhysicalActivity;
-import com.bobridze5.TeleMed_backend.core.entity.report.PhysicalActivityIntensityType;
-import com.bobridze5.TeleMed_backend.core.entity.report.PhysicalActivityType;
+import com.bobridze5.TeleMed_backend.core.entity.report.activity.PhysicalActivity;
+import com.bobridze5.TeleMed_backend.core.entity.report.activity.PhysicalActivityIntensityType;
+import com.bobridze5.TeleMed_backend.core.entity.report.activity.PhysicalActivityType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

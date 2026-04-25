@@ -1,7 +1,7 @@
 package com.bobridze5.TeleMed_backend.api.dto.params.physical_activity;
 
-import com.bobridze5.TeleMed_backend.core.entity.report.PhysicalActivityIntensityType;
-import com.bobridze5.TeleMed_backend.core.entity.report.PhysicalActivityType;
+import com.bobridze5.TeleMed_backend.core.entity.report.activity.PhysicalActivityIntensityType;
+import com.bobridze5.TeleMed_backend.core.entity.report.activity.PhysicalActivityType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 

@@ -1,8 +1,6 @@
 package com.bobridze5.TeleMed_backend.api.controllers.doctor;
 
 import com.bobridze5.TeleMed_backend.api.controllers.API;
-import com.bobridze5.TeleMed_backend.api.dto.meal.MealFilterRequest;
-import com.bobridze5.TeleMed_backend.api.dto.meal.MealResponse;
 import com.bobridze5.TeleMed_backend.api.dto.medcard.AllergyResponse;
 import com.bobridze5.TeleMed_backend.api.dto.medcard.MedicalEventResponse;
 import com.bobridze5.TeleMed_backend.api.dto.medcard.MedicationResponse;
@@ -21,7 +19,6 @@ import com.bobridze5.TeleMed_backend.core.annotations.CurrentDoctor;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Doctor;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
 import com.bobridze5.TeleMed_backend.core.service.doctor.DoctorPatientAccessService;
-import com.bobridze5.TeleMed_backend.core.service.meal.MealService;
 import com.bobridze5.TeleMed_backend.core.service.medcard.AllergyService;
 import com.bobridze5.TeleMed_backend.core.service.medcard.MedicalEventService;
 import com.bobridze5.TeleMed_backend.core.service.medcard.MedicationService;
@@ -35,7 +32,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -56,7 +52,6 @@ public class DoctorPatientParamsController {
     private final SymptomServicePatient symptomService;
     private final PhysicalActivityService physicalActivityService;
     private final PatientReportService reportService;
-    private final MealService mealService;
     private final PatientProfileService patientProfileService;
     private final AllergyService allergyService;
     private final MedicationService medicationService;
@@ -180,29 +175,6 @@ public class DoctorPatientParamsController {
     ) {
         Patient patient = accessService.getPatientForDoctor(doctor, patientId);
         return patientProfileService.getProfile(patient);
-    }
-
-    @GetMapping("/meals")
-    @Operation(summary = "Приёмы пищи пациента — список")
-    public Page<MealResponse> getMeals(
-            @CurrentDoctor Doctor doctor,
-            @PathVariable Long patientId,
-            @ParameterObject @ModelAttribute MealFilterRequest filter,
-            Pageable pageable
-    ) {
-        Patient patient = accessService.getPatientForDoctor(doctor, patientId);
-        return mealService.getMeals(patient, filter, pageable);
-    }
-
-    @GetMapping("/meals/{mealId}")
-    @Operation(summary = "Приём пищи пациента — по ID")
-    public MealResponse getMealById(
-            @CurrentDoctor Doctor doctor,
-            @PathVariable Long patientId,
-            @PathVariable Long mealId
-    ) {
-        Patient patient = accessService.getPatientForDoctor(doctor, patientId);
-        return mealService.getMealById(patient, mealId);
     }
 
     @GetMapping("/allergies")

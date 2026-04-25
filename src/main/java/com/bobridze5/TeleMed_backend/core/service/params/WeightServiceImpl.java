@@ -5,7 +5,7 @@ import com.bobridze5.TeleMed_backend.api.dto.params.weight.WeightRequest;
 import com.bobridze5.TeleMed_backend.api.dto.params.weight.WeightResponse;
 import com.bobridze5.TeleMed_backend.api.mappers.params.WeightMapper;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
-import com.bobridze5.TeleMed_backend.core.entity.report.Weight;
+import com.bobridze5.TeleMed_backend.core.entity.report.weight.Weight;
 import com.bobridze5.TeleMed_backend.core.exceptions.EntityNotFoundException;
 import com.bobridze5.TeleMed_backend.core.repository.WeightRepository;
 import lombok.RequiredArgsConstructor;

@@ -34,6 +34,12 @@ public final class API {
     public static final String PATIENT_ME_PARAMS_PHYSICAL_ACTIVITY = PATIENT_ME + "/physical-activities";
     public static final String PATIENT_ME_PARAMS_GLYCEMIA = PATIENT_ME + "/glycemia";
 
+    public static final String PATIENT_ME_DIARY = PATIENT_ME + "/diary";
+    public static final String PATIENT_ME_MEALS = PATIENT_ME + "/meals";
+    public static final String PATIENT_ME_MEAL_ID = PATIENT_ME_MEALS + "/{mealId}";
+    public static final String PATIENT_ME_MEAL_ITEMS = PATIENT_ME_MEAL_ID + "/items";
+    public static final String PATIENT_ME_MEAL_ITEM_ID = PATIENT_ME_MEAL_ITEMS + "/{itemId}";
+
     public static final String PATIENT_ME_PROFILE = PATIENT_ME + "/profile";
     public static final String PATIENT_ME_TEST = PATIENT_ME + "/test";
     public static final String PATIENT_ME_MEDICAL_CARD = PATIENT_ME + "/card";
@@ -43,10 +49,6 @@ public final class API {
     public static final String PATIENT_ME_MEDICAL_EVENTS = PATIENT_ME + "/medical-events";
     public static final String PATIENT_ME_APPOINTMENTS = PATIENT_ME + "/appointments";
     public static final String PATIENT_ME_REPORT = PATIENT_ME + "/report";
-    public static final String PATIENT_ME_MEALS = PATIENT_ME + "/meals";
-    public static final String PATIENT_ME_MEAL_ID = PATIENT_ME_MEALS + "/{mealId}";
-    public static final String PATIENT_ME_MEAL_ITEMS = PATIENT_ME_MEAL_ID + "/items";
-    public static final String PATIENT_ME_MEAL_ITEM_ID = PATIENT_ME_MEAL_ITEMS + "/{itemId}";
 
 
     // Doctor
@@ -54,6 +56,8 @@ public final class API {
     public static final String DOCTOR_ME = DOCTORS + "/me";
     public static final String DOCTOR_ME_PROFILE = DOCTOR_ME + "/profile";
     public static final String DOCTOR_ME_PATIENTS = DOCTOR_ME + "/patients";
+    public static final String DOCTOR_ME_PATIENT_ID = DOCTOR_ME_PATIENTS + "/{patientId}";
+    public static final String DOCTOR_ME_PATIENT_DIARY = DOCTOR_ME_PATIENT_ID + "/diary";
     public static final String DOCTOR_ME_SCHEDULE = DOCTOR_ME + "/schedule";
     public static final String DOCTOR_ME_APPOINTMENTS = DOCTOR_ME + "/appointments";
     public static final String PATIENT_PARAMS_WEIGHT = PATIENT_ID + "/weights";

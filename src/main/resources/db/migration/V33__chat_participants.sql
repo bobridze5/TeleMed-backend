@@ -1,3 +1,0 @@
--- MERGED INTO V27__create_chat_tables.sql
--- This migration was neutralized: creation of chat_participants and schema changes were merged into V27__create_chat_tables.sql
--- Note: data migration (moving existing participants from chats.patient_id/doctor_id) has been intentionally omitted; run a manual migration if needed.

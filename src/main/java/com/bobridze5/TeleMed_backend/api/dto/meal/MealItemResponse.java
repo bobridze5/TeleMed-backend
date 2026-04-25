@@ -6,10 +6,11 @@ public record MealItemResponse(
         Long id,
         DishResponse dish,
         Double portionGrams,
-        String notes,
+        Integer quantity,
         Double caloriesTotal,
         Double carbsTotal,
         Double proteinTotal,
-        Double fatsTotal
+        Double fatsTotal,
+        Double breadUnits
 ) {
 }

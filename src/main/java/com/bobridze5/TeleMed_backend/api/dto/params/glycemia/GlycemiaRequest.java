@@ -1,6 +1,6 @@
 package com.bobridze5.TeleMed_backend.api.dto.params.glycemia;
 
-import com.bobridze5.TeleMed_backend.core.entity.report.GlycemiaType;
+import com.bobridze5.TeleMed_backend.core.entity.report.glycemia.GlycemiaType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 

@@ -1,7 +1,5 @@
 package com.bobridze5.TeleMed_backend.api.dto.dish;
 
-import com.bobridze5.TeleMed_backend.core.entity.report.DishStatus;
-
 public record DishResponse(
         Long id,
         String name,
@@ -10,7 +8,6 @@ public record DishResponse(
         Double protein,
         Double fats,
         String photoURL,
-        String description,
-        DishStatus status
+        String description
 ) {
 }

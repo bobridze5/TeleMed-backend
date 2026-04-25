@@ -1,2 +1,0 @@
--- MERGED INTO V25__create_medication_table.sql
--- This migration was neutralized: its changes have been moved into V25__create_medication_table.sql

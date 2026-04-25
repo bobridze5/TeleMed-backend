@@ -1,6 +1,6 @@
 package com.bobridze5.TeleMed_backend.core.repository;
 
-import com.bobridze5.TeleMed_backend.core.entity.report.MealItem;
+import com.bobridze5.TeleMed_backend.core.entity.report.eat.MealItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

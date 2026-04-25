@@ -1,6 +1,7 @@
 package com.bobridze5.TeleMed_backend.api.dto.meal;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 
 public record MealItemRequest(
@@ -11,6 +12,7 @@ public record MealItemRequest(
         @PositiveOrZero(message = "Порция не может быть отрицательной")
         Double portionGrams,
 
-        String notes
+        @Positive(message = "Количество должно быть положительным")
+        Integer quantity
 ) {
 }
