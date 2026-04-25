@@ -42,7 +42,8 @@ public class DishMapper {
                 dish.getProtein(),
                 dish.getFats(),
                 dish.getPhotoURL(),
-                dish.getDescription()
+                dish.getDescription(),
+                dish.getPatient() != null ? dish.getPatient().getId() : null
         );
     }
 }

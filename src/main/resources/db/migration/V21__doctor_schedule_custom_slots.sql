@@ -1,12 +1,15 @@
--- Поддержка ручного задания слотов (без авторасчёта из диапазона).
--- Если для расписания есть записи в doctor_schedule_slots, они имеют приоритет над range-полями.
+CREATE TABLE doctor_schedules (
+    schedule_id BIGSERIAL PRIMARY KEY,
+    doctor_id BIGINT NOT NULL,
+    schedule_day_of_week VARCHAR(20) NOT NULL,
 
-CREATE TABLE doctor_schedule_slots (
-    schedule_id BIGINT NOT NULL,
-    slot_time TIME NOT NULL,
-    PRIMARY KEY (schedule_id, slot_time),
-    CONSTRAINT fk_schedule_slot FOREIGN KEY (schedule_id)
-        REFERENCES doctor_schedules(schedule_id) ON DELETE CASCADE
+    -- Ограничение уникальности (один врач - одно расписание на конкретный день недели)
+    CONSTRAINT uk_doctor_day UNIQUE (doctor_id, schedule_day_of_week),
+
+    -- Внешний ключ на таблицу докторов (убедитесь, что имя таблицы doctor корректно)
+    CONSTRAINT fk_doctor_schedule FOREIGN KEY (doctor_id)
+        REFERENCES doctors (doctor_id) ON DELETE CASCADE
 );
 
-CREATE INDEX idx_schedule_slots_schedule ON doctor_schedule_slots(schedule_id);
+-- Индекс для ускорения поиска расписания конкретного врача
+CREATE INDEX idx_doctor_schedules_doctor_id ON doctor_schedules(doctor_id);

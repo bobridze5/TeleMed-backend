@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.DayOfWeek;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,20 +30,8 @@ public class DoctorSchedule {
     @Column(name = "schedule_day_of_week", nullable = false)
     private DayOfWeek dayOfWeek;
 
-    @Column(name = "schedule_start_time", nullable = false)
-    private LocalTime startTime;
-
-    @Column(name = "schedule_end_time", nullable = false)
-    private LocalTime endTime;
-
-    @Column(name = "schedule_slot_duration_minutes", nullable = false)
-    private int slotDurationMinutes;
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(
-            name = "doctor_schedule_slots",
-            joinColumns = @JoinColumn(name = "schedule_id")
-    )
+    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OrderBy("startTime ASC")
     @Builder.Default
     private List<ScheduleSlot> customSlots = new ArrayList<>();
 }

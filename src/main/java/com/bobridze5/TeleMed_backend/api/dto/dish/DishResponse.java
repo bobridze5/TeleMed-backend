@@ -8,6 +8,7 @@ public record DishResponse(
         Double protein,
         Double fats,
         String photoURL,
-        String description
+        String description,
+        Long patientId
 ) {
 }

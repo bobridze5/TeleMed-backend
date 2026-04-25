@@ -60,5 +60,6 @@ public class DoctorProfileMapper {
 
     public void updateDoctor(Doctor doctor, DoctorProfileUpdateRequest request) {
         if (request.getQualification() != null) doctor.setQualification(request.getQualification());
+        if (request.getExperience() != null) doctor.setExperience(request.getExperience());
     }
 }

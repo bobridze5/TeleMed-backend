@@ -19,6 +19,7 @@ import java.util.Map;
 @RequestMapping(API.DOCTOR_ME + "/notifications")
 @RequiredArgsConstructor
 @Tag(name = "Уведомления врача")
+@Deprecated
 public class DoctorNotificationController {
     private final DoctorNotificationRepository notificationRepository;
 
