@@ -1,10 +1,9 @@
 package com.bobridze5.TeleMed_backend.core.resolvers;
 
 import com.bobridze5.TeleMed_backend.core.annotations.CurrentPatient;
-import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
 import com.bobridze5.TeleMed_backend.core.entity.auth.User;
+import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
 import com.bobridze5.TeleMed_backend.core.repository.PatientRepository;
-import com.bobridze5.TeleMed_backend.core.repository.UserRepository;
 import com.bobridze5.TeleMed_backend.core.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -4,7 +4,7 @@ import com.bobridze5.TeleMed_backend.api.dto.params.physical_activity.PhysicalAc
 import com.bobridze5.TeleMed_backend.api.dto.params.physical_activity.PhysicalActivityResponse;
 import com.bobridze5.TeleMed_backend.api.dto.params.physical_activity.PhysicalActivityUpdateRequest;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
-import com.bobridze5.TeleMed_backend.core.entity.report.PhysicalActivity;
+import com.bobridze5.TeleMed_backend.core.entity.report.activity.PhysicalActivity;
 import org.springframework.stereotype.Component;
 
 @Component

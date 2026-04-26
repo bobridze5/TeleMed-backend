@@ -3,7 +3,10 @@ package com.bobridze5.TeleMed_backend.core.entity.auth;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -60,4 +63,22 @@ public abstract class User {
     @UpdateTimestamp
     @Column(name = "user_datetime_updated", nullable = false)
     protected LocalDateTime updatedAt;
+
+    public abstract String getRole();
+
+    public String getFullName() {
+        StringBuilder name = new StringBuilder();
+        if (lastName != null && !lastName.isBlank()) {
+            name.append(lastName);
+        }
+        if (firstName != null && !firstName.isBlank()) {
+            if (!name.isEmpty()) name.append(" ");
+            name.append(firstName);
+        }
+        if (middleName != null && !middleName.isBlank()) {
+            if (!name.isEmpty()) name.append(" ");
+            name.append(middleName);
+        }
+        return name.toString();
+    }
 }

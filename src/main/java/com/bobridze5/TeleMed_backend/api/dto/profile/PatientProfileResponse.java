@@ -10,12 +10,15 @@ public record PatientProfileResponse(
         String lastName,
         String middleName,
         LocalDate dateBirth,
-        Character gender,
+        String gender,
         String email,
         DiabetesType diabetesType,
         LocalDate diagnosisDate,
         Boolean isInsulinDependency,
         Double targetLow,
-        Double targetHigh
+        Double targetHigh,
+        String bloodType,
+        Integer heightCm,
+        Double hba1c
 ) {
 }

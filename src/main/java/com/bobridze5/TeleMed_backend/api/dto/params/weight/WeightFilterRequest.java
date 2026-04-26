@@ -7,8 +7,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 
 public record WeightFilterRequest(
-        int page,
-        int size,
+        Integer page,
+        Integer size,
 
         @PositiveOrZero
         Double minWeight,

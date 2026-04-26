@@ -5,7 +5,7 @@ import com.bobridze5.TeleMed_backend.api.dto.params.blood_pressure.BloodPressure
 import com.bobridze5.TeleMed_backend.api.dto.params.blood_pressure.BloodPressureResponse;
 import com.bobridze5.TeleMed_backend.api.mappers.params.BloodPressureMapper;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
-import com.bobridze5.TeleMed_backend.core.entity.report.BloodPressure;
+import com.bobridze5.TeleMed_backend.core.entity.report.pressure.BloodPressure;
 import com.bobridze5.TeleMed_backend.core.exceptions.EntityNotFoundException;
 import com.bobridze5.TeleMed_backend.core.repository.BloodPressureRepository;
 import com.bobridze5.TeleMed_backend.core.service.utils.ParamSpecification;
@@ -50,6 +50,7 @@ public class BloodPressureServiceImplPatient implements BloodPressureServicePati
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BloodPressureResponse getRecordById(Patient patient, Long id) {
         BloodPressure bloodPressure = bloodPressureRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Запись не найдена"));
@@ -62,8 +63,11 @@ public class BloodPressureServiceImplPatient implements BloodPressureServicePati
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<BloodPressureResponse> getRecords(Patient patient, BloodPressureFilterRequest request) {
-        Pageable pageable = PageRequest.of(request.page(), request.size(), Sort.by("createdAt").descending());
+        int page = request.page() != null ? request.page() : 0;
+        int size = request.size() != null && request.size() > 0 ? request.size() : 20;
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
         Specification<BloodPressure> spec = ParamSpecification.byPatientAndDateTimeBetween(
                 patient.getId(), request

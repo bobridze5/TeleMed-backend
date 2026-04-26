@@ -40,6 +40,7 @@ public class JwtService {
                 .expiration(new Date(System.currentTimeMillis() + accessLifeTimeMs))
                 .signWith(getKey())
                 .claim("type", TOKEN_TYPE_ACCESS)
+                .claim("role", user.getRole())
                 .compact();
     }
 

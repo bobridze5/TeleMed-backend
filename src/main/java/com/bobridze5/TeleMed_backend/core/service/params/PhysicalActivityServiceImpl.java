@@ -6,7 +6,7 @@ import com.bobridze5.TeleMed_backend.api.dto.params.physical_activity.PhysicalAc
 import com.bobridze5.TeleMed_backend.api.dto.params.physical_activity.PhysicalActivityUpdateRequest;
 import com.bobridze5.TeleMed_backend.api.mappers.params.PhysicalActivityMapper;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
-import com.bobridze5.TeleMed_backend.core.entity.report.PhysicalActivity;
+import com.bobridze5.TeleMed_backend.core.entity.report.activity.PhysicalActivity;
 import com.bobridze5.TeleMed_backend.core.exceptions.EntityNotFoundException;
 import com.bobridze5.TeleMed_backend.core.repository.PhysicalActivityRepository;
 import lombok.RequiredArgsConstructor;
@@ -51,7 +51,9 @@ public class PhysicalActivityServiceImpl implements PhysicalActivityService {
 
     @Override
     public Page<PhysicalActivityResponse> getRecords(Patient patient, PhysicalActivityFilterRequest filter) {
-        Pageable pageable = PageRequest.of(filter.page(), filter.size(), Sort.by("createdAt").descending());
+        int page = filter.page() != null ? filter.page() : 0;
+        int size = filter.size() != null && filter.size() > 0 ? filter.size() : 20;
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
         return physicalActivityRepository.findWithFilter(
                 patient.getId(),

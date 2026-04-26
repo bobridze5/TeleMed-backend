@@ -6,7 +6,7 @@ import com.bobridze5.TeleMed_backend.api.dto.params.symptom.SymptomResponse;
 import com.bobridze5.TeleMed_backend.api.dto.params.symptom.SymptomUpdateRequest;
 import com.bobridze5.TeleMed_backend.api.mappers.params.SymptomMapper;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
-import com.bobridze5.TeleMed_backend.core.entity.report.Symptom;
+import com.bobridze5.TeleMed_backend.core.entity.report.symptom.Symptom;
 import com.bobridze5.TeleMed_backend.core.exceptions.EntityNotFoundException;
 import com.bobridze5.TeleMed_backend.core.repository.SymptomRepository;
 import lombok.RequiredArgsConstructor;
@@ -51,7 +51,9 @@ public class SymptomServiceImplPatient implements SymptomServicePatient {
 
     @Override
     public Page<SymptomResponse> getRecords(Patient patient, SymptomFilterRequest filter) {
-        Pageable pageable = PageRequest.of(filter.page(), filter.size(), Sort.by("createdAt").descending());
+        int page = filter.page() != null ? filter.page() : 0;
+        int size = filter.size() != null && filter.size() > 0 ? filter.size() : 20;
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
         return symptomRepository.findWithFilter(
                 patient.getId(),

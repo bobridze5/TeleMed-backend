@@ -1,6 +1,5 @@
 package com.bobridze5.TeleMed_backend.api.dto.dish;
 
-import com.bobridze5.TeleMed_backend.core.entity.report.DishStatus;
 import jakarta.validation.constraints.PositiveOrZero;
 
 public record DishFilterRequest(
@@ -24,8 +23,6 @@ public record DishFilterRequest(
         @PositiveOrZero
         Double minCarb,
         @PositiveOrZero
-        Double maxCarb,
-
-        DishStatus status
+        Double maxCarb
 ) {
 }

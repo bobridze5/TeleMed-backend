@@ -1,6 +1,5 @@
 package com.bobridze5.TeleMed_backend.core.service.profile;
 
-import com.bobridze5.TeleMed_backend.api.dto.profile.PatientProfileRequest;
 import com.bobridze5.TeleMed_backend.api.dto.profile.PatientProfileResponse;
 import com.bobridze5.TeleMed_backend.api.dto.profile.PatientProfileUpdateRequest;
 import com.bobridze5.TeleMed_backend.api.mappers.profile.PatientProfileMapper;

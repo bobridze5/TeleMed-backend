@@ -1,14 +1,14 @@
 package com.bobridze5.TeleMed_backend.api.dto.params.physical_activity;
 
-import com.bobridze5.TeleMed_backend.core.entity.report.PhysicalActivityIntensityType;
-import com.bobridze5.TeleMed_backend.core.entity.report.PhysicalActivityType;
+import com.bobridze5.TeleMed_backend.core.entity.report.activity.PhysicalActivityIntensityType;
+import com.bobridze5.TeleMed_backend.core.entity.report.activity.PhysicalActivityType;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
 public record PhysicalActivityFilterRequest(
-        int page,
-        int size,
+        Integer page,
+        Integer size,
 
         PhysicalActivityType activityType,
         PhysicalActivityIntensityType intensityType,

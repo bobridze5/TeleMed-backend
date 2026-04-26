@@ -1,7 +1,10 @@
 package com.bobridze5.TeleMed_backend.core.entity.medical;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "cities")

@@ -14,13 +14,16 @@ public class PatientProfileMapper {
                 patient.getLastName(),
                 patient.getMiddleName(),
                 patient.getDateOfBirth(),
-                patient.getGender(),
+                patient.getGender() != null ? String.valueOf(patient.getGender()) : null,
                 patient.getEmail(),
                 patient.getDiabetesType(),
                 patient.getDiagnosisDate(),
                 patient.getIsInsulinDependency(),
                 patient.getTargetLow(),
-                patient.getTargetHigh()
+                patient.getTargetHigh(),
+                patient.getBloodType(),
+                patient.getHeightCm(),
+                patient.getHba1c()
         );
     }
 
@@ -31,5 +34,8 @@ public class PatientProfileMapper {
         if (request.getDiagnosisDate() != null) patient.setDiagnosisDate(request.getDiagnosisDate());
         if (request.getTargetHigh() != null) patient.setTargetHigh(request.getTargetHigh());
         if (request.getTargetLow() != null) patient.setTargetLow(request.getTargetLow());
+        if (request.getBloodType() != null) patient.setBloodType(request.getBloodType());
+        if (request.getHeightCm() != null) patient.setHeightCm(request.getHeightCm());
+        if (request.getHba1c() != null) patient.setHba1c(request.getHba1c());
     }
 }

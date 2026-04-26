@@ -22,7 +22,8 @@ public record PatientProfileRequest(
         LocalDate dateOfBirth,
 
         @NotNull(message = "Укажите пол")
-        Character gender,
+        @Pattern(regexp = "[MF]", message = "Допустимые значения: M, F")
+        String gender,
 
         @NotNull(message = "Укажите тип диабета")
         DiabetesType diabetesType,

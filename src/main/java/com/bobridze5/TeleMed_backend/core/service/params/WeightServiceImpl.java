@@ -5,7 +5,7 @@ import com.bobridze5.TeleMed_backend.api.dto.params.weight.WeightRequest;
 import com.bobridze5.TeleMed_backend.api.dto.params.weight.WeightResponse;
 import com.bobridze5.TeleMed_backend.api.mappers.params.WeightMapper;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
-import com.bobridze5.TeleMed_backend.core.entity.report.Weight;
+import com.bobridze5.TeleMed_backend.core.entity.report.weight.Weight;
 import com.bobridze5.TeleMed_backend.core.exceptions.EntityNotFoundException;
 import com.bobridze5.TeleMed_backend.core.repository.WeightRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,9 @@ public class WeightServiceImpl implements WeightService {
 
     @Override
     public Page<WeightResponse> getWeightRecords(Patient patient, WeightFilterRequest request) {
-        Pageable pageable = PageRequest.of(request.page(), request.size(), Sort.by("createdAt").descending());
+        int page = request.page() != null ? request.page() : 0;
+        int size = request.size() != null && request.size() > 0 ? request.size() : 20;
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
         Page<Weight> weightPage;
 

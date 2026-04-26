@@ -3,12 +3,47 @@ package com.bobridze5.TeleMed_backend.api.mappers;
 import com.bobridze5.TeleMed_backend.api.dto.dish.CreateDishRequest;
 import com.bobridze5.TeleMed_backend.api.dto.dish.DishResponse;
 import com.bobridze5.TeleMed_backend.api.dto.dish.UpdateDishRequest;
-import com.bobridze5.TeleMed_backend.core.entity.report.Dish;
+import com.bobridze5.TeleMed_backend.core.entity.report.eat.Dish;
+import org.springframework.stereotype.Component;
 
-public interface DishMapper {
-    Dish mapCreateRequest(CreateDishRequest request);
+@Component
+public class DishMapper {
 
-    void updateEntity(UpdateDishRequest request, Dish dish);
+    public Dish mapCreateRequest(CreateDishRequest request) {
+        return Dish.builder()
+                .name(request.name())
+                .calories(request.calories())
+                .carbs(request.carbs())
+                .protein(request.protein())
+                .fats(request.fats())
+                .photoURL(request.photoURL())
+                .description(request.description())
+                .build();
+    }
 
-    DishResponse mapToResponse(Dish dish);
+    public void updateEntity(UpdateDishRequest request, Dish dish) {
+        if (request == null) return;
+
+        if (request.name() != null) dish.setName(request.name());
+        if (request.calories() != null) dish.setCalories(request.calories());
+        if (request.fats() != null) dish.setFats(request.fats());
+        if (request.carbs() != null) dish.setCarbs(request.carbs());
+        if (request.protein() != null) dish.setProtein(request.protein());
+        if (request.description() != null) dish.setDescription(request.description());
+        if (request.photoURL() != null) dish.setPhotoURL(request.photoURL());
+    }
+
+    public DishResponse mapToResponse(Dish dish) {
+        return new DishResponse(
+                dish.getId(),
+                dish.getName(),
+                dish.getCalories(),
+                dish.getCarbs(),
+                dish.getProtein(),
+                dish.getFats(),
+                dish.getPhotoURL(),
+                dish.getDescription(),
+                dish.getPatient() != null ? dish.getPatient().getId() : null
+        );
+    }
 }

@@ -7,8 +7,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 
 public record BloodPressureFilterRequest(
-        int page,
-        int size,
+        Integer page,
+        Integer size,
 
         @PositiveOrZero
         Integer minSystolic,

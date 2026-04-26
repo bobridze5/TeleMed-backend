@@ -2,7 +2,7 @@ package com.bobridze5.TeleMed_backend.core.entity.medical;
 
 import com.bobridze5.TeleMed_backend.core.entity.Ownable;
 import com.bobridze5.TeleMed_backend.core.entity.auth.User;
-import com.bobridze5.TeleMed_backend.core.entity.report.Dish;
+import com.bobridze5.TeleMed_backend.core.entity.report.eat.Dish;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -37,6 +37,20 @@ public class Patient extends User {
     @Builder.Default
     @Column(name = "patient_target_high", nullable = false)
     private Double targetHigh = 10.0;
+
+    @Column(name = "patient_blood_type", length = 10)
+    private String bloodType;
+
+    @Column(name = "patient_height_cm")
+    private Integer heightCm;
+
+    @Column(name = "patient_hba1c")
+    private Double hba1c;
+
+    @Override
+    public String getRole() {
+        return "PATIENT";
+    }
 
     public boolean isOwner(Ownable entity) {
         Patient owner = entity.getPatient();

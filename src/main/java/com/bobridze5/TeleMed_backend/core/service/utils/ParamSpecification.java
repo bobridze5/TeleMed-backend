@@ -3,8 +3,6 @@ package com.bobridze5.TeleMed_backend.core.service.utils;
 import com.bobridze5.TeleMed_backend.api.dto.params.DateFilter;
 import org.springframework.data.jpa.domain.Specification;
 
-import java.time.LocalDateTime;
-
 public final class ParamSpecification {
 
     public static <T> Specification<T> hasPatient(Long patientId) {
