@@ -26,8 +26,6 @@ import org.springframework.web.bind.annotation.*;
 public class AdminController {
     private final AdminService adminService;
 
-    // ── Doctors ────────────────────────────────────────────────────────────────
-
     @GetMapping(API.ADMIN_DOCTORS + "/pending")
     @Operation(summary = "Список врачей на проверке")
     public Page<AdminDoctorPendingResponse> getPendingDoctors(
@@ -58,7 +56,6 @@ public class AdminController {
         adminService.rejectDoctor(id, request.reason());
     }
 
-    // ── Patients ───────────────────────────────────────────────────────────────
 
     @GetMapping(API.ADMIN_PATIENTS)
     @Operation(summary = "Список всех пациентов")
@@ -68,7 +65,6 @@ public class AdminController {
         return adminService.getAllPatients(pageable);
     }
 
-    // ── Stats ──────────────────────────────────────────────────────────────────
 
     @GetMapping(API.ADMIN_STATS)
     @Operation(summary = "Статистика системы")
@@ -76,7 +72,6 @@ public class AdminController {
         return adminService.getStats();
     }
 
-    // ── Users (ban / activate) ────────────────────────────────────────────────
 
     @PatchMapping(API.ADMIN_USERS + "/{id}/ban")
     @ResponseStatus(HttpStatus.NO_CONTENT)

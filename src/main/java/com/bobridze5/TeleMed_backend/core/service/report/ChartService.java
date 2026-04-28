@@ -22,71 +22,79 @@ import org.jfree.chart.ui.TextAnchor;
 import org.jfree.data.time.Millisecond;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
-import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Function;
 
 @Slf4j
 @Service
 public class ChartService {
-    private static final int WIDTH  = 1040;
+    private static final int WIDTH = 1040;
     private static final int HEIGHT = 560;
 
-    public static final int PDF_WIDTH  = WIDTH  / 2;
+    public static final int PDF_WIDTH = WIDTH / 2;
     public static final int PDF_HEIGHT = HEIGHT / 2;
 
-    public byte[] createWeightChart(List<Weight> records) {
-        TimeSeries series = new TimeSeries("Вес");
-        records.forEach(w -> series.addOrUpdate(
-                toMs(w.getCreatedAt().toInstant(ZoneOffset.UTC).toEpochMilli()),
-                w.getValue()
-        ));
+    private static final Font CHART_FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 18);
+    private static final Font TITLE_FONT = CHART_FONT.deriveFont(22f);
+    private static final Font LABEL_FONT = CHART_FONT.deriveFont(17f);
 
-        JFreeChart chart = ChartFactory.createTimeSeriesChart(
-                "Вес (кг)", "Дата", "кг",
-                new TimeSeriesCollection(series), false, false, false
+    private static final Color BACKGROUND = Color.WHITE;
+    private static final Color PLOT_BG = new Color(245, 245, 245);
+    private static final Color GRID = Color.LIGHT_GRAY;
+    private static final Color SERIES_BLUE = new Color(66, 133, 244);
+    private static final Color SERIES_RED = new Color(220, 50, 50);
+    private static final Color SERIES_NAVY = new Color(50, 100, 220);
+    private static final Color TARGET_FILL = new Color(100, 200, 100, 60);
+    private static final Color TARGET_LINE = new Color(50, 150, 50);
+
+    private static final RectangleInsets PLOT_INSETS = new RectangleInsets(30, 20, 8, 30);
+    private static final RectangleInsets TITLE_PADDING = new RectangleInsets(6, 0, 4, 0);
+
+    private static final SimpleDateFormat DATE_AXIS_FORMAT = new SimpleDateFormat("dd.MM HH:mm");
+    private static final SimpleDateFormat ITEM_LABEL_FORMAT = new SimpleDateFormat("dd.MM.yy");
+
+    private static final BasicStroke SERIES_STROKE = new BasicStroke(2f);
+
+    public byte[] createWeightChart(List<Weight> records) {
+        return buildSingleSeriesChart(
+                records, "Вес", "Вес (кг)", "кг", "0.0",
+                Weight::getCreatedAt, Weight::getValue,
+                SERIES_BLUE, null
         );
-        applyBaseStyle(chart, "0.0");
-        return encode(chart);
     }
 
     public byte[] createGlycemiaChart(List<Glycemia> records, double targetLow, double targetHigh) {
-        TimeSeries series = new TimeSeries("Гликемия");
-        records.forEach(g -> series.addOrUpdate(
-                toMs(g.getCreatedAt().toInstant(ZoneOffset.UTC).toEpochMilli()),
-                g.getLevel()
-        ));
-
-        JFreeChart chart = ChartFactory.createTimeSeriesChart(
-                "Гликемия (ммоль/л)", "Дата", "ммоль/л",
-                new TimeSeriesCollection(series), false, false, false
+        return buildSingleSeriesChart(
+                records, "Гликемия", "Гликемия (ммоль/л)", "ммоль/л", "0.0",
+                Glycemia::getCreatedAt, Glycemia::getLevel,
+                SERIES_BLUE,
+                plot -> {
+                    IntervalMarker zone = new IntervalMarker(targetLow, targetHigh);
+                    zone.setPaint(TARGET_FILL);
+                    plot.addRangeMarker(zone, Layer.BACKGROUND);
+                    plot.addRangeMarker(new ValueMarker(targetLow, TARGET_LINE, SERIES_STROKE));
+                    plot.addRangeMarker(new ValueMarker(targetHigh, TARGET_LINE, SERIES_STROKE));
+                }
         );
-        applyBaseStyle(chart, "0.0");
-
-        XYPlot plot = chart.getXYPlot();
-        IntervalMarker targetZone = new IntervalMarker(targetLow, targetHigh);
-        targetZone.setPaint(new Color(100, 200, 100, 60));
-        plot.addRangeMarker(targetZone, Layer.BACKGROUND);
-        plot.addRangeMarker(new ValueMarker(targetLow, new Color(50, 150, 50), new BasicStroke(2f)));
-        plot.addRangeMarker(new ValueMarker(targetHigh, new Color(50, 150, 50), new BasicStroke(2f)));
-
-        return encode(chart);
     }
 
     public byte[] createBloodPressureChart(List<BloodPressure> records) {
-        TimeSeries systolic  = new TimeSeries("Систолическое");
+        TimeSeries systolic = new TimeSeries("Систолическое");
         TimeSeries diastolic = new TimeSeries("Диастолическое");
-
         records.forEach(bp -> {
-            Millisecond ms = toMs(bp.getCreatedAt().toInstant(ZoneOffset.UTC).toEpochMilli());
+            Millisecond ms = toMs(bp.getCreatedAt());
             systolic.addOrUpdate(ms, bp.getSystolic());
             diastolic.addOrUpdate(ms, bp.getDiastolic());
         });
@@ -99,65 +107,92 @@ public class ChartService {
                 "Артериальное давление (мм рт. ст.)", "Дата", "мм рт. ст.",
                 dataset, true, false, false
         );
-        applyBaseStyle(chart, "0");
+        applyBaseStyle(chart, "0", false);
 
-        XYPlot plot = chart.getXYPlot();
-        XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();
-        renderer.setSeriesPaint(0, new Color(220, 50, 50));
-        renderer.setSeriesPaint(1, new Color(50, 100, 220));
+        XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) chart.getXYPlot().getRenderer();
+        renderer.setSeriesPaint(0, SERIES_RED);
+        renderer.setSeriesPaint(1, SERIES_NAVY);
 
         return encode(chart);
     }
 
-    private void applyBaseStyle(JFreeChart chart, String valuePattern) {
-        chart.setBackgroundPaint(Color.WHITE);
+    private <T> byte[] buildSingleSeriesChart(
+            List<T> records,
+            String seriesName,
+            String chartTitle,
+            String yAxisLabel,
+            String valuePattern,
+            Function<T, LocalDateTime> timeExtractor,
+            Function<T, Number> valueExtractor,
+            Color seriesColor,
+            java.util.function.Consumer<XYPlot> plotCustomizer
+    ) {
+        TimeSeries series = new TimeSeries(seriesName);
+        records.forEach(r -> series.addOrUpdate(toMs(timeExtractor.apply(r)), valueExtractor.apply(r)));
+
+        JFreeChart chart = ChartFactory.createTimeSeriesChart(
+                chartTitle, "Дата", yAxisLabel,
+                new TimeSeriesCollection(series), false, false, false
+        );
+        applyBaseStyle(chart, valuePattern, true);
+
+        XYPlot plot = chart.getXYPlot();
+        ((XYLineAndShapeRenderer) plot.getRenderer()).setSeriesPaint(0, seriesColor);
+
+        if (plotCustomizer != null) {
+            plotCustomizer.accept(plot);
+        }
+        return encode(chart);
+    }
+
+    private void applyBaseStyle(JFreeChart chart, String valuePattern, boolean withItemLabels) {
+        chart.setBackgroundPaint(BACKGROUND);
 
         if (chart.getTitle() != null) {
-            chart.getTitle().setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 22));
-            chart.getTitle().setPadding(new RectangleInsets(6, 0, 4, 0));
+            chart.getTitle().setFont(TITLE_FONT);
+            chart.getTitle().setPadding(TITLE_PADDING);
         }
 
         XYPlot plot = chart.getXYPlot();
-        plot.setBackgroundPaint(new Color(245, 245, 245));
-        plot.setDomainGridlinePaint(Color.LIGHT_GRAY);
-        plot.setRangeGridlinePaint(Color.LIGHT_GRAY);
-        plot.setInsets(new RectangleInsets(30, 20, 8, 30));
+        plot.setBackgroundPaint(PLOT_BG);
+        plot.setDomainGridlinePaint(GRID);
+        plot.setRangeGridlinePaint(GRID);
+        plot.setInsets(PLOT_INSETS);
 
         DateAxis dateAxis = (DateAxis) plot.getDomainAxis();
-        dateAxis.setDateFormatOverride(new SimpleDateFormat("dd.MM HH:mm"));
+        dateAxis.setDateFormatOverride(DATE_AXIS_FORMAT);
         dateAxis.setUpperMargin(0.05);
         dateAxis.setLowerMargin(0.05);
-        dateAxis.setTickLabelFont(new Font(Font.SANS_SERIF, Font.PLAIN, 18));
+        dateAxis.setTickLabelFont(CHART_FONT);
 
         ValueAxis rangeAxis = plot.getRangeAxis();
         rangeAxis.setUpperMargin(0.25);
         rangeAxis.setLowerMargin(0.15);
-        rangeAxis.setTickLabelFont(new Font(Font.SANS_SERIF, Font.PLAIN, 18));
+        rangeAxis.setTickLabelFont(CHART_FONT);
 
-        XYLineAndShapeRenderer renderer = getXyLineAndShapeRenderer(valuePattern);
-
-        plot.setRenderer(renderer);
+        plot.setRenderer(buildRenderer(valuePattern, withItemLabels));
     }
 
-    private static @NonNull XYLineAndShapeRenderer getXyLineAndShapeRenderer(String valuePattern) {
+    private static XYLineAndShapeRenderer buildRenderer(String valuePattern, boolean withItemLabels) {
         XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer(true, true);
-        renderer.setSeriesPaint(0, new Color(66, 133, 244));
         renderer.setSeriesShapesVisible(0, true);
-        renderer.setSeriesStroke(0, new BasicStroke(2f));
+        renderer.setSeriesStroke(0, SERIES_STROKE);
 
-        renderer.setDefaultItemLabelsVisible(true);
-        renderer.setDefaultItemLabelGenerator(new StandardXYItemLabelGenerator(
-                "{2}", new SimpleDateFormat("dd.MM.yy"), new DecimalFormat(valuePattern)
-        ));
-        renderer.setDefaultItemLabelFont(new Font(Font.SANS_SERIF, Font.PLAIN, 17));
-        renderer.setDefaultPositiveItemLabelPosition(
-                new ItemLabelPosition(ItemLabelAnchor.OUTSIDE12, TextAnchor.BOTTOM_CENTER)
-        );
+        if (withItemLabels) {
+            renderer.setDefaultItemLabelsVisible(true);
+            renderer.setDefaultItemLabelGenerator(new StandardXYItemLabelGenerator(
+                    "{2}", ITEM_LABEL_FORMAT, new DecimalFormat(valuePattern)
+            ));
+            renderer.setDefaultItemLabelFont(LABEL_FONT);
+            renderer.setDefaultPositiveItemLabelPosition(
+                    new ItemLabelPosition(ItemLabelAnchor.OUTSIDE12, TextAnchor.BOTTOM_CENTER)
+            );
+        }
         return renderer;
     }
 
-    private Millisecond toMs(long epochMilli) {
-        return new Millisecond(new Date(epochMilli));
+    private Millisecond toMs(LocalDateTime ldt) {
+        return new Millisecond(new Date(ldt.toInstant(ZoneOffset.UTC).toEpochMilli()));
     }
 
     private byte[] encode(JFreeChart chart) {
@@ -166,7 +201,7 @@ public class ChartService {
             return out.toByteArray();
         } catch (IOException e) {
             log.error("Ошибка генерации графика", e);
-            return new byte[0];
+            throw new IllegalStateException("Не удалось сгенерировать график", e);
         }
     }
 }
