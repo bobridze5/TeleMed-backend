@@ -8,6 +8,8 @@ import com.bobridze5.TeleMed_backend.api.dto.params.blood_pressure.BloodPressure
 import com.bobridze5.TeleMed_backend.api.dto.params.blood_pressure.BloodPressureResponse;
 import com.bobridze5.TeleMed_backend.api.dto.params.glycemia.GlycemiaFilterRequest;
 import com.bobridze5.TeleMed_backend.api.dto.params.glycemia.GlycemiaResponse;
+import com.bobridze5.TeleMed_backend.api.dto.params.insulin.InsulinDoseFilterRequest;
+import com.bobridze5.TeleMed_backend.api.dto.params.insulin.InsulinDoseResponse;
 import com.bobridze5.TeleMed_backend.api.dto.params.physical_activity.PhysicalActivityFilterRequest;
 import com.bobridze5.TeleMed_backend.api.dto.params.physical_activity.PhysicalActivityResponse;
 import com.bobridze5.TeleMed_backend.api.dto.params.symptom.SymptomFilterRequest;
@@ -51,6 +53,7 @@ public class DoctorPatientParamsController {
     private final GlycemiaService glycemiaService;
     private final SymptomServicePatient symptomService;
     private final PhysicalActivityService physicalActivityService;
+    private final InsulinDoseService insulinDoseService;
     private final PatientReportService reportService;
     private final PatientProfileService patientProfileService;
     private final AllergyService allergyService;
@@ -165,6 +168,28 @@ public class DoctorPatientParamsController {
     ) {
         Patient patient = accessService.getPatientForDoctor(doctor, patientId);
         return physicalActivityService.getRecordById(patient, id);
+    }
+
+    @GetMapping("/insulin-doses")
+    @Operation(summary = "Дозы инсулина пациента — список")
+    public Page<InsulinDoseResponse> getInsulinDoses(
+            @CurrentDoctor Doctor doctor,
+            @PathVariable Long patientId,
+            @ParameterObject @Valid @ModelAttribute InsulinDoseFilterRequest filter
+    ) {
+        Patient patient = accessService.getPatientForDoctor(doctor, patientId);
+        return insulinDoseService.getDoses(patient, filter);
+    }
+
+    @GetMapping("/insulin-doses/{id}")
+    @Operation(summary = "Дозы инсулина пациента — по ID")
+    public InsulinDoseResponse getInsulinDoseById(
+            @CurrentDoctor Doctor doctor,
+            @PathVariable Long patientId,
+            @PathVariable Long id
+    ) {
+        Patient patient = accessService.getPatientForDoctor(doctor, patientId);
+        return insulinDoseService.getDoseById(patient, id);
     }
 
     @GetMapping("/profile")

@@ -5,5 +5,6 @@ public enum ReportType {
     WEIGHT,
     GLYCEMIA,
     BLOOD_PRESSURE,
-    NUTRITION
+    NUTRITION,
+    INSULIN
 }

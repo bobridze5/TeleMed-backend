@@ -33,6 +33,7 @@ public final class API {
     public static final String PATIENT_ME_PARAMS_BLOOD_PRESSURE = PATIENT_ME + "/blood-pressures";
     public static final String PATIENT_ME_PARAMS_PHYSICAL_ACTIVITY = PATIENT_ME + "/physical-activities";
     public static final String PATIENT_ME_PARAMS_GLYCEMIA = PATIENT_ME + "/glycemia";
+    public static final String PATIENT_ME_PARAMS_INSULIN = PATIENT_ME + "/insulin-doses";
 
     public static final String PATIENT_ME_DIARY = PATIENT_ME + "/diary";
     public static final String PATIENT_ME_MEALS = PATIENT_ME + "/meals";
@@ -65,6 +66,7 @@ public final class API {
     public static final String PATIENT_PARAMS_SYMPTOM = PATIENT_ID + "/symptoms";
     public static final String PATIENT_PARAMS_PHYSICAL_ACTIVITY = PATIENT_ID + "/physical-activities";
     public static final String PATIENT_PARAMS_GLYCEMIA = PATIENT_ID + "/glycemia";
+    public static final String PATIENT_PARAMS_INSULIN = PATIENT_ID + "/insulin-doses";
     public static final String PATIENT_MEALS = PATIENT_ID + "/meals";
     public static final String PATIENT_PROFILE = PATIENT_ID + "/profile";
     public static final String PATIENT_ALLERGIES = PATIENT_ID + "/allergies";
