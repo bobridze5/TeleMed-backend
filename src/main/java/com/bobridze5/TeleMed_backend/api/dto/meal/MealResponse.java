@@ -1,6 +1,6 @@
 package com.bobridze5.TeleMed_backend.api.dto.meal;
 
-import com.bobridze5.TeleMed_backend.core.entity.report.eat.MealType;
+import com.bobridze5.TeleMed_backend.core.entity.report.food.MealType;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,6 +13,7 @@ public record MealResponse(
         Double totalCalories,
         Double totalCarbs,
         Double totalProtein,
-        Double totalFats
+        Double totalFats,
+        Double totalBreadUnits
 ) {
 }

@@ -9,6 +9,8 @@ public record DishResponse(
         Double fats,
         String photoURL,
         String description,
+        Double breadUnits,
         Long patientId
+
 ) {
 }

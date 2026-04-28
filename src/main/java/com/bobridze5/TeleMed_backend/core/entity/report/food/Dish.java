@@ -1,4 +1,4 @@
-package com.bobridze5.TeleMed_backend.core.entity.report.eat;
+package com.bobridze5.TeleMed_backend.core.entity.report.food;
 
 import com.bobridze5.TeleMed_backend.core.entity.Ownable;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
@@ -8,7 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Check;
 
 @Entity
 @Table(name = "dish")

@@ -5,11 +5,11 @@ import com.bobridze5.TeleMed_backend.api.dto.diary.NutritionDayUpdateRequest;
 import com.bobridze5.TeleMed_backend.api.dto.meal.MealResponse;
 import com.bobridze5.TeleMed_backend.api.mappers.MealMapper;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
-import com.bobridze5.TeleMed_backend.core.entity.report.eat.Meal;
-import com.bobridze5.TeleMed_backend.core.entity.report.eat.MealItem;
-import com.bobridze5.TeleMed_backend.core.entity.report.eat.NutritionDay;
+import com.bobridze5.TeleMed_backend.core.entity.report.food.Meal;
+import com.bobridze5.TeleMed_backend.core.entity.report.food.NutritionDay;
 import com.bobridze5.TeleMed_backend.core.exceptions.EntityNotFoundException;
 import com.bobridze5.TeleMed_backend.core.repository.NutritionDayRepository;
+import com.bobridze5.TeleMed_backend.core.service.utils.Constant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -78,14 +78,10 @@ public class DiaryService {
     public void recomputeTotals(NutritionDay day) {
         double calories = 0, carbs = 0, protein = 0, fats = 0;
         for (Meal meal : day.getMeals()) {
-            for (MealItem item : meal.getItems()) {
-                double factor = (item.getPortionGrams() != null ? item.getPortionGrams() : 0) / 100.0;
-                int qty = item.getQuantity() != null ? item.getQuantity() : 1;
-                calories += nz(item.getCalories()) * factor * qty;
-                carbs += nz(item.getCarbs()) * factor * qty;
-                protein += nz(item.getProtein()) * factor * qty;
-                fats += nz(item.getFats()) * factor * qty;
-            }
+            calories += meal.totalCalories();
+            carbs    += meal.totalCarbs();
+            protein  += meal.totalProtein();
+            fats     += meal.totalFats();
         }
         day.setTotalCalories(round(calories));
         day.setTotalCarbs(round(carbs));
@@ -110,12 +106,9 @@ public class DiaryService {
                 day.getTotalFats(),
                 day.getCompleted(),
                 day.getNotes(),
-                meals
+                meals,
+                Constant.Nutrition.toBreadUnits(day.getTotalCarbs())
         );
-    }
-
-    private double nz(Double v) {
-        return v != null ? v : 0.0;
     }
 
     private double round(double v) {

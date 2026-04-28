@@ -1,4 +1,4 @@
-package com.bobridze5.TeleMed_backend.core.entity.report.eat;
+package com.bobridze5.TeleMed_backend.core.entity.report.food;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Positive;
@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Check;
 
 @Entity
 @Table(name = "meal_item")
@@ -57,4 +56,31 @@ public class MealItem {
     @Positive
     @Column(name = "meal_item_quantity", nullable = false)
     private Integer quantity;
+
+    @Transient
+    public double factor() {
+        double portion = portionGrams != null ? portionGrams : 0.0;
+        int qty = quantity != null ? quantity : 1;
+        return portion / 100.0 * qty;
+    }
+
+    @Transient
+    public double totalCalories() {
+        return calories != null ? calories * factor() : 0.0;
+    }
+
+    @Transient
+    public double totalCarbs() {
+        return carbs != null ? carbs * factor() : 0.0;
+    }
+
+    @Transient
+    public double totalProtein() {
+        return protein != null ? protein * factor() : 0.0;
+    }
+
+    @Transient
+    public double totalFats() {
+        return fats != null ? fats * factor() : 0.0;
+    }
 }

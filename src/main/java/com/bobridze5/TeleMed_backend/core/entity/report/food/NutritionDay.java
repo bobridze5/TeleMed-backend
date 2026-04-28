@@ -1,4 +1,4 @@
-package com.bobridze5.TeleMed_backend.core.entity.report.eat;
+package com.bobridze5.TeleMed_backend.core.entity.report.food;
 
 import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
 import jakarta.persistence.CascadeType;

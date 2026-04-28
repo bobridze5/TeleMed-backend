@@ -1,4 +1,4 @@
-package com.bobridze5.TeleMed_backend.core.entity.report.eat;
+package com.bobridze5.TeleMed_backend.core.entity.report.food;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

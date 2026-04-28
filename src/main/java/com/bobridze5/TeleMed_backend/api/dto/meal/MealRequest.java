@@ -1,6 +1,6 @@
 package com.bobridze5.TeleMed_backend.api.dto.meal;
 
-import com.bobridze5.TeleMed_backend.core.entity.report.eat.MealType;
+import com.bobridze5.TeleMed_backend.core.entity.report.food.MealType;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;

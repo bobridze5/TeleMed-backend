@@ -1,14 +1,18 @@
 package com.bobridze5.TeleMed_backend.core.service.report;
 
 import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
+import com.bobridze5.TeleMed_backend.core.entity.report.food.Meal;
+import com.bobridze5.TeleMed_backend.core.entity.report.food.MealItem;
 import com.bobridze5.TeleMed_backend.core.entity.report.glycemia.Glycemia;
 import com.bobridze5.TeleMed_backend.core.entity.report.pressure.BloodPressure;
 import com.bobridze5.TeleMed_backend.core.entity.report.symptom.Symptom;
 import com.bobridze5.TeleMed_backend.core.entity.report.weight.Weight;
 import com.bobridze5.TeleMed_backend.core.repository.BloodPressureRepository;
 import com.bobridze5.TeleMed_backend.core.repository.GlycemiaRepository;
+import com.bobridze5.TeleMed_backend.core.repository.MealRepository;
 import com.bobridze5.TeleMed_backend.core.repository.SymptomRepository;
 import com.bobridze5.TeleMed_backend.core.repository.WeightRepository;
+import com.bobridze5.TeleMed_backend.core.service.utils.Constant.Nutrition;
 import com.lowagie.text.*;
 import com.lowagie.text.Font;
 import com.lowagie.text.Image;
@@ -28,6 +32,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -44,6 +49,7 @@ public class PatientReportService {
     private final GlycemiaRepository     glycemiaRepository;
     private final BloodPressureRepository bloodPressureRepository;
     private final SymptomRepository      symptomRepository;
+    private final MealRepository         mealRepository;
     private final ChartService           chartService;
 
     public byte[] generateReport(Patient patient, LocalDate from, LocalDate to, ReportType type) {
@@ -61,6 +67,9 @@ public class PatientReportService {
                 : List.of();
         List<Symptom>       symptoms      = (type == ReportType.GENERAL)
                 ? symptomRepository.findByPatientIdAndCreatedAtBetweenOrderByCreatedAtAsc(patient.getId(), start, end)
+                : List.of();
+        List<Meal>          meals         = (type == ReportType.GENERAL || type == ReportType.NUTRITION)
+                ? mealRepository.findByPatientIdAndMealDatetimeBetweenOrderByMealDatetimeAsc(patient.getId(), start, end)
                 : List.of();
 
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
@@ -128,11 +137,18 @@ public class PatientReportService {
                 doc.add(gap());
             }
 
+            if (!meals.isEmpty()) {
+                doc.add(sectionHeader("Питание", fSection));
+                doc.add(buildMealsTable(meals, fSmallBold, fNormal, fSmall));
+                doc.add(gap());
+            }
+
             doc.add(sectionHeader("Анализ ИИ", fSection));
             doc.add(buildAiAnalysisBlock(fSmall, fNormal));
             doc.add(gap());
 
-            if (weights.isEmpty() && glycemiaList.isEmpty() && bloodPressures.isEmpty() && symptoms.isEmpty()) {
+            if (weights.isEmpty() && glycemiaList.isEmpty() && bloodPressures.isEmpty()
+                    && symptoms.isEmpty() && meals.isEmpty()) {
                 doc.add(new Paragraph("Нет данных за выбранный период.", fNormal));
             }
 
@@ -149,10 +165,49 @@ public class PatientReportService {
             case WEIGHT        -> "Отчёт: Вес";
             case GLYCEMIA      -> "Отчёт: Гликемия";
             case BLOOD_PRESSURE -> "Отчёт: Артериальное давление";
+            case NUTRITION     -> "Отчёт: Питание";
             case GENERAL       -> "Дневник самоконтроля";
         };
     }
 
+
+    private Table buildMealsTable(List<Meal> meals,
+                                  Font headerFont, Font normalFont, Font smallFont) throws DocumentException {
+        Table table = new Table(6);
+        table.setWidths(new float[]{18, 12, 30, 10, 15, 15});
+        table.setWidth(100);
+        table.setHorizontalAlignment(HorizontalAlignment.CENTER);
+        table.setPadding(3);
+        addHeaderRow(table, new String[]{"Дата и время", "Тип", "Состав", "Ккал", "Углеводы, г", "ХЕ"}, headerFont);
+        for (int i = 0; i < meals.size(); i++) {
+            Meal m = meals.get(i);
+            String composition = m.getItems() == null ? "—"
+                    : m.getItems().stream()
+                        .filter(it -> it != null && it.getDish() != null)
+                        .map(this::formatMealItem)
+                        .collect(Collectors.joining("; "));
+            Double bu = Nutrition.toBreadUnits(m.totalCarbs());
+            addDataRow(table, new String[]{
+                    m.getMealDatetime() != null ? m.getMealDatetime().format(DATETIME_FMT) : "—",
+                    m.getMealType() != null ? m.getMealType().name() : "—",
+                    composition.isEmpty() ? "—" : composition,
+                    String.format("%.0f", m.totalCalories()),
+                    String.format("%.1f", m.totalCarbs()),
+                    bu != null ? String.format("%.1f", bu) : "—"
+            }, i % 2 == 1 ? smallFont : normalFont, i % 2 == 1);
+        }
+        return table;
+    }
+
+    private String formatMealItem(MealItem item) {
+        String name = item.getDish().getName();
+        Double portion = item.getPortionGrams();
+        Integer qty = item.getQuantity();
+        StringBuilder sb = new StringBuilder(name);
+        if (portion != null) sb.append(" ").append(String.format("%.0f", portion)).append(" г");
+        if (qty != null && qty > 1) sb.append(" × ").append(qty);
+        return sb.toString();
+    }
 
     private Table buildSymptomsTable(List<Symptom> records,
                                      Font headerFont, Font normalFont, Font smallFont) throws DocumentException {

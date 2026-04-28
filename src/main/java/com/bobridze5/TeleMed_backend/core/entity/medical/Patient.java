@@ -2,7 +2,7 @@ package com.bobridze5.TeleMed_backend.core.entity.medical;
 
 import com.bobridze5.TeleMed_backend.core.entity.Ownable;
 import com.bobridze5.TeleMed_backend.core.entity.auth.User;
-import com.bobridze5.TeleMed_backend.core.entity.report.eat.Dish;
+import com.bobridze5.TeleMed_backend.core.entity.report.food.Dish;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;

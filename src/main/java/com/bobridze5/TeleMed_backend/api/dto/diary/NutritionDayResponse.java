@@ -14,6 +14,7 @@ public record NutritionDayResponse(
         Double totalFats,
         Boolean completed,
         String notes,
-        List<MealResponse> meals
+        List<MealResponse> meals,
+        Double totalBreadUnits
 ) {
 }

@@ -2,7 +2,7 @@ package com.bobridze5.TeleMed_backend.core.service.utils;
 
 
 import com.bobridze5.TeleMed_backend.api.dto.dish.DishFilterRequest;
-import com.bobridze5.TeleMed_backend.core.entity.report.eat.Dish;
+import com.bobridze5.TeleMed_backend.core.entity.report.food.Dish;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;

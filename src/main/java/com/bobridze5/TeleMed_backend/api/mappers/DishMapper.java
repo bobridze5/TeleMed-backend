@@ -3,8 +3,10 @@ package com.bobridze5.TeleMed_backend.api.mappers;
 import com.bobridze5.TeleMed_backend.api.dto.dish.CreateDishRequest;
 import com.bobridze5.TeleMed_backend.api.dto.dish.DishResponse;
 import com.bobridze5.TeleMed_backend.api.dto.dish.UpdateDishRequest;
-import com.bobridze5.TeleMed_backend.core.entity.report.eat.Dish;
+import com.bobridze5.TeleMed_backend.core.entity.report.food.Dish;
 import org.springframework.stereotype.Component;
+
+import static com.bobridze5.TeleMed_backend.core.service.utils.Constant.Nutrition;
 
 @Component
 public class DishMapper {
@@ -43,6 +45,7 @@ public class DishMapper {
                 dish.getFats(),
                 dish.getPhotoURL(),
                 dish.getDescription(),
+                Nutrition.toBreadUnits(dish.getCarbs()),
                 dish.getPatient() != null ? dish.getPatient().getId() : null
         );
     }
