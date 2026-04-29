@@ -63,7 +63,15 @@ public class ReminderService {
     public ReminderResponse toggle(Patient patient, Long reminderId) {
         Reminder reminder = reminderRepository.findByIdAndPatientId(reminderId, patient.getId())
                 .orElseThrow(() -> new EntityNotFoundException("Напоминание не найдено"));
-        reminder.setEnabled(!Boolean.TRUE.equals(reminder.getEnabled()));
+        // Разовое уведомление, которое уже сработало, повторно включить нельзя.
+        boolean turningOn = !Boolean.TRUE.equals(reminder.getEnabled());
+        if (turningOn
+                && reminder.getKind() == ReminderKind.ONE_SHOT
+                && reminder.getLastFiredAt() != null) {
+            throw new ApiException(HttpStatus.BAD_REQUEST,
+                    "Разовое напоминание уже сработало и не может быть включено повторно");
+        }
+        reminder.setEnabled(turningOn);
         return ReminderMapper.mapToResponse(reminder);
     }
 

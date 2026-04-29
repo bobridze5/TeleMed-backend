@@ -6,6 +6,7 @@ import com.bobridze5.TeleMed_backend.api.dto.appointment.AppointmentRequest;
 import com.bobridze5.TeleMed_backend.api.dto.appointment.AppointmentResponse;
 import com.bobridze5.TeleMed_backend.api.dto.appointment.AppointmentUpdateRequest;
 import com.bobridze5.TeleMed_backend.api.dto.appointment.CancelAppointmentRequest;
+import com.bobridze5.TeleMed_backend.api.dto.appointment.DoctorConfirmRequest;
 import com.bobridze5.TeleMed_backend.core.annotations.CurrentDoctor;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Doctor;
 import com.bobridze5.TeleMed_backend.core.service.appointment.AppointmentService;
@@ -85,12 +86,27 @@ public class DoctorAppointmentController {
     }
 
     @PostMapping("/{id}/confirm")
-    @Operation(summary = "Подтвердить запись", description = "Переводит запись в статус CONFIRMED")
+    @Operation(
+            summary = "Подтвердить запись (со стороны врача)",
+            description = "Помечает запись как подтверждённую врачом и одновременно сохраняет " +
+                    "детали встречи: ссылку на видеоконференцию, телефон для аудио-звонка, " +
+                    "заметки/пароль для входа. Когда обе стороны подтвердили — статус становится CONFIRMED."
+    )
     public AppointmentResponse confirmAppointment(
             @PathVariable Long id,
+            @RequestBody(required = false) DoctorConfirmRequest request,
             @CurrentDoctor Doctor doctor
     ) {
-        appointmentService.confirmAppointment(id, doctor.getId(), "DOCTOR");
+        if (request == null) {
+            appointmentService.confirmAppointment(id, doctor.getId(), "DOCTOR");
+        } else {
+            appointmentService.confirmAppointmentByDoctor(
+                    id, doctor.getId(),
+                    request.meetingLink(),
+                    request.meetingPhone(),
+                    request.meetingNotes()
+            );
+        }
         return appointmentService.getAppointmentById(id, doctor.getId());
     }
 
@@ -102,6 +118,35 @@ public class DoctorAppointmentController {
             @CurrentDoctor Doctor doctor
     ) {
         appointmentService.cancelAppointment(id, doctor.getId(), request != null ? request.reason() : null);
+        return appointmentService.getAppointmentById(id, doctor.getId());
+    }
+
+    @PostMapping("/{id}/complete")
+    @Operation(
+            summary = "Завершить консультацию",
+            description = "Переводит запись в статус COMPLETED. Только врач может отметить " +
+                    "приём как состоявшийся; пациент после этого сможет оставить отзыв."
+    )
+    public AppointmentResponse completeAppointment(
+            @PathVariable Long id,
+            @CurrentDoctor Doctor doctor
+    ) {
+        appointmentService.completeAppointment(id, doctor.getId());
+        return appointmentService.getAppointmentById(id, doctor.getId());
+    }
+
+    @PostMapping("/{id}/no-show")
+    @Operation(
+            summary = "Отметить как «Пациент не явился»",
+            description = "Переводит запись в статус NO_SHOW. Доступно только " +
+                    "для подтверждённых записей (из CONFIRMED)."
+    )
+    public AppointmentResponse markNoShow(
+            @PathVariable Long id,
+            @RequestBody(required = false) CancelAppointmentRequest request,
+            @CurrentDoctor Doctor doctor
+    ) {
+        appointmentService.markNoShow(id, doctor.getId(), request != null ? request.reason() : null);
         return appointmentService.getAppointmentById(id, doctor.getId());
     }
 }

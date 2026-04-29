@@ -15,6 +15,7 @@ public final class GlycemiaMapper {
                 .patient(patient)
                 .level(request.level())
                 .type(request.type())
+                .createdAt(request.timestamp())
                 .build();
     }
 
@@ -23,12 +24,13 @@ public final class GlycemiaMapper {
                 entity.getId(),
                 entity.getLevel(),
                 entity.getType(),
-                entity.getUpdatedAt()
+                entity.getCreatedAt()
         );
     }
 
     public void updateEntity(GlycemiaUpdateRequest request, Glycemia entity) {
         if (request.level() != null) entity.setLevel(request.level());
         if (request.type() != null) entity.setType(request.type());
+        if (request.timestamp() != null) entity.setCreatedAt(request.timestamp());
     }
 }

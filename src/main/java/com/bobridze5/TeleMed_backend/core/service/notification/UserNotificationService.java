@@ -44,6 +44,13 @@ public class UserNotificationService {
     }
 
     @Transactional
+    public void delete(Long userId, Long notificationId) {
+        Notification notification = repository.findByIdAndUserId(notificationId, userId)
+                .orElseThrow(() -> new EntityNotFoundException("Уведомление не найдено"));
+        repository.delete(notification);
+    }
+
+    @Transactional
     public Notification create(User user, Reminder reminder, String type, String title, String message) {
         Notification notification = Notification.builder()
                 .user(user)

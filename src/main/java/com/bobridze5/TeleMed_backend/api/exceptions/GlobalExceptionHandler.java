@@ -75,16 +75,4 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.badRequest().body(response);
     }
-
-//    @ExceptionHandler(Exception.class)
-//    public ResponseEntity<Map<String, Object>> handleOtherExceptions(Exception e){
-//        Map<String, Object> response = Map.of(
-//                "timestamp", Instant.now(),
-//                "status", HttpStatus.INTERNAL_SERVER_ERROR.value(),
-//                "error", HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-//                "message", e.getMessage()
-//        );
-//
-//        return ResponseEntity.status(500).body(response);
-//    }
 }

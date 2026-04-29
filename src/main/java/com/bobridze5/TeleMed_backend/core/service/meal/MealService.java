@@ -122,6 +122,13 @@ public class MealService {
     public void deleteMeal(Patient patient, Long mealId) {
         Meal meal = findMealForPatient(patient, mealId);
         NutritionDay day = meal.getNutritionDay();
+        if (day != null && day.getMeals() != null) {
+            // ВАЖНО: убираем meal из managed-коллекции дня ДО delete, иначе
+            // recomputeTotals → nutritionDayRepository.save(day) попытается
+            // каскадом смерджить уже удалённый meal и упадёт с
+            // org.hibernate.ObjectDeletedException: deleted instance passed to merge.
+            day.getMeals().removeIf(m -> mealId.equals(m.getId()));
+        }
         mealRepository.delete(meal);
         if (day != null) {
             diaryService.recomputeTotals(day);

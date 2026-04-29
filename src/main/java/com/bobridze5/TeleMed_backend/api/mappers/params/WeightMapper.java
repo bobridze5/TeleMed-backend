@@ -11,6 +11,7 @@ public class WeightMapper {
                 .id(null)
                 .value(request.value())
                 .patient(patient)
+                .createdAt(request.timestamp())
                 .build();
     }
 
@@ -24,5 +25,6 @@ public class WeightMapper {
 
     public static void updateEntity(WeightRequest request, Weight weight) {
         if (request.value() != null) weight.setValue(request.value());
+        if (request.timestamp() != null) weight.setCreatedAt(request.timestamp());
     }
 }

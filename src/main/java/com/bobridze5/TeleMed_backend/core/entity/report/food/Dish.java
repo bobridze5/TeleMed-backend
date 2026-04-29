@@ -11,10 +11,6 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "dish")
-//@Check(constraints = "dish_calories_per_100 >= 0 " +
-//        "AND dish_carbs_per_100 >= 0 " +
-//        "AND dish_protein_per_100 >= 0 " +
-//        "AND dish_fats_per_100 >= 0")
 @Data
 @Builder
 @NoArgsConstructor

@@ -3,11 +3,14 @@ package com.bobridze5.TeleMed_backend.api.dto.params.symptom;
 import com.bobridze5.TeleMed_backend.core.entity.report.symptom.SymptomSeverity;
 import jakarta.validation.constraints.NotNull;
 
+import java.time.LocalDateTime;
+
 public record SymptomRequest(
     @NotNull(message = "Степень серьёзности должна быть указана")
     SymptomSeverity severity,
 
-    String description
-) {
+    String description,
 
+    LocalDateTime timestamp
+) {
 }

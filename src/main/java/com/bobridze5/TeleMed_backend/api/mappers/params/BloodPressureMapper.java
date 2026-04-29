@@ -12,6 +12,7 @@ public class BloodPressureMapper {
                 .patient(patient)
                 .systolic(request.systolic())
                 .diastolic(request.diastolic())
+                .createdAt(request.timestamp())
                 .build();
     }
 
@@ -27,5 +28,6 @@ public class BloodPressureMapper {
     public static void updateEntity(BloodPressureRequest request, BloodPressure bloodPressure) {
         if (request.systolic() != null) bloodPressure.setSystolic(request.systolic());
         if (request.diastolic() != null) bloodPressure.setDiastolic(request.diastolic());
+        if (request.timestamp() != null) bloodPressure.setCreatedAt(request.timestamp());
     }
 }

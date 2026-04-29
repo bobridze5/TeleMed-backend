@@ -5,6 +5,8 @@ import com.bobridze5.TeleMed_backend.core.entity.report.activity.PhysicalActivit
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
+import java.time.LocalDateTime;
+
 public record PhysicalActivityRequest(
         @NotNull(message = "Активность должна быть указана")
         PhysicalActivityType activityType,
@@ -14,7 +16,8 @@ public record PhysicalActivityRequest(
 
         @NotNull(message = "Длительность должна быть указана")
         @Positive(message = "Длительность в минутах должна быть больше нуля")
-        Integer duration
+        Integer duration,
 
+        LocalDateTime timestamp
 ) {
 }

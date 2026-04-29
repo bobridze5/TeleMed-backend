@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "meal_item")
-//@Check(constraints = "meal_item_portion_grams >= 0")
 @Data
 @Builder
 @NoArgsConstructor

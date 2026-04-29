@@ -16,6 +16,7 @@ public final class PhysicalActivityMapper {
                 .activityType(request.activityType())
                 .intensityType(request.intensityType())
                 .duration(request.duration())
+                .createdAt(request.timestamp())
                 .build();
     }
 
@@ -25,7 +26,7 @@ public final class PhysicalActivityMapper {
                 entity.getActivityType(),
                 entity.getIntensityType(),
                 entity.getDuration(),
-                entity.getUpdatedAt()
+                entity.getCreatedAt()
         );
     }
 
@@ -33,6 +34,6 @@ public final class PhysicalActivityMapper {
         if (request.activityType() != null) entity.setActivityType(request.activityType());
         if (request.intensityType() != null) entity.setIntensityType(request.intensityType());
         if (request.duration() != null) entity.setDuration(request.duration());
-
+        if (request.timestamp() != null) entity.setCreatedAt(request.timestamp());
     }
 }

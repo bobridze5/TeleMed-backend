@@ -27,12 +27,17 @@ public class PatientAppointmentStrategy implements AppointmentCreationStrategy {
 
         Patient patient = (Patient) initiator;
 
+        // Создаём запись без подтверждений: и пациент, и врач должны явно
+        // нажать «Подтвердить» в своих интерфейсах. Только тогда запись
+        // переходит в статус CONFIRMED.
         return Appointment.builder()
                 .patient(patient)
                 .doctor(doctor)
                 .dateTime(request.dateTime())
                 .consultationType(request.consultationType())
                 .status(AppointmentStatus.CREATED)
+                .confirmedByPatient(false)
+                .confirmedByDoctor(false)
                 .build();
     }
 }

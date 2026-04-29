@@ -86,7 +86,11 @@ public class AppointmentController {
     }
 
     @PostMapping("/{id}/confirm")
-    @Operation(summary = "Подтвердить запись на приём", description = "Переводит запись в статус CONFIRMED")
+    @Operation(
+            summary = "Подтвердить запись на приём (со стороны пациента)",
+            description = "Помечает запись подтверждённой пациентом. Запись становится CONFIRMED " +
+                    "только после подтверждения обеими сторонами."
+    )
     public AppointmentResponse confirmAppointment(
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetailsImpl userDetails
@@ -103,16 +107,6 @@ public class AppointmentController {
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         appointmentService.cancelAppointment(id, userDetails.getUserId(), request != null ? request.reason() : null);
-        return appointmentService.getAppointmentById(id, userDetails.getUserId());
-    }
-
-    @PostMapping("/{id}/complete")
-    @Operation(summary = "Завершить консультацию", description = "Переводит запись в статус COMPLETED")
-    public AppointmentResponse completeAppointment(
-            @PathVariable Long id,
-            @AuthenticationPrincipal UserDetailsImpl userDetails
-    ) {
-        appointmentService.completeAppointment(id, userDetails.getUserId());
         return appointmentService.getAppointmentById(id, userDetails.getUserId());
     }
 

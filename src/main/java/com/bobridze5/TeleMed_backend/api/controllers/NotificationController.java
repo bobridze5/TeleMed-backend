@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -50,5 +51,15 @@ public class NotificationController {
             @PathVariable Long notificationId
     ) {
         notificationService.markRead(userDetails.getUserId(), notificationId);
+    }
+
+    @DeleteMapping("/{notificationId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Удалить уведомление")
+    public void delete(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @PathVariable Long notificationId
+    ) {
+        notificationService.delete(userDetails.getUserId(), notificationId);
     }
 }

@@ -116,7 +116,31 @@ public class AppointmentService {
         Appointment appointment = appointmentRepository.findByIdAndUserId(appointmentId, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Запись не найдена"));
 
+        if (appointment.getStatus() == AppointmentStatus.CANCELED
+                || appointment.getStatus() == AppointmentStatus.COMPLETED) {
+            throw new IllegalStateException("Нельзя изменить отменённую или завершённую запись");
+        }
+
+        // Если меняется время или тип консультации — сбрасываем оба
+        // подтверждения, чтобы стороны заново согласовали новый слот.
+        // Без этого получалось бы, что обе стороны «согласны» на время,
+        // которое уже неактуально.
+        boolean rescheduled =
+                (request.dateTime() != null
+                        && !request.dateTime().equals(appointment.getDateTime()))
+                || (request.consultationType() != null
+                        && request.consultationType() != appointment.getConsultationType());
+
         mapper.updateEntity(request, appointment);
+
+        if (rescheduled) {
+            appointment.setConfirmedByPatient(false);
+            appointment.setConfirmedByDoctor(false);
+            appointment.setConfirmedBy(null);
+            appointment.setStatus(AppointmentStatus.CREATED);
+            log.info("Запись ID: {} перенесена — флаги подтверждения сброшены", appointmentId);
+        }
+
         Appointment updated = appointmentRepository.save(appointment);
 
         log.info("Обновлена запись ID: {} пользователем ID: {}", appointmentId, userId);
@@ -124,16 +148,96 @@ public class AppointmentService {
         return mapper.mapToResponse(updated);
     }
 
+    /**
+     * Двухстороннее подтверждение записи. Каждая сторона (пациент/врач)
+     * подтверждает независимо; только когда обе стороны подтвердили,
+     * статус переходит в CONFIRMED. До этого момента запись висит в CREATED,
+     * но во фронте видно, кто уже подтвердил.
+     *
+     * @param confirmedByRole "PATIENT" или "DOCTOR"
+     */
     @Transactional
     public void confirmAppointment(Long appointmentId, Long userId, String confirmedByRole) {
         Appointment appointment = appointmentRepository.findByIdAndUserId(appointmentId, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Запись не найдена"));
 
-        appointment.setStatus(AppointmentStatus.CONFIRMED);
+        if (appointment.getStatus() == AppointmentStatus.CANCELED
+                || appointment.getStatus() == AppointmentStatus.COMPLETED) {
+            throw new IllegalStateException("Нельзя подтвердить отменённую или завершённую запись");
+        }
+
+        if ("PATIENT".equals(confirmedByRole)) {
+            appointment.setConfirmedByPatient(true);
+        } else if ("DOCTOR".equals(confirmedByRole)) {
+            appointment.setConfirmedByDoctor(true);
+        } else {
+            throw new IllegalArgumentException("Неизвестная роль подтверждения: " + confirmedByRole);
+        }
+
+        // Старое поле — пишем сюда последнего подтвердившего, чтобы не сломать
+        // потенциальных потребителей.
         appointment.setConfirmedBy(confirmedByRole);
+
+        // Запись считается подтверждённой только когда обе стороны нажали «подтвердить».
+        if (Boolean.TRUE.equals(appointment.getConfirmedByPatient())
+                && Boolean.TRUE.equals(appointment.getConfirmedByDoctor())) {
+            appointment.setStatus(AppointmentStatus.CONFIRMED);
+        }
+
         appointmentRepository.save(appointment);
 
-        log.info("Запись ID: {} подтверждена пользователем ID: {} (роль: {})", appointmentId, userId, confirmedByRole);
+        log.info("Запись ID: {} подтверждена ролью {}; pat={}, doc={}, status={}",
+                appointmentId, confirmedByRole,
+                appointment.getConfirmedByPatient(),
+                appointment.getConfirmedByDoctor(),
+                appointment.getStatus());
+    }
+
+    /**
+     * Подтверждение записи врачом с заполнением деталей встречи
+     * (ссылка/телефон/заметки и пароль). Поля опциональны и обновляются
+     * только если переданы непустые значения.
+     *
+     * Вся логика в одном методе и одной транзакции, чтобы:
+     *  1) не делать лишний SQL-select (был дубль с self-invocation);
+     *  2) гарантировать атомарность «детали + подтверждение».
+     */
+    @Transactional
+    public void confirmAppointmentByDoctor(Long appointmentId, Long doctorId,
+                                           String meetingLink, String meetingPhone, String meetingNotes) {
+        Appointment appointment = appointmentRepository.findByIdAndUserId(appointmentId, doctorId)
+                .orElseThrow(() -> new EntityNotFoundException("Запись не найдена"));
+
+        if (appointment.getStatus() == AppointmentStatus.CANCELED
+                || appointment.getStatus() == AppointmentStatus.COMPLETED) {
+            throw new IllegalStateException("Нельзя подтвердить отменённую или завершённую запись");
+        }
+
+        if (meetingLink != null) {
+            appointment.setMeetingLink(meetingLink.isBlank() ? null : meetingLink.trim());
+        }
+        if (meetingPhone != null) {
+            appointment.setMeetingPhone(meetingPhone.isBlank() ? null : meetingPhone.trim());
+        }
+        if (meetingNotes != null) {
+            appointment.setMeetingNotes(meetingNotes.isBlank() ? null : meetingNotes.trim());
+        }
+
+        appointment.setConfirmedByDoctor(true);
+        appointment.setConfirmedBy("DOCTOR");
+
+        if (Boolean.TRUE.equals(appointment.getConfirmedByPatient())
+                && Boolean.TRUE.equals(appointment.getConfirmedByDoctor())) {
+            appointment.setStatus(AppointmentStatus.CONFIRMED);
+        }
+
+        appointmentRepository.save(appointment);
+
+        log.info("Запись ID: {} подтверждена врачом ID: {}; pat={}, doc={}, status={}",
+                appointmentId, doctorId,
+                appointment.getConfirmedByPatient(),
+                appointment.getConfirmedByDoctor(),
+                appointment.getStatus());
     }
 
     @Transactional
@@ -151,6 +255,11 @@ public class AppointmentService {
         Appointment appointment = appointmentRepository.findByIdAndUserId(appointmentId, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Запись не найдена"));
 
+        if (appointment.getStatus() == AppointmentStatus.CANCELED
+                || appointment.getStatus() == AppointmentStatus.COMPLETED) {
+            throw new IllegalStateException("Запись уже завершена или отменена");
+        }
+
         appointment.setStatus(AppointmentStatus.CANCELED);
         if (reason != null && !reason.isBlank()) {
             appointment.setReason(reason);
@@ -160,10 +269,47 @@ public class AppointmentService {
         log.info("Запись ID: {} отменена пользователем ID: {}", appointmentId, userId);
     }
 
+    /**
+     * Отметка «Пациент не явился» — отдельная от обычной отмены.
+     * Используется только врачом и переводит запись в статус NO_SHOW.
+     * Доступно только из CONFIRMED (нелогично «не являться» туда, что
+     * стороны и не подтверждали).
+     */
+    @Transactional
+    public void markNoShow(Long appointmentId, Long doctorId, String reason) {
+        Appointment appointment = appointmentRepository.findByIdAndUserId(appointmentId, doctorId)
+                .orElseThrow(() -> new EntityNotFoundException("Запись не найдена"));
+
+        if (appointment.getStatus() != AppointmentStatus.CONFIRMED) {
+            throw new IllegalStateException(
+                    "Отметить «Не явился» можно только подтверждённую запись " +
+                    "(текущий статус: " + appointment.getStatus() + ")"
+            );
+        }
+
+        appointment.setStatus(AppointmentStatus.NO_SHOW);
+        if (reason != null && !reason.isBlank()) {
+            appointment.setReason(reason);
+        }
+        appointmentRepository.save(appointment);
+
+        log.info("Запись ID: {} отмечена как NO_SHOW врачом ID: {}", appointmentId, doctorId);
+    }
+
     @Transactional
     public void completeAppointment(Long appointmentId, Long userId) {
         Appointment appointment = appointmentRepository.findByIdAndUserId(appointmentId, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Запись не найдена"));
+
+        // Завершить можно только подтверждённую запись.
+        // Из CREATED завершать нельзя — иначе можно «провести» консультацию,
+        // которая ещё не была согласована обеими сторонами.
+        if (appointment.getStatus() != AppointmentStatus.CONFIRMED) {
+            throw new IllegalStateException(
+                    "Завершить можно только подтверждённую обеими сторонами запись " +
+                    "(текущий статус: " + appointment.getStatus() + ")"
+            );
+        }
 
         appointment.setStatus(AppointmentStatus.COMPLETED);
         appointmentRepository.save(appointment);

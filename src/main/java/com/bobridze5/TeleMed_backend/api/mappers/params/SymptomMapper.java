@@ -15,6 +15,7 @@ public class SymptomMapper {
                 .patient(patient)
                 .severity(request.severity())
                 .description(request.description())
+                .createdAt(request.timestamp())
                 .build();
     }
 
@@ -23,12 +24,13 @@ public class SymptomMapper {
                 entity.getId(),
                 entity.getSeverity(),
                 entity.getDescription(),
-                entity.getUpdatedAt()
+                entity.getCreatedAt()
         );
     }
 
     public void updateEntity(SymptomUpdateRequest request, Symptom entity) {
         if (request.severity() != null) entity.setSeverity(request.severity());
         if (request.description() != null) entity.setDescription(request.description());
+        if (request.timestamp() != null) entity.setCreatedAt(request.timestamp());
     }
 }

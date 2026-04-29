@@ -36,8 +36,12 @@ public final class AppointmentMapper {
                 appointment.getConsultationType(),
                 appointment.getStatus(),
                 appointment.getMeetingLink(),
+                appointment.getMeetingPhone(),
+                appointment.getMeetingNotes(),
                 appointment.getReason(),
                 appointment.getConfirmedBy(),
+                Boolean.TRUE.equals(appointment.getConfirmedByPatient()),
+                Boolean.TRUE.equals(appointment.getConfirmedByDoctor()),
                 appointment.getUpdatedAt()
         );
     }
@@ -50,6 +54,8 @@ public final class AppointmentMapper {
                 .consultationType(request.consultationType())
                 .status(AppointmentStatus.CREATED)
                 .dateTime(request.dateTime())
+                .confirmedByPatient(false)
+                .confirmedByDoctor(false)
                 .build();
     }
 
@@ -63,20 +69,14 @@ public final class AppointmentMapper {
         if (request.meetingLink() != null) {
             appointment.setMeetingLink(request.meetingLink());
         }
+        if (request.meetingPhone() != null) {
+            appointment.setMeetingPhone(request.meetingPhone());
+        }
+        if (request.meetingNotes() != null) {
+            appointment.setMeetingNotes(request.meetingNotes());
+        }
         if (request.reason() != null) {
             appointment.setReason(request.reason());
         }
     }
 }
-
-/*
-    Long id,
-    Long patientId,
-    Long doctorId,
-    LocalDateTime dateTime,
-    ConsultationType consultationType,
-    AppointmentStatus status,
-    String meetingLink,
-    String reason,
-    LocalDateTime timestamp
- */

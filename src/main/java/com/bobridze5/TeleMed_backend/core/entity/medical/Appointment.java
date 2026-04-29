@@ -42,11 +42,29 @@ public class Appointment {
     @Column(name = "appointment_link")
     private String meetingLink;
 
+    @Column(name = "appointment_meeting_phone", length = 64)
+    private String meetingPhone;
+
+    @Column(name = "appointment_meeting_notes", columnDefinition = "TEXT")
+    private String meetingNotes;
+
     @Column(name = "appointment_reason", columnDefinition = "TEXT")
     private String reason;
 
+    // Хранит роль ПОСЛЕДНЕГО подтвердившего ("PATIENT" / "DOCTOR").
+    // Используется только для логирования и обратной совместимости со старым
+    // фронтендом — основная логика двухстороннего подтверждения опирается на
+    // confirmedByPatient / confirmedByDoctor ниже.
     @Column(name = "appointment_confirmed_by", length = 16)
     private String confirmedBy;
+
+    @Builder.Default
+    @Column(name = "appointment_confirmed_by_patient", nullable = false)
+    private Boolean confirmedByPatient = false;
+
+    @Builder.Default
+    @Column(name = "appointment_confirmed_by_doctor", nullable = false)
+    private Boolean confirmedByDoctor = false;
 
     @UpdateTimestamp
     @Column(name = "appointment_updated_at", nullable = false)
