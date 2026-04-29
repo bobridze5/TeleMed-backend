@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,14 +18,14 @@ public interface InsulinRepository extends JpaRepository<InsulinDose, Long>, Jpa
 
     Page<InsulinDose> findByPatientIdAndTakenAtBetween(
             Long patientId,
-            LocalDateTime start,
-            LocalDateTime end,
+            Instant start,
+            Instant end,
             Pageable pageable
     );
 
     Optional<InsulinDose> findByIdAndPatientId(Long id, Long patientId);
 
     List<InsulinDose> findByPatientIdAndTakenAtBetweenOrderByTakenAtAsc(
-            Long patientId, LocalDateTime start, LocalDateTime end
+            Long patientId, Instant start, Instant end
     );
 }

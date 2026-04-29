@@ -7,7 +7,7 @@ public final class API {
     public static final String AUTH_LOGIN = AUTH + "/login";
     public static final String AUTH_REGISTER = AUTH + "/register";
 
-
+    public static final String NOTIFICATION = V1 + "/notify";
     public static final String USERS = V1 + "/users";
     public static final String CITY = V1 + "/city";
     public static final String DISH = V1 + "/dishes";
@@ -50,6 +50,8 @@ public final class API {
     public static final String PATIENT_ME_MEDICAL_EVENTS = PATIENT_ME + "/medical-events";
     public static final String PATIENT_ME_APPOINTMENTS = PATIENT_ME + "/appointments";
     public static final String PATIENT_ME_REPORT = PATIENT_ME + "/report";
+    public static final String PATIENT_ME_REMINDERS = PATIENT_ME + "/reminders";
+    public static final String NOTIFICATIONS_ME = V1 + "/notifications/me";
 
 
     // Doctor

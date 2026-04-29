@@ -15,6 +15,7 @@ import com.bobridze5.TeleMed_backend.core.repository.MealRepository;
 import com.bobridze5.TeleMed_backend.core.repository.SymptomRepository;
 import com.bobridze5.TeleMed_backend.core.repository.WeightRepository;
 import com.bobridze5.TeleMed_backend.core.service.utils.Constant.Nutrition;
+import com.bobridze5.TeleMed_backend.core.service.utils.TimeZoneSupport;
 import com.lowagie.text.*;
 import com.lowagie.text.Font;
 import com.lowagie.text.Image;
@@ -74,8 +75,11 @@ public class PatientReportService {
         List<Meal> meals = (type == ReportType.GENERAL || type == ReportType.NUTRITION)
                 ? mealRepository.findByPatientIdAndMealDatetimeBetweenOrderByMealDatetimeAsc(patient.getId(), start, end)
                 : List.of();
+        java.time.ZoneId reportTz = TimeZoneSupport.zoneIdFor(patient);
+        java.time.Instant insulinStart = start.atZone(reportTz).toInstant();
+        java.time.Instant insulinEnd   = end.atZone(reportTz).toInstant();
         List<InsulinDose> insulinDoses = (type == ReportType.GENERAL || type == ReportType.INSULIN)
-                ? insulinRepository.findByPatientIdAndTakenAtBetweenOrderByTakenAtAsc(patient.getId(), start, end)
+                ? insulinRepository.findByPatientIdAndTakenAtBetweenOrderByTakenAtAsc(patient.getId(), insulinStart, insulinEnd)
                 : List.of();
 
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
@@ -151,7 +155,7 @@ public class PatientReportService {
 
             if (!insulinDoses.isEmpty()) {
                 doc.add(sectionHeader("Инсулин", fSection));
-                doc.add(buildInsulinDosesTable(insulinDoses, fSmallBold, fNormal, fSmall));
+                doc.add(buildInsulinDosesTable(insulinDoses, reportTz, fSmallBold, fNormal, fSmall));
                 doc.add(buildInsulinSummaryLine(insulinDoses, fSmall));
                 doc.add(gap());
             }
@@ -213,7 +217,7 @@ public class PatientReportService {
         return table;
     }
 
-    private Table buildInsulinDosesTable(List<InsulinDose> doses,
+    private Table buildInsulinDosesTable(List<InsulinDose> doses, java.time.ZoneId tz,
                                          Font headerFont, Font normalFont, Font smallFont) throws DocumentException {
         Table table = new Table(5);
         table.setWidths(new float[]{18, 12, 12, 18, 40});
@@ -226,8 +230,11 @@ public class PatientReportService {
             String mealLabel = d.getMeal() != null && d.getMeal().getMealType() != null
                     ? d.getMeal().getMealType().name()
                     : "—";
+            String takenStr = d.getTakenAt() != null
+                    ? java.time.LocalDateTime.ofInstant(d.getTakenAt(), tz).format(DATETIME_FMT)
+                    : "—";
             addDataRow(table, new String[]{
-                    d.getTakenAt() != null ? d.getTakenAt().format(DATETIME_FMT) : "—",
+                    takenStr,
                     d.getInsulinType() != null ? d.getInsulinType().name() : "—",
                     d.getUnits() != null ? String.format("%.1f", d.getUnits()) : "—",
                     mealLabel,
@@ -236,6 +243,7 @@ public class PatientReportService {
         }
         return table;
     }
+
 
     private Paragraph buildInsulinSummaryLine(List<InsulinDose> doses, Font font) {
         double totalShort = doses.stream()

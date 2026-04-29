@@ -4,7 +4,7 @@ import com.bobridze5.TeleMed_backend.core.entity.report.insulin.InsulinType;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 public record InsulinDoseUpdateRequest(
         @Positive(message = "Количество единиц должно быть больше нуля")
@@ -12,7 +12,7 @@ public record InsulinDoseUpdateRequest(
 
         Long mealId,
         InsulinType insulinType,
-        LocalDateTime takenAt,
+        Instant takenAt,
 
         @Size(max = 500, message = "Заметка не может превышать 500 символов")
         String note

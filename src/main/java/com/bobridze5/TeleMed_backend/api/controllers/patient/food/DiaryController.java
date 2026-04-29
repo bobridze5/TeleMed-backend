@@ -1,4 +1,4 @@
-package com.bobridze5.TeleMed_backend.api.controllers.patient.eat;
+package com.bobridze5.TeleMed_backend.api.controllers.patient.food;
 
 import com.bobridze5.TeleMed_backend.api.controllers.API;
 import com.bobridze5.TeleMed_backend.api.dto.diary.NutritionDayResponse;

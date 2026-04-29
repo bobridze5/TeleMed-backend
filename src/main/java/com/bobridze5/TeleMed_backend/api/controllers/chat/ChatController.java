@@ -37,10 +37,7 @@ public class ChatController {
 
     @PostMapping
     @Operation(summary = "Создать (или получить существующий) чат с другим пользователем")
-    public ResponseEntity<ChatResponse> createChat(
-            @CurrentUser User user,
-            @Valid @RequestBody ChatCreateRequest request
-    ) {
+    public ResponseEntity<ChatResponse> createChat(@CurrentUser User user, @Valid @RequestBody ChatCreateRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(chatService.createDirectChat(user, request));
     }
 
@@ -62,8 +59,7 @@ public class ChatController {
             @PathVariable Long chatId,
             @Valid @RequestBody MessageRequest request
     ) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(chatService.sendMessage(chatId, user, request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(chatService.sendMessage(chatId, user, request));
     }
 
     @PostMapping(value = "/{chatId}/messages/attachment", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -74,8 +70,7 @@ public class ChatController {
             @RequestPart("file") MultipartFile file,
             @RequestPart(value = "caption", required = false) String caption
     ) throws IOException {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(chatService.sendAttachment(chatId, user, file, caption));
+        return ResponseEntity.status(HttpStatus.CREATED).body(chatService.sendAttachment(chatId, user, file, caption));
     }
 
     @GetMapping("/{chatId}/messages/{messageId}/attachment")
@@ -111,11 +106,7 @@ public class ChatController {
     @DeleteMapping("/{chatId}/messages/{messageId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Удалить сообщение")
-    public void deleteMessage(
-            @CurrentUser User user,
-            @PathVariable Long chatId,
-            @PathVariable Long messageId
-    ) {
+    public void deleteMessage(@CurrentUser User user, @PathVariable Long chatId, @PathVariable Long messageId) {
         chatService.deleteMessage(chatId, messageId, user);
     }
 }

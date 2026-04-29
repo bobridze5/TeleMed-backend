@@ -56,6 +56,9 @@ public abstract class User {
     @Enumerated(EnumType.STRING)
     protected UserStatus status;
 
+    @Column(name = "user_time_zone", nullable = false, length = 50)
+    protected String timeZone;
+
     @CreationTimestamp
     @Column(name = "user_datetime_created", nullable = false)
     protected LocalDateTime createdAt;

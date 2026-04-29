@@ -5,6 +5,7 @@ import com.bobridze5.TeleMed_backend.api.dto.auth.RegisterDoctorRequest;
 import com.bobridze5.TeleMed_backend.api.dto.auth.RegisterPatientRequest;
 import com.bobridze5.TeleMed_backend.core.entity.auth.UserStatus;
 import com.bobridze5.TeleMed_backend.core.entity.medical.*;
+import com.bobridze5.TeleMed_backend.core.service.utils.TimeZoneSupport;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.Nullable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,6 +21,7 @@ public class RegisterMapper {
                 .email(request.email())
                 .passwordHash(passwordEncoder.encode(request.password1()))
                 .status(UserStatus.PENDING)
+                .timeZone(TimeZoneSupport.validateOrDefaultId(request.timeZone()))
                 .build();
     }
 
@@ -36,6 +38,7 @@ public class RegisterMapper {
                 .organization(organization)
                 .experience(request.experience())
                 .qualification(request.qualification())
+                .timeZone(TimeZoneSupport.DEFAULT.getId())
                 .build();
     }
 
@@ -44,6 +47,7 @@ public class RegisterMapper {
                 .email(request.email())
                 .passwordHash(passwordEncoder.encode(request.password1()))
                 .status(UserStatus.AWAITING_APPROVAL)
+                .timeZone(TimeZoneSupport.DEFAULT.getId())
                 .build();
     }
 }

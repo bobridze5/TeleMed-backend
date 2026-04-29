@@ -74,10 +74,7 @@ public class WeightController {
     @DeleteMapping("/{weightId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Удалить запись о весе")
-    public void deleteWeight(
-            @CurrentPatient Patient patient,
-            @PathVariable("weightId") Long weightId
-    ) {
+    public void deleteWeight(@CurrentPatient Patient patient, @PathVariable("weightId") Long weightId) {
         weightService.deleteWeightRecord(patient, weightId);
     }
 

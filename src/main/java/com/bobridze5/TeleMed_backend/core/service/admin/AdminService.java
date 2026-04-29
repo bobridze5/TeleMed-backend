@@ -9,14 +9,13 @@ import com.bobridze5.TeleMed_backend.api.mappers.doctor.DoctorProfileMapper;
 import com.bobridze5.TeleMed_backend.core.entity.auth.User;
 import com.bobridze5.TeleMed_backend.core.entity.auth.UserStatus;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Doctor;
-import com.bobridze5.TeleMed_backend.core.entity.medical.DoctorNotification;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
 import com.bobridze5.TeleMed_backend.core.exceptions.EntityNotFoundException;
-import com.bobridze5.TeleMed_backend.core.repository.DoctorNotificationRepository;
 import com.bobridze5.TeleMed_backend.core.repository.DoctorRepository;
 import com.bobridze5.TeleMed_backend.core.repository.PatientRepository;
 import com.bobridze5.TeleMed_backend.core.repository.UserRepository;
 import com.bobridze5.TeleMed_backend.core.service.auth.EmailService;
+import com.bobridze5.TeleMed_backend.core.service.notification.UserNotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -33,7 +32,7 @@ public class AdminService {
     private final UserRepository userRepository;
     private final DoctorProfileMapper doctorProfileMapper;
     private final EmailService emailService;
-    private final DoctorNotificationRepository doctorNotificationRepository;
+    private final UserNotificationService userNotificationService;
 
     @Transactional(readOnly = true)
     public Page<AdminDoctorPendingResponse> getPendingDoctors(Pageable pageable) {
@@ -71,12 +70,13 @@ public class AdminService {
         log.info("Врач id={} одобрен администратором", doctorId);
         emailService.sendDoctorApproved(doctor.getEmail(), doctor.getLastName());
 
-        doctorNotificationRepository.save(DoctorNotification.builder()
-                .doctor(doctor)
-                .title("Профиль одобрен")
-                .message("Ваша заявка рассмотрена и одобрена администрацией TeleMed. " +
-                        "Теперь вы можете принимать пациентов. Добро пожаловать!")
-                .build());
+        userNotificationService.create(
+                doctor,
+                null,
+                "DOCTOR_APPROVAL",
+                "Профиль одобрен",
+                "Ваша заявка рассмотрена и одобрена администрацией TeleMed. " +
+                        "Теперь вы можете принимать пациентов. Добро пожаловать!");
 
         return doctorProfileMapper.mapToResponse(doctor);
     }

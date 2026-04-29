@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 public record InsulinDoseRequest(
         @NotNull(message = "Количество единиц обязательно")
@@ -18,7 +18,7 @@ public record InsulinDoseRequest(
         InsulinType insulinType,
 
         @NotNull(message = "Время инъекции обязательно")
-        LocalDateTime takenAt,
+        Instant takenAt,
 
         @Size(max = 500, message = "Заметка не может превышать 500 символов")
         String note

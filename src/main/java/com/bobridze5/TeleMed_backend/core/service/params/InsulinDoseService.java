@@ -11,6 +11,7 @@ import com.bobridze5.TeleMed_backend.core.entity.report.insulin.InsulinDose;
 import com.bobridze5.TeleMed_backend.core.exceptions.EntityNotFoundException;
 import com.bobridze5.TeleMed_backend.core.repository.InsulinRepository;
 import com.bobridze5.TeleMed_backend.core.repository.MealRepository;
+import com.bobridze5.TeleMed_backend.core.service.utils.TimeZoneSupport;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +19,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Service
 @RequiredArgsConstructor
@@ -32,10 +37,11 @@ public class InsulinDoseService {
         Pageable pageable = PageRequest.of(page, size, Sort.by("takenAt").descending());
 
         Long patientId = patient.getId();
+        ZoneId tz = TimeZoneSupport.zoneIdFor(patient);
 
         Page<InsulinDose> dosePage = request.isBetween()
                 ? insulinRepository.findByPatientIdAndTakenAtBetween(
-                        patientId, request.startDate(), request.endDate(), pageable)
+                        patientId, toInstant(request.startDate(), tz), toInstant(request.endDate(), tz), pageable)
                 : insulinRepository.findByPatientId(patientId, pageable);
 
         return dosePage.map(InsulinMapper::mapToResponse);
@@ -85,5 +91,9 @@ public class InsulinDoseService {
         if (mealId == null) return null;
         return mealRepository.findByIdAndPatientId(mealId, patient.getId())
                 .orElseThrow(() -> new EntityNotFoundException("Приём пищи не найден"));
+    }
+
+    private Instant toInstant(LocalDateTime dt, ZoneId tz) {
+        return dt != null ? dt.atZone(tz).toInstant() : null;
     }
 }

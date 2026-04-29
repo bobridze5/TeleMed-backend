@@ -32,11 +32,7 @@ public class SymptomController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Получить симптом по ID")
-    public SymptomResponse getSymptomRecordById(
-            @CurrentPatient Patient patient,
-            @PathVariable("id") Long id
-    ) {
-
+    public SymptomResponse getSymptomRecordById(@CurrentPatient Patient patient, @PathVariable("id") Long id) {
         return symptomService.getRecordById(patient, id);
     }
 
@@ -74,12 +70,7 @@ public class SymptomController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Удалить запись симптома")
-    public void deleteSymptomRecord(
-            @CurrentPatient Patient patient,
-            @PathVariable Long id
-    ) {
+    public void deleteSymptomRecord(@CurrentPatient Patient patient, @PathVariable Long id) {
         symptomService.deleteRecord(patient, id);
     }
-
-
 }

@@ -9,7 +9,8 @@ CREATE TABLE "users" (
     user_password_hash VARCHAR(255) NOT NULL,
     user_status VARCHAR(50) NOT NULL,
     user_datetime_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    user_datetime_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+    user_datetime_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    user_time_zone VARCHAR(50) NOT NULL DEFAULT 'Europe/Moscow'
 );
 
 CREATE INDEX idx_users_email ON users(user_email);

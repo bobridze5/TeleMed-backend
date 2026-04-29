@@ -15,7 +15,9 @@ public record RegisterPatientRequest(
 
         @Size(min = 8, max = 64, message = "Пароль должен быть от 8 до 64 символов")
         @NotBlank
-        String password2
+        String password2,
+
+        String timeZone
 ) {
     public RegisterPatientRequest {
         if (!password1.equals(password2)) {

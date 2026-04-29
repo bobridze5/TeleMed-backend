@@ -1,4 +1,4 @@
-package com.bobridze5.TeleMed_backend.api.controllers.patient.eat;
+package com.bobridze5.TeleMed_backend.api.controllers.patient.food;
 
 import com.bobridze5.TeleMed_backend.api.controllers.API;
 import com.bobridze5.TeleMed_backend.api.dto.dish.CreateDishRequest;
@@ -92,9 +92,7 @@ public class DishController {
 
     @GetMapping("/{dishId}/image")
     @Operation(summary = "Получить фото блюда")
-    public ResponseEntity<byte[]> getImage(
-            @PathVariable("dishId") Long id
-    ) throws IOException {
+    public ResponseEntity<byte[]> getImage(@PathVariable("dishId") Long id) throws IOException {
         byte[] data = dishService.getImage(id);
         return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_JPEG)
