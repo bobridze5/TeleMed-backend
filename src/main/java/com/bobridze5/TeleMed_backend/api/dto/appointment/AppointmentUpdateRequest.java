@@ -11,7 +11,6 @@ public record AppointmentUpdateRequest(
         ConsultationType consultationType,
         String meetingLink,
         String meetingPhone,
-        String meetingNotes,
-        String reason
+        String meetingNotes
 ) {
 }

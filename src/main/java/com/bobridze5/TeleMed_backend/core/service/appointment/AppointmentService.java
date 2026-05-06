@@ -1,20 +1,22 @@
 package com.bobridze5.TeleMed_backend.core.service.appointment;
 
+import com.bobridze5.TeleMed_backend.api.dto.appointment.AppointmentCreationRequest;
 import com.bobridze5.TeleMed_backend.api.dto.appointment.AppointmentFilterRequest;
-import com.bobridze5.TeleMed_backend.api.dto.appointment.AppointmentRequest;
 import com.bobridze5.TeleMed_backend.api.dto.appointment.AppointmentResponse;
 import com.bobridze5.TeleMed_backend.api.dto.appointment.AppointmentUpdateRequest;
 import com.bobridze5.TeleMed_backend.api.mappers.AppointmentMapper;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Appointment;
 import com.bobridze5.TeleMed_backend.core.entity.medical.AppointmentStatus;
+import com.bobridze5.TeleMed_backend.core.entity.medical.ConsultationType;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Doctor;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
-import com.bobridze5.TeleMed_backend.core.entity.medical.PatientDoctorAssignment;
 import com.bobridze5.TeleMed_backend.core.entity.auth.User;
+import com.bobridze5.TeleMed_backend.core.exceptions.AccessForbiddenException;
+import com.bobridze5.TeleMed_backend.core.exceptions.AppointmentStateException;
 import com.bobridze5.TeleMed_backend.core.exceptions.EntityNotFoundException;
 import com.bobridze5.TeleMed_backend.core.repository.AppointmentRepository;
-import com.bobridze5.TeleMed_backend.core.repository.PatientDoctorAssignmentRepository;
 import com.bobridze5.TeleMed_backend.core.repository.UserRepository;
+import com.bobridze5.TeleMed_backend.core.service.doctor.AssignmentService;
 import com.bobridze5.TeleMed_backend.core.service.notification.AppointmentNotifier;
 import com.bobridze5.TeleMed_backend.core.service.schedule.DoctorScheduleService;
 import jakarta.persistence.criteria.Predicate;
@@ -27,6 +29,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,10 +40,10 @@ public class AppointmentService {
     private final AppointmentStrategyFactory appointmentStrategyFactory;
     private final UserRepository userRepository;
     private final AppointmentRepository appointmentRepository;
-    private final PatientDoctorAssignmentRepository assignmentRepository;
+    private final AssignmentService assignmentService;
     private final AppointmentMapper mapper;
-    private final DoctorScheduleService scheduleService;
     private final AppointmentNotifier appointmentNotifier;
+    private final DoctorScheduleService scheduleService;
 
     public AppointmentResponse getAppointmentById(Long appointmentId, Long userId) {
         Appointment appointment = appointmentRepository.findByIdAndUserId(appointmentId, userId)
@@ -52,11 +55,7 @@ public class AppointmentService {
     public Page<AppointmentResponse> getAppointments(Long userId, AppointmentFilterRequest filter) {
         int page = filter.page() != null ? filter.page() : 0;
         int size = filter.size() != null && filter.size() > 0 ? filter.size() : 20;
-        PageRequest pageRequest = PageRequest.of(
-                page,
-                size,
-                Sort.by("dateTime").descending()
-        );
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("dateTime").descending());
 
         Specification<Appointment> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -78,9 +77,6 @@ public class AppointmentService {
 
         Page<Appointment> appointments = appointmentRepository.findAll(spec, pageRequest);
 
-        // Один запрос на medical records + один на reviews для всех записей
-        // страницы — иначе AppointmentResponse.medicalRecordId/reviewId
-        // вызывали бы N+1 в `mapToResponse`.
         var ids = appointments.getContent().stream().map(Appointment::getId).toList();
         var recordIdByApt = mapper.loadMedicalRecordIds(ids);
         var reviewIdByApt = mapper.loadReviewIds(ids);
@@ -93,10 +89,9 @@ public class AppointmentService {
     }
 
     @Transactional
-    public AppointmentResponse createAppointment(Long userId, AppointmentRequest request) {
-        log.info("createAppointment START: initiator={}, targetId={}, dateTime={}, consultationType={}, slotDurationMinutes={}",
-                userId, request.targetId(), request.dateTime(),
-                request.consultationType(), request.slotDurationMinutes());
+    public AppointmentResponse createAppointment(Long userId, AppointmentCreationRequest request) {
+        log.info("createAppointment START: initiator={}, targetId={}, dateTime={}, consultationType={}",
+                userId, request.targetId(), request.dateTime(), request.consultationType());
 
         User initiator = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("Пользователь-инициатор не найден"));
@@ -104,49 +99,16 @@ public class AppointmentService {
         User target = userRepository.findById(request.targetId())
                 .orElseThrow(() -> new EntityNotFoundException("Пользователь-цель не найден"));
 
-        AppointmentCreationStrategy strategy = appointmentStrategyFactory.getStrategy(initiator);
-        Appointment appointment = strategy.create(initiator, target, request);
+        Appointment appointment = appointmentStrategyFactory.getStrategy(initiator).create(initiator, target, request);
 
         log.info("createAppointment: entity built with consultationType={}", appointment.getConsultationType());
 
-        // Две ветки валидации — в зависимости от инициатора:
-        //  • Пациент: слот должен уже существовать в расписании врача и быть
-        //    свободен (полная validateSlot).
-        //  • Врач: слот создаём «на лету» через ensureSlotExists (с проверкой
-        //    на пересечение с существующими слотами — «никаких пересечений в
-        //    расписании не должно быть»), после чего достаточно убедиться, что
-        //    никто другой не занял это же время.
-        Long doctorIdForValidation = appointment.getDoctor().getId();
-        if (initiator instanceof Doctor) {
-            int duration = request.slotDurationMinutes() != null && request.slotDurationMinutes() > 0
-                    ? request.slotDurationMinutes()
-                    : 30;
-            scheduleService.ensureSlotExists(
-                    doctorIdForValidation,
-                    request.dateTime(),
-                    duration,
-                    request.consultationType()
-            );
-            scheduleService.validateSlotNotTaken(doctorIdForValidation, request.dateTime());
-        } else {
-            scheduleService.validateSlot(doctorIdForValidation, request.dateTime(), request.consultationType());
-        }
-
         Appointment savedAppointment = appointmentRepository.save(appointment);
 
-        // Автоматически создаём привязку пациент-врач, если её ещё нет
         if (initiator instanceof Patient patient && target instanceof Doctor doctor) {
-            if (!assignmentRepository.existsAssignment(doctor.getId(), patient.getId())) {
-                assignmentRepository.save(PatientDoctorAssignment.builder()
-                        .patient(patient)
-                        .doctor(doctor)
-                        .active(true)
-                        .build());
-                log.info("Создана привязка пациент ID:{} к врачу ID:{}", patient.getId(), doctor.getId());
-            }
+            assignmentService.assignIfAbsent(patient, doctor);
         }
 
-        // In-app уведомление обеим сторонам.
         appointmentNotifier.onCreated(savedAppointment, initiator instanceof Doctor);
 
         log.info("Создана новая запись ID: {} от пользователя ID: {} к пользователю ID: {}",
@@ -155,39 +117,88 @@ public class AppointmentService {
         return mapper.mapToResponse(savedAppointment);
     }
 
+    /**
+     * Обновление записи. По бизнес-правилу метод доступен только врачу
+     * (контроллер пациента не вызывает его, см. {@link
+     * com.bobridze5.TeleMed_backend.api.controllers.doctor.DoctorAppointmentController}).
+     *
+     * Делит изменения на две группы:
+     *  1) «Перенос» — изменение dateTime или consultationType. Допустим только
+     *     из CREATED, до подтверждения любой из сторон, и новый слот должен
+     *     существовать в расписании врача и не быть занят. После переноса
+     *     пациент получает уведомление.
+     *  2) Прочие поля (meetingLink/meetingPhone/meetingNotes) — врач может
+     *     править их в любом нетерминальном статусе.
+     */
     @Transactional
     public AppointmentResponse updateAppointment(Long appointmentId, Long userId, AppointmentUpdateRequest request) {
         Appointment appointment = appointmentRepository.findByIdAndUserId(appointmentId, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Запись не найдена"));
 
         if (appointment.getStatus() == AppointmentStatus.CANCELED
-                || appointment.getStatus() == AppointmentStatus.COMPLETED) {
-            throw new IllegalStateException("Нельзя изменить отменённую или завершённую запись");
+                || appointment.getStatus() == AppointmentStatus.COMPLETED
+                || appointment.getStatus() == AppointmentStatus.NO_SHOW) {
+            throw new AppointmentStateException(
+                    "Нельзя изменить запись в статусе " + appointment.getStatus());
         }
 
-        // Если меняется время или тип консультации — сбрасываем оба
-        // подтверждения, чтобы стороны заново согласовали новый слот.
-        // Без этого получалось бы, что обе стороны «согласны» на время,
-        // которое уже неактуально.
-        boolean rescheduled =
+        // Defense-in-depth: даже если сюда дотянется не-врач (например, после
+        // ребрендинга роутинга), мы не дадим ему ничего изменить. Сравнение
+        // по id, а не повторный SELECT по userRepository, — экономим запрос.
+        if (!appointment.getDoctor().getId().equals(userId)) {
+            throw new AccessForbiddenException("Изменять запись может только врач");
+        }
+
+        boolean reschedulingAttempt =
                 (request.dateTime() != null
                         && !request.dateTime().equals(appointment.getDateTime()))
                 || (request.consultationType() != null
                         && request.consultationType() != appointment.getConsultationType());
 
-        mapper.updateEntity(request, appointment);
+        LocalDateTime previousDateTime = appointment.getDateTime();
+        ConsultationType previousType = appointment.getConsultationType();
 
-        if (rescheduled) {
-            appointment.setConfirmedByPatient(false);
-            appointment.setConfirmedByDoctor(false);
-            appointment.setConfirmedBy(null);
-            appointment.setStatus(AppointmentStatus.CREATED);
-            log.info("Запись ID: {} перенесена — флаги подтверждения сброшены", appointmentId);
+        if (reschedulingAttempt) {
+            if (appointment.getStatus() != AppointmentStatus.CREATED) {
+                throw new AppointmentStateException(
+                        "Изменить время можно только у неподтверждённой записи "
+                                + "(текущий статус: " + appointment.getStatus() + ")");
+            }
+            if (Boolean.TRUE.equals(appointment.getConfirmedByPatient())
+                    || Boolean.TRUE.equals(appointment.getConfirmedByDoctor())) {
+                throw new AppointmentStateException(
+                        "Нельзя изменить время — запись уже подтверждена одной из сторон");
+            }
+
+            // Новый слот должен существовать у врача (его расписание — источник
+            // истины) и не быть занят другой активной записью. Проверяем
+            // итоговую комбинацию dateTime+consultationType, даже если
+            // изменилось только одно из двух полей.
+            LocalDateTime newDateTime = request.dateTime() != null
+                    ? request.dateTime() : previousDateTime;
+            ConsultationType newType = request.consultationType() != null
+                    ? request.consultationType() : previousType;
+
+            scheduleService.validateSlotBelongsToSchedule(
+                    appointment.getDoctor().getId(), newDateTime, newType);
+            // Если время не меняется (поменялся только тип), то «слот занят»
+            // даст ложноположительный результат на саму эту запись —
+            // проверяем not-taken только при реальной смене времени.
+            if (request.dateTime() != null && !request.dateTime().equals(previousDateTime)) {
+                scheduleService.validateSlotNotTaken(
+                        appointment.getDoctor().getId(), newDateTime);
+            }
         }
 
+        mapper.updateEntity(request, appointment);
         Appointment updated = appointmentRepository.save(appointment);
 
-        log.info("Обновлена запись ID: {} пользователем ID: {}", appointmentId, userId);
+        if (reschedulingAttempt) {
+            appointmentNotifier.onRescheduled(updated, previousDateTime, previousType);
+        }
+
+        log.info("Обновлена запись ID: {} пользователем ID: {} (rescheduled={})",
+                appointmentId, userId, reschedulingAttempt);
 
         return mapper.mapToResponse(updated);
     }
@@ -217,10 +228,6 @@ public class AppointmentService {
         } else {
             throw new IllegalArgumentException("Неизвестная роль подтверждения: " + confirmedByRole);
         }
-
-        // Старое поле — пишем сюда последнего подтвердившего, чтобы не сломать
-        // потенциальных потребителей.
-        appointment.setConfirmedBy(confirmedByRole);
 
         // Запись считается подтверждённой только когда обе стороны нажали «подтвердить».
         if (Boolean.TRUE.equals(appointment.getConfirmedByPatient())
@@ -270,7 +277,6 @@ public class AppointmentService {
         }
 
         appointment.setConfirmedByDoctor(true);
-        appointment.setConfirmedBy("DOCTOR");
 
         if (Boolean.TRUE.equals(appointment.getConfirmedByPatient())
                 && Boolean.TRUE.equals(appointment.getConfirmedByDoctor())) {
@@ -288,14 +294,47 @@ public class AppointmentService {
                 appointment.getStatus());
     }
 
+    /**
+     * Жёсткое удаление записи. Используется только для случая «врач создал
+     * запись по ошибке, никто ещё не успел отреагировать». Любой другой
+     * сценарий должен идти через {@link #cancelAppointment} — там сохраняется
+     * история и пациент получает уведомление.
+     *
+     * Гейты:
+     *  • удалять может только врач этой записи (defense-in-depth — контроллер
+     *    уже ограничен @CurrentDoctor);
+     *  • статус строго CREATED;
+     *  • ни одна сторона ещё не подтвердила.
+     *
+     * Дополнительно: запретив удаление вне CREATED, мы автоматически
+     * исключаем FK-конфликты с Review (Review.appointment NOT NULL,
+     * существует только у COMPLETED).
+     */
     @Transactional
     public void deleteAppointment(Long appointmentId, Long userId) {
         Appointment appointment = appointmentRepository.findByIdAndUserId(appointmentId, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Запись не найдена"));
 
+        if (!appointment.getDoctor().getId().equals(userId)) {
+            throw new AccessForbiddenException("Удалить запись может только врач");
+        }
+
+        if (appointment.getStatus() != AppointmentStatus.CREATED) {
+            throw new AppointmentStateException(
+                    "Удалить можно только новую неподтверждённую запись " +
+                            "(текущий статус: " + appointment.getStatus() +
+                            "). Используйте отмену.");
+        }
+        if (Boolean.TRUE.equals(appointment.getConfirmedByPatient())
+                || Boolean.TRUE.equals(appointment.getConfirmedByDoctor())) {
+            throw new AppointmentStateException(
+                    "Нельзя удалить запись — её уже подтвердила одна из сторон. " +
+                            "Используйте отмену.");
+        }
+
         appointmentRepository.delete(appointment);
 
-        log.info("Запись ID: {} удалена пользователем ID: {}", appointmentId, userId);
+        log.info("Запись ID: {} удалена врачом ID: {}", appointmentId, userId);
     }
 
     @Transactional

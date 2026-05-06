@@ -7,7 +7,7 @@ import com.bobridze5.TeleMed_backend.api.dto.doctor.DoctorResponse;
 import com.bobridze5.TeleMed_backend.api.mappers.doctor.DoctorProfileMapper;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Doctor;
 import com.bobridze5.TeleMed_backend.core.repository.DoctorRepository;
-import com.bobridze5.TeleMed_backend.core.repository.PatientDoctorAssignmentRepository;
+import com.bobridze5.TeleMed_backend.core.repository.AssignmentRepository;
 import com.bobridze5.TeleMed_backend.core.repository.PatientRepository;
 import com.bobridze5.TeleMed_backend.core.repository.ReviewRepository;
 import com.bobridze5.TeleMed_backend.core.service.auth.UserService;
@@ -28,7 +28,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class DoctorService {
     private final DoctorRepository doctorRepository;
-    private final PatientDoctorAssignmentRepository assignmentRepository;
+    private final AssignmentRepository assignmentRepository;
     private final PatientRepository patientRepository;
     private final ReviewRepository reviewRepository;
     private final DoctorProfileMapper doctorProfileMapper;

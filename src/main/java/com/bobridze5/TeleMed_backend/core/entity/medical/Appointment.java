@@ -51,13 +51,6 @@ public class Appointment {
     @Column(name = "appointment_reason", columnDefinition = "TEXT")
     private String reason;
 
-    // Хранит роль ПОСЛЕДНЕГО подтвердившего ("PATIENT" / "DOCTOR").
-    // Используется только для логирования и обратной совместимости со старым
-    // фронтендом — основная логика двухстороннего подтверждения опирается на
-    // confirmedByPatient / confirmedByDoctor ниже.
-    @Column(name = "appointment_confirmed_by", length = 16)
-    private String confirmedBy;
-
     @Builder.Default
     @Column(name = "appointment_confirmed_by_patient", nullable = false)
     private Boolean confirmedByPatient = false;

@@ -2,10 +2,9 @@ package com.bobridze5.TeleMed_backend.api.controllers.patient;
 
 import com.bobridze5.TeleMed_backend.api.controllers.API;
 import com.bobridze5.TeleMed_backend.api.dto.appointment.AppointmentFilterRequest;
-import com.bobridze5.TeleMed_backend.api.dto.appointment.AppointmentRequest;
 import com.bobridze5.TeleMed_backend.api.dto.appointment.AppointmentResponse;
-import com.bobridze5.TeleMed_backend.api.dto.appointment.AppointmentUpdateRequest;
 import com.bobridze5.TeleMed_backend.api.dto.appointment.CancelAppointmentRequest;
+import com.bobridze5.TeleMed_backend.api.dto.appointment.PatientAppointmentRequest;
 import com.bobridze5.TeleMed_backend.api.dto.review.ReviewRequest;
 import com.bobridze5.TeleMed_backend.api.dto.review.ReviewResponse;
 import com.bobridze5.TeleMed_backend.core.security.UserDetailsImpl;
@@ -56,7 +55,7 @@ public class AppointmentController {
     @PostMapping
     @Operation(summary = "Создать запись к врачу", description = "Создаёт новую запись пациента к выбранному врачу на указанное время")
     public ResponseEntity<AppointmentResponse> createAppointment(
-            @Valid @RequestBody AppointmentRequest request,
+            @Valid @RequestBody PatientAppointmentRequest request,
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             HttpServletRequest httpServletRequest
     ) {
@@ -65,25 +64,10 @@ public class AppointmentController {
         return ResponseEntity.created(location).body(response);
     }
 
-    @PatchMapping("/{id}")
-    @Operation(summary = "Обновить запись на приём", description = "Изменяет время или тип консультации")
-    public AppointmentResponse updateAppointment(
-            @PathVariable Long id,
-            @Valid @RequestBody AppointmentUpdateRequest request,
-            @AuthenticationPrincipal UserDetailsImpl userDetails
-    ) {
-        return appointmentService.updateAppointment(id, userDetails.getUserId(), request);
-    }
-
-    @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "Удалить запись на приём")
-    public void deleteAppointment(
-            @PathVariable Long id,
-            @AuthenticationPrincipal UserDetailsImpl userDetails
-    ) {
-        appointmentService.deleteAppointment(id, userDetails.getUserId());
-    }
+    // Пациент не вправе менять или удалять запись: время/тип/детали встречи
+    // — зона врача, а «снять» запись пациент должен через POST /{id}/cancel
+    // (мягкая отмена со статусом CANCELED, чтобы сохранить историю и
+    // уведомить врача).
 
     @PostMapping("/{id}/confirm")
     @Operation(

@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -30,6 +31,7 @@ public class AppointmentNotifier {
     private static final String TYPE_NEW = "APPOINTMENT_NEW";
     private static final String TYPE_CONFIRMED = "APPOINTMENT_CONFIRMED";
     private static final String TYPE_CANCELED = "APPOINTMENT_CANCELED";
+    private static final String TYPE_RESCHEDULED = "APPOINTMENT_RESCHEDULED";
     private static final String TYPE_REMINDER = "APPOINTMENT_REMINDER";
 
     private final UserNotificationService userNotificationService;
@@ -124,6 +126,47 @@ public class AppointmentNotifier {
             }
         } catch (Exception e) {
             log.error("Не удалось создать notification (cancel) для записи ID={}", appointment.getId(), e);
+        }
+    }
+
+    /**
+     * Запись перенесена врачом (изменено время и/или тип консультации).
+     * Уведомление получает только пациент: бизнес-правило допускает перенос
+     * исключительно из CREATED при отсутствии подтверждений с обеих сторон,
+     * поэтому врач сам и инициатор, и единственный, кто видел старое время.
+     */
+    public void onRescheduled(Appointment appointment,
+                              LocalDateTime previousDateTime,
+                              ConsultationType previousType) {
+        try {
+            Patient patient = appointment.getPatient();
+            Doctor doctor = appointment.getDoctor();
+            String oldWhen = previousDateTime != null ? previousDateTime.format(FMT) : "—";
+            String newWhen = appointment.getDateTime().format(FMT);
+            String newType = consultationLabel(appointment.getConsultationType());
+
+            boolean dateChanged = previousDateTime != null
+                    && !previousDateTime.equals(appointment.getDateTime());
+            boolean typeChanged = previousType != null
+                    && previousType != appointment.getConsultationType();
+
+            StringBuilder msg = new StringBuilder();
+            msg.append("Врач ").append(fullName(doctor)).append(" перенёс приём");
+            if (dateChanged) {
+                msg.append(" с ").append(oldWhen).append(" на ").append(newWhen);
+            } else {
+                msg.append(" на ").append(newWhen);
+            }
+            if (typeChanged) {
+                msg.append(" (").append(newType).append(")");
+            }
+            msg.append(". Подтвердите запись.");
+
+            userNotificationService.create(patient, null, TYPE_RESCHEDULED,
+                    "Запись перенесена", msg.toString());
+        } catch (Exception e) {
+            log.error("Не удалось создать notification (reschedule) для записи ID={}",
+                    appointment.getId(), e);
         }
     }
 

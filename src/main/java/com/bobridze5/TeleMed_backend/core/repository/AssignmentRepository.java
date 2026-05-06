@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface PatientDoctorAssignmentRepository extends JpaRepository<PatientDoctorAssignment, Long> {
+public interface AssignmentRepository extends JpaRepository<PatientDoctorAssignment, Long> {
 
     @Query("SELECT COUNT(a) > 0 FROM PatientDoctorAssignment a " +
             "WHERE a.doctor.id = :doctorId AND a.patient.id = :patientId")

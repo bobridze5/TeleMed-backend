@@ -18,7 +18,6 @@ public record AppointmentResponse(
         String meetingPhone,
         String meetingNotes,
         String reason,
-        String confirmedBy,
         Boolean confirmedByPatient,
         Boolean confirmedByDoctor,
         LocalDateTime timestamp,

@@ -1,12 +1,8 @@
 package com.bobridze5.TeleMed_backend.api.mappers;
 
-import com.bobridze5.TeleMed_backend.api.dto.appointment.AppointmentRequest;
 import com.bobridze5.TeleMed_backend.api.dto.appointment.AppointmentResponse;
 import com.bobridze5.TeleMed_backend.api.dto.appointment.AppointmentUpdateRequest;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Appointment;
-import com.bobridze5.TeleMed_backend.core.entity.medical.AppointmentStatus;
-import com.bobridze5.TeleMed_backend.core.entity.medical.Doctor;
-import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
 import com.bobridze5.TeleMed_backend.core.entity.auth.User;
 import com.bobridze5.TeleMed_backend.core.repository.MedicalRecordRepository;
 import com.bobridze5.TeleMed_backend.core.repository.ReviewRepository;
@@ -65,7 +61,6 @@ public final class AppointmentMapper {
                 appointment.getMeetingPhone(),
                 appointment.getMeetingNotes(),
                 appointment.getReason(),
-                appointment.getConfirmedBy(),
                 Boolean.TRUE.equals(appointment.getConfirmedByPatient()),
                 Boolean.TRUE.equals(appointment.getConfirmedByDoctor()),
                 appointment.getUpdatedAt(),
@@ -96,19 +91,6 @@ public final class AppointmentMapper {
                 ));
     }
 
-    public Appointment mapToEntity(AppointmentRequest request, Patient patient, Doctor doctor) {
-        return Appointment.builder()
-                .id(null)
-                .patient(patient)
-                .doctor(doctor)
-                .consultationType(request.consultationType())
-                .status(AppointmentStatus.CREATED)
-                .dateTime(request.dateTime())
-                .confirmedByPatient(false)
-                .confirmedByDoctor(false)
-                .build();
-    }
-
     public void updateEntity(AppointmentUpdateRequest request, Appointment appointment) {
         if (request.dateTime() != null) {
             appointment.setDateTime(request.dateTime());
@@ -116,17 +98,19 @@ public final class AppointmentMapper {
         if (request.consultationType() != null) {
             appointment.setConsultationType(request.consultationType());
         }
+        // Пустые строки для meeting* трактуем как «очистить поле», чтобы UI
+        // мог послать "" и убрать ссылку, не плодя отдельной ручки.
         if (request.meetingLink() != null) {
-            appointment.setMeetingLink(request.meetingLink());
+            appointment.setMeetingLink(
+                    request.meetingLink().isBlank() ? null : request.meetingLink().trim());
         }
         if (request.meetingPhone() != null) {
-            appointment.setMeetingPhone(request.meetingPhone());
+            appointment.setMeetingPhone(
+                    request.meetingPhone().isBlank() ? null : request.meetingPhone().trim());
         }
         if (request.meetingNotes() != null) {
-            appointment.setMeetingNotes(request.meetingNotes());
-        }
-        if (request.reason() != null) {
-            appointment.setReason(request.reason());
+            appointment.setMeetingNotes(
+                    request.meetingNotes().isBlank() ? null : request.meetingNotes().trim());
         }
     }
 }

@@ -10,7 +10,6 @@ CREATE TABLE appointments (
     appointment_status VARCHAR(50) NOT NULL,
     appointment_link VARCHAR(255),
     appointment_reason TEXT,
-    appointment_confirmed_by VARCHAR(16),
     appointment_updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     appointment_created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
 

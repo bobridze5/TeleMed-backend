@@ -2,10 +2,10 @@ package com.bobridze5.TeleMed_backend.api.controllers.doctor;
 
 import com.bobridze5.TeleMed_backend.api.controllers.API;
 import com.bobridze5.TeleMed_backend.api.dto.appointment.AppointmentFilterRequest;
-import com.bobridze5.TeleMed_backend.api.dto.appointment.AppointmentRequest;
 import com.bobridze5.TeleMed_backend.api.dto.appointment.AppointmentResponse;
 import com.bobridze5.TeleMed_backend.api.dto.appointment.AppointmentUpdateRequest;
 import com.bobridze5.TeleMed_backend.api.dto.appointment.CancelAppointmentRequest;
+import com.bobridze5.TeleMed_backend.api.dto.appointment.DoctorAppointmentRequest;
 import com.bobridze5.TeleMed_backend.api.dto.appointment.DoctorConfirmRequest;
 import com.bobridze5.TeleMed_backend.core.annotations.CurrentDoctor;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Doctor;
@@ -56,7 +56,7 @@ public class DoctorAppointmentController {
             description = "Врач самостоятельно создаёт запись к себе для указанного пациента"
     )
     public ResponseEntity<AppointmentResponse> createAppointment(
-            @Valid @RequestBody AppointmentRequest request,
+            @Valid @RequestBody DoctorAppointmentRequest request,
             @CurrentDoctor Doctor doctor,
             HttpServletRequest httpServletRequest
     ) {
