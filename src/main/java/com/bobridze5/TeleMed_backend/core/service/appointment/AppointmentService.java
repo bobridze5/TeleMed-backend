@@ -15,6 +15,7 @@ import com.bobridze5.TeleMed_backend.core.exceptions.EntityNotFoundException;
 import com.bobridze5.TeleMed_backend.core.repository.AppointmentRepository;
 import com.bobridze5.TeleMed_backend.core.repository.PatientDoctorAssignmentRepository;
 import com.bobridze5.TeleMed_backend.core.repository.UserRepository;
+import com.bobridze5.TeleMed_backend.core.service.notification.AppointmentNotifier;
 import com.bobridze5.TeleMed_backend.core.service.schedule.DoctorScheduleService;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,7 @@ public class AppointmentService {
     private final PatientDoctorAssignmentRepository assignmentRepository;
     private final AppointmentMapper mapper;
     private final DoctorScheduleService scheduleService;
+    private final AppointmentNotifier appointmentNotifier;
 
     public AppointmentResponse getAppointmentById(Long appointmentId, Long userId) {
         Appointment appointment = appointmentRepository.findByIdAndUserId(appointmentId, userId)
@@ -75,11 +77,27 @@ public class AppointmentService {
         };
 
         Page<Appointment> appointments = appointmentRepository.findAll(spec, pageRequest);
-        return appointments.map(mapper::mapToResponse);
+
+        // Один запрос на medical records + один на reviews для всех записей
+        // страницы — иначе AppointmentResponse.medicalRecordId/reviewId
+        // вызывали бы N+1 в `mapToResponse`.
+        var ids = appointments.getContent().stream().map(Appointment::getId).toList();
+        var recordIdByApt = mapper.loadMedicalRecordIds(ids);
+        var reviewIdByApt = mapper.loadReviewIds(ids);
+
+        return appointments.map(a -> mapper.mapToResponse(
+                a,
+                recordIdByApt.get(a.getId()),
+                reviewIdByApt.get(a.getId())
+        ));
     }
 
     @Transactional
     public AppointmentResponse createAppointment(Long userId, AppointmentRequest request) {
+        log.info("createAppointment START: initiator={}, targetId={}, dateTime={}, consultationType={}, slotDurationMinutes={}",
+                userId, request.targetId(), request.dateTime(),
+                request.consultationType(), request.slotDurationMinutes());
+
         User initiator = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("Пользователь-инициатор не найден"));
 
@@ -89,7 +107,30 @@ public class AppointmentService {
         AppointmentCreationStrategy strategy = appointmentStrategyFactory.getStrategy(initiator);
         Appointment appointment = strategy.create(initiator, target, request);
 
-        scheduleService.validateSlot(appointment.getDoctor().getId(), request.dateTime(), request.consultationType());
+        log.info("createAppointment: entity built with consultationType={}", appointment.getConsultationType());
+
+        // Две ветки валидации — в зависимости от инициатора:
+        //  • Пациент: слот должен уже существовать в расписании врача и быть
+        //    свободен (полная validateSlot).
+        //  • Врач: слот создаём «на лету» через ensureSlotExists (с проверкой
+        //    на пересечение с существующими слотами — «никаких пересечений в
+        //    расписании не должно быть»), после чего достаточно убедиться, что
+        //    никто другой не занял это же время.
+        Long doctorIdForValidation = appointment.getDoctor().getId();
+        if (initiator instanceof Doctor) {
+            int duration = request.slotDurationMinutes() != null && request.slotDurationMinutes() > 0
+                    ? request.slotDurationMinutes()
+                    : 30;
+            scheduleService.ensureSlotExists(
+                    doctorIdForValidation,
+                    request.dateTime(),
+                    duration,
+                    request.consultationType()
+            );
+            scheduleService.validateSlotNotTaken(doctorIdForValidation, request.dateTime());
+        } else {
+            scheduleService.validateSlot(doctorIdForValidation, request.dateTime(), request.consultationType());
+        }
 
         Appointment savedAppointment = appointmentRepository.save(appointment);
 
@@ -104,6 +145,9 @@ public class AppointmentService {
                 log.info("Создана привязка пациент ID:{} к врачу ID:{}", patient.getId(), doctor.getId());
             }
         }
+
+        // In-app уведомление обеим сторонам.
+        appointmentNotifier.onCreated(savedAppointment, initiator instanceof Doctor);
 
         log.info("Создана новая запись ID: {} от пользователя ID: {} к пользователю ID: {}",
                 savedAppointment.getId(), userId, request.targetId());
@@ -186,6 +230,8 @@ public class AppointmentService {
 
         appointmentRepository.save(appointment);
 
+        appointmentNotifier.onConfirmed(appointment, confirmedByRole);
+
         log.info("Запись ID: {} подтверждена ролью {}; pat={}, doc={}, status={}",
                 appointmentId, confirmedByRole,
                 appointment.getConfirmedByPatient(),
@@ -233,6 +279,8 @@ public class AppointmentService {
 
         appointmentRepository.save(appointment);
 
+        appointmentNotifier.onConfirmed(appointment, "DOCTOR");
+
         log.info("Запись ID: {} подтверждена врачом ID: {}; pat={}, doc={}, status={}",
                 appointmentId, doctorId,
                 appointment.getConfirmedByPatient(),
@@ -265,6 +313,12 @@ public class AppointmentService {
             appointment.setReason(reason);
         }
         appointmentRepository.save(appointment);
+
+        // Узнаём, кто отменил, по совпадению userId с patient/doctor — иначе
+        // у фронта нет надёжного способа сказать «другой стороне», что приём
+        // отменили.
+        String cancelledBy = appointment.getPatient().getId().equals(userId) ? "PATIENT" : "DOCTOR";
+        appointmentNotifier.onCanceled(appointment, cancelledBy, reason);
 
         log.info("Запись ID: {} отменена пользователем ID: {}", appointmentId, userId);
     }

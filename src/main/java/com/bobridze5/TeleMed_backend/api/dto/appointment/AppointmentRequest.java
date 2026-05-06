@@ -14,7 +14,14 @@ public record AppointmentRequest(
         LocalDateTime dateTime,
 
         @NotNull(message = "Выберите ти консультации")
-        ConsultationType consultationType
+        ConsultationType consultationType,
+
+        // Опциональная длительность слота в минутах. Имеет смысл только когда
+        // запись создаёт сам врач и слота ещё нет в расписании — в этом случае
+        // бэкенд создаёт слот с указанной длительностью. Если не передано —
+        // используется значение по умолчанию (30 минут). Для записи со стороны
+        // пациента поле игнорируется: пациент выбирает из готовых слотов.
+        Integer slotDurationMinutes
 ) {
 }
 

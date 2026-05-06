@@ -7,7 +7,7 @@ COPY build.gradle.kts settings.gradle.kts ./
 
 RUN chmod +x ./gradlew
 RUN --mount=type=cache,target=/root/.gradle \
-    ./gradlew --no-daemon dependencies > /dev/null 2>&1 || true \
+    ./gradlew --no-daemon dependencies > /dev/null 2>&1 || true
 
 COPY src ./src
 RUN --mount=type=cache,target=/root/.gradle \

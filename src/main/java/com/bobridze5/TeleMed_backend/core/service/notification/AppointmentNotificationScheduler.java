@@ -17,14 +17,14 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class AppointmentNotificationScheduler {
     private final AppointmentRepository appointmentRepository;
-    private final NotificationService notificationService;
+    private final AppointmentEmailService appointmentEmailService;
+    private final AppointmentNotifier appointmentNotifier;
 
     @Scheduled(fixedDelay = 3_600_000) // Запускается каждый час (3600000 мс)
     public void sendReminders() {
         log.info("Запуск планировщика напоминаний о приёмах");
 
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime tomorrow = now.plusHours(24);
 
         // Ищем приёмы, которые начинаются между текущим временем + 23.5 часа и текущим временем + 24.5 часа
         LocalDateTime searchStart = now.plusHours(23).minusMinutes(30);
@@ -44,7 +44,10 @@ public class AppointmentNotificationScheduler {
 
         for (Appointment appointment : upcomingAppointments) {
             try {
-                notificationService.sendConfirmationRequest(appointment);
+                // Email-канал.
+                appointmentEmailService.sendAppointmentReminder(appointment);
+                // In-app канал (колокольчик).
+                appointmentNotifier.onReminder(appointment);
             } catch (Exception e) {
                 log.error("Ошибка при отправке напоминания для приёма ID: {}", appointment.getId(), e);
             }

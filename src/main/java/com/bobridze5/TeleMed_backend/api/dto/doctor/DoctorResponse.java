@@ -10,6 +10,12 @@ public record DoctorResponse(
         String qualification,
         String specialization,
         String organization,
-        String city
+        String city,
+        String about,
+        // Средняя оценка по 5-балльной шкале и общее кол-во отзывов. Считается
+        // на бэкенде, чтобы фронт не делал отдельный запрос за каждым врачом.
+        // null если отзывов нет.
+        Double averageRating,
+        Long reviewsCount
 ) {
 }

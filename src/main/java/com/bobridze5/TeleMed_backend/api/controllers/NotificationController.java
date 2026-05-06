@@ -25,7 +25,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Tag(name = "Уведомления", description = "Лента уведомлений текущего пользователя (любой роли)")
 public class NotificationController {
-    private final UserNotificationService notificationService;
+    private final UserNotificationService userNotificationService;
 
     @GetMapping
     @Operation(summary = "Список уведомлений")
@@ -34,13 +34,13 @@ public class NotificationController {
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size
     ) {
-        return notificationService.getNotifications(userDetails.getUserId(), page, size);
+        return userNotificationService.getNotifications(userDetails.getUserId(), page, size);
     }
 
     @GetMapping("/unread-count")
     @Operation(summary = "Количество непрочитанных")
     public Map<String, Long> unreadCount(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return Map.of("count", notificationService.getUnreadCount(userDetails.getUserId()));
+        return Map.of("count", userNotificationService.getUnreadCount(userDetails.getUserId()));
     }
 
     @PatchMapping("/{notificationId}/read")
@@ -50,7 +50,7 @@ public class NotificationController {
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Long notificationId
     ) {
-        notificationService.markRead(userDetails.getUserId(), notificationId);
+        userNotificationService.markRead(userDetails.getUserId(), notificationId);
     }
 
     @DeleteMapping("/{notificationId}")
@@ -60,6 +60,6 @@ public class NotificationController {
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Long notificationId
     ) {
-        notificationService.delete(userDetails.getUserId(), notificationId);
+        userNotificationService.delete(userDetails.getUserId(), notificationId);
     }
 }

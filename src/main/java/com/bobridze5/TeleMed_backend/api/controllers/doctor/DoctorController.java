@@ -3,8 +3,10 @@ package com.bobridze5.TeleMed_backend.api.controllers.doctor;
 import com.bobridze5.TeleMed_backend.api.controllers.API;
 import com.bobridze5.TeleMed_backend.api.dto.doctor.DoctorFilterRequest;
 import com.bobridze5.TeleMed_backend.api.dto.doctor.DoctorResponse;
+import com.bobridze5.TeleMed_backend.api.dto.review.ReviewResponse;
 import com.bobridze5.TeleMed_backend.api.dto.schedule.AvailableSlotDto;
 import com.bobridze5.TeleMed_backend.core.service.doctor.DoctorService;
+import com.bobridze5.TeleMed_backend.core.service.review.ReviewService;
 import com.bobridze5.TeleMed_backend.core.service.schedule.DoctorScheduleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,6 +29,7 @@ import java.util.List;
 public class DoctorController {
     private final DoctorService doctorService;
     private final DoctorScheduleService scheduleService;
+    private final ReviewService reviewService;
 
     @GetMapping
     @Operation(summary = "Получить список врачей", description = "Возвращает страницу врачей с фильтрацией по специализации и городу")
@@ -53,5 +56,19 @@ public class DoctorController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {
         return scheduleService.getAvailableSlots(id, date);
+    }
+
+    @GetMapping("/{id}/reviews")
+    @Operation(
+            summary = "Получить отзывы о враче",
+            description = "Публичный пейджинг по отзывам конкретного врача — используется на карточке " +
+                    "врача в разделе «Запись к врачу» на стороне пациента."
+    )
+    public Page<ReviewResponse> getDoctorReviews(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        return reviewService.getDoctorReviews(id, page, size);
     }
 }

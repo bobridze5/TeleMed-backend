@@ -12,12 +12,29 @@ import org.springframework.stereotype.Component;
 public class DoctorProfileMapper {
 
     public DoctorResponse mapToResponse(Doctor doctor) {
+        return mapToResponse(doctor, null, null);
+    }
+
+    /**
+     * Версия маппера, позволяющая пробросить агрегат рейтинга (средняя оценка +
+     * количество отзывов). Если статистика не передана (null), в ответе будут
+     * null-поля.
+     */
+    public DoctorResponse mapToResponse(Doctor doctor, Double averageRating, Long reviewsCount) {
         String specialization = doctor.getSpecialization() != null
                 ? doctor.getSpecialization().getName() : null;
         String organization = doctor.getOrganization() != null
                 ? doctor.getOrganization().getName() : null;
         String city = doctor.getOrganization() != null && doctor.getOrganization().getCity() != null
                 ? doctor.getOrganization().getCity().getName() : null;
+
+        // Нормализуем рейтинг: если отзывов 0 — возвращаем null, иначе округляем до 0.1.
+        Double avg = null;
+        Long count = 0L;
+        if (reviewsCount != null && reviewsCount > 0 && averageRating != null) {
+            avg = Math.round(averageRating * 10.0) / 10.0;
+            count = reviewsCount;
+        }
 
         return new DoctorResponse(
                 doctor.getId(),
@@ -29,7 +46,10 @@ public class DoctorProfileMapper {
                 doctor.getQualification(),
                 specialization,
                 organization,
-                city
+                city,
+                doctor.getAbout(),
+                avg,
+                count
         );
     }
 

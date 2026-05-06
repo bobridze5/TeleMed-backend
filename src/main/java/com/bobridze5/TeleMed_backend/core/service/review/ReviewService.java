@@ -49,6 +49,36 @@ public class ReviewService {
         return toResponse(reviewRepository.save(review));
     }
 
+    /**
+     * Пациент редактирует свой отзыв. Доступ проверяется по совпадению
+     * patient.id у отзыва с patientUserId — иначе можно было бы редактировать
+     * чужие отзывы, зная их id.
+     */
+    @Transactional
+    public ReviewResponse updateReview(Long appointmentId, Long patientUserId, ReviewRequest request) {
+        Review review = reviewRepository.findByAppointmentId(appointmentId)
+                .orElseThrow(() -> new EntityNotFoundException("Отзыв не найден"));
+        if (!review.getPatient().getId().equals(patientUserId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Редактировать можно только свой отзыв");
+        }
+        if (request.rating() != null) review.setRating(request.rating());
+        // Для комментария null означает «не менять», а пустая строка → стереть.
+        if (request.comment() != null) {
+            review.setComment(request.comment().isBlank() ? null : request.comment());
+        }
+        return toResponse(reviewRepository.save(review));
+    }
+
+    @Transactional
+    public void deleteReview(Long appointmentId, Long patientUserId) {
+        Review review = reviewRepository.findByAppointmentId(appointmentId)
+                .orElseThrow(() -> new EntityNotFoundException("Отзыв не найден"));
+        if (!review.getPatient().getId().equals(patientUserId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Удалять можно только свой отзыв");
+        }
+        reviewRepository.delete(review);
+    }
+
     public Page<ReviewResponse> getDoctorReviews(Long doctorId, int page, int size) {
         return reviewRepository.findByDoctorIdOrderByCreatedAtDesc(
                 doctorId,
@@ -56,12 +86,28 @@ public class ReviewService {
         ).map(this::toResponse);
     }
 
+    /**
+     * Получить отзыв по своему приёму — используется фронтом при открытии
+     * формы редактирования отзыва (нужно подгрузить текущий рейтинг и текст).
+     * Если отзыв чужой — кидаем 404 (намеренно, чтобы не палить сам факт).
+     */
+    @Transactional(readOnly = true)
+    public ReviewResponse getReviewByAppointment(Long appointmentId, Long patientUserId) {
+        Review review = reviewRepository.findByAppointmentId(appointmentId)
+                .orElseThrow(() -> new EntityNotFoundException("Отзыв не найден"));
+        if (!review.getPatient().getId().equals(patientUserId)) {
+            throw new EntityNotFoundException("Отзыв не найден");
+        }
+        return toResponse(review);
+    }
+
     private ReviewResponse toResponse(Review r) {
         String patientName = Stream.of(
                 r.getPatient().getLastName(),
                 r.getPatient().getFirstName(),
                 r.getPatient().getMiddleName()
-        ).filter(s -> s != null && !s.isBlank()).reduce("", (a, b) -> a.isBlank() ? b : a + " " + b);
+        ).filter(s -> s != null && !s.isBlank())
+                .reduce("", (a, b) -> a.isBlank() ? b : a + " " + b);
 
         return new ReviewResponse(
                 r.getId(),

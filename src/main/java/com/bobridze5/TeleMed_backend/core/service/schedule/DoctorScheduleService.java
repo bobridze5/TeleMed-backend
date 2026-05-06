@@ -213,7 +213,21 @@ public class DoctorScheduleService {
                 .orElse(List.of());
     }
 
+    /**
+     * Полная валидация слота для пациент-инициированной записи: и «слот есть
+     * в расписании», и «на него ещё никто не записан».
+     */
     public void validateSlot(Long doctorId, LocalDateTime dateTime, ConsultationType consultationType) {
+        validateSlotBelongsToSchedule(doctorId, dateTime, consultationType);
+        validateSlotNotTaken(doctorId, dateTime);
+    }
+
+    /**
+     * Проверяет, что слот (startTime + consultationType) действительно есть в
+     * расписании врача на этот день недели. Для пациент-flow обязателен:
+     * пациент должен выбирать только из слотов, которые врач объявил.
+     */
+    public void validateSlotBelongsToSchedule(Long doctorId, LocalDateTime dateTime, ConsultationType consultationType) {
         DoctorSchedule schedule = scheduleRepository
                 .findByDoctorIdAndDayOfWeek(doctorId, dateTime.getDayOfWeek())
                 .orElseThrow(() -> new InvalidSlotException("Врач не ведёт приём в этот день недели"));
@@ -224,11 +238,78 @@ public class DoctorScheduleService {
         if (!isValidSlot) {
             throw new InvalidSlotException("Выбранное время не соответствует доступным слотам врача");
         }
+    }
 
+    /**
+     * Проверяет, что на указанное время ещё нет активной (не отменённой) записи
+     * у этого врача. Используется и в пациент-flow, и во врач-flow (чтобы
+     * врач сам себя не забукировал дважды).
+     */
+    public void validateSlotNotTaken(Long doctorId, LocalDateTime dateTime) {
         if (appointmentRepository.existsByDoctorIdAndDateTimeAndStatusNot(
                 doctorId, dateTime, AppointmentStatus.CANCELED)) {
             throw new InvalidSlotException("Выбранный слот уже занят");
         }
+    }
+
+    /**
+     * Гарантирует, что в расписании врача есть слот на указанное время и тип
+     * консультации. Используется, когда врач самостоятельно записывает
+     * пациента на приём — тогда запись создаёт слот в расписании «на лету»,
+     * и этот слот становится частью обычного расписания (виден в разделе
+     * «Расписание», доступен другим пациентам для просмотра).
+     *
+     * Поведение:
+     *  • точное совпадение (start/end/type) — no-op;
+     *  • пересечение с любым другим слотом — {@link InvalidSlotException}
+     *    («никаких пересечений в расписании не должно быть»);
+     *  • иначе — создаёт новый слот и кладёт его в in-memory коллекцию
+     *    расписания, чтобы последующий validateSlot увидел его в той же
+     *    транзакции.
+     */
+    @Transactional
+    public void ensureSlotExists(Long doctorId, LocalDateTime dateTime,
+                                 int durationMinutes, ConsultationType consultationType) {
+        if (durationMinutes <= 0) durationMinutes = 30;
+        LocalTime startTime = dateTime.toLocalTime();
+        LocalTime endTime = startTime.plusMinutes(durationMinutes);
+
+        DoctorSchedule schedule = getOrCreateSchedule(doctorId, dateTime.getDayOfWeek());
+
+        // Точное совпадение (start/end/type) — слот уже есть, нет смысла
+        // создавать дубликат.
+        boolean exactMatch = schedule.getCustomSlots().stream()
+                .anyMatch(s -> s.getStartTime().equals(startTime)
+                        && s.getEndTime().equals(endTime)
+                        && s.getConsultationType() == consultationType);
+        if (exactMatch) return;
+
+        // Пересечение с любым существующим слотом (того же или другого типа).
+        // Принцип: в расписании не должно быть пересекающихся слотов — иначе
+        // врач не сможет понять, что у него реально свободно.
+        for (ScheduleSlot existing : schedule.getCustomSlots()) {
+            if (slotsOverlap(startTime, endTime, existing.getStartTime(), existing.getEndTime())) {
+                throw new InvalidSlotException(
+                        "Время " + startTime + "–" + endTime
+                                + " пересекается со слотом " + existing.getStartTime()
+                                + "–" + existing.getEndTime() + " в вашем расписании");
+            }
+        }
+
+        ScheduleSlot slot = ScheduleSlot.builder()
+                .schedule(schedule)
+                .startTime(startTime)
+                .endTime(endTime)
+                .consultationType(consultationType)
+                .build();
+        ScheduleSlot saved = slotRepository.save(slot);
+        // Важно: добавляем слот в уже загруженную коллекцию schedule, иначе
+        // следующий вызов в той же транзакции (напр. validateSlot) его не
+        // увидит из first-level кэша Hibernate и упадёт с «Выбранное время не
+        // соответствует доступным слотам врача».
+        schedule.getCustomSlots().add(saved);
+        log.info("Auto-slot: создан слот на {} у врача ID={} (type={}, {}-{})",
+                dateTime.getDayOfWeek(), doctorId, consultationType, startTime, endTime);
     }
 
     private DoctorSchedule getOrCreateSchedule(Long doctorId, DayOfWeek dayOfWeek) {

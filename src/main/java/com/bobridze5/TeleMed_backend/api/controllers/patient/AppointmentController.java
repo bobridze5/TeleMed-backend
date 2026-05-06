@@ -110,6 +110,15 @@ public class AppointmentController {
         return appointmentService.getAppointmentById(id, userDetails.getUserId());
     }
 
+    @GetMapping("/{id}/review")
+    @Operation(summary = "Получить свой отзыв об этом приёме")
+    public ReviewResponse getReview(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        return reviewService.getReviewByAppointment(id, userDetails.getUserId());
+    }
+
     @PostMapping("/{id}/review")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Оставить отзыв", description = "Оставить отзыв после завершённой консультации")
@@ -119,5 +128,25 @@ public class AppointmentController {
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         return reviewService.createReview(id, userDetails.getUserId(), request);
+    }
+
+    @PatchMapping("/{id}/review")
+    @Operation(summary = "Изменить свой отзыв", description = "Меняет рейтинг и/или комментарий ранее оставленного отзыва")
+    public ReviewResponse updateReview(
+            @PathVariable Long id,
+            @Valid @RequestBody ReviewRequest request,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        return reviewService.updateReview(id, userDetails.getUserId(), request);
+    }
+
+    @DeleteMapping("/{id}/review")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Удалить свой отзыв")
+    public void deleteReview(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        reviewService.deleteReview(id, userDetails.getUserId());
     }
 }

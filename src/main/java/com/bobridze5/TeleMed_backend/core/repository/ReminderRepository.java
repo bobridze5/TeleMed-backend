@@ -18,8 +18,6 @@ public interface ReminderRepository extends JpaRepository<Reminder, Long> {
 
     Optional<Reminder> findByIdAndPatientId(Long id, Long patientId);
 
-    List<Reminder> findAllByEnabledTrue();
-
     List<Reminder> findAllByEnabledTrueAndKind(ReminderKind kind);
 
     List<Reminder> findAllByEnabledTrueAndKindAndScheduledAtBefore(

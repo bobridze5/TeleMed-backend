@@ -29,6 +29,14 @@ import java.util.stream.Collectors;
 public class ReminderScheduler {
     private static final String NOTIFICATION_TYPE = "REMINDER";
 
+    /**
+     * Окно срабатывания recurring-напоминания после расчётного времени, в минутах.
+     * Защищает от пропуска при опоздании планировщика (рестарт сервера, GC,
+     * длинная транзакция). Дубли исключены проверкой lastFiredAt по дню в TZ
+     * пациента: одно recurring может сработать максимум раз в сутки.
+     */
+    private static final long RECURRING_WINDOW_MINUTES = 5;
+
     private final ReminderRepository reminderRepository;
     private final UserNotificationService userNotificationService;
     private final EmailSender emailSender;
@@ -82,7 +90,11 @@ public class ReminderScheduler {
 
         LocalTime target = r.getRecurrenceTime();
         LocalTime current = nowInTz.toLocalTime();
-        if (Math.abs(Duration.between(target, current).toMinutes()) > 0) return false;
+        // Окно: [target, target + RECURRING_WINDOW_MINUTES]. Раньше времени —
+        // ждём; позже — пропускаем (один тик в минуту, дубль одного дня
+        // отрезается lastFiredAt-проверкой ниже).
+        long deltaMinutes = Duration.between(target, current).toMinutes();
+        if (deltaMinutes < 0 || deltaMinutes > RECURRING_WINDOW_MINUTES) return false;
 
         Instant lastFired = r.getLastFiredAt();
         if (lastFired != null) {

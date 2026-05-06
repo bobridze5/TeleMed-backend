@@ -8,6 +8,7 @@ import com.bobridze5.TeleMed_backend.core.entity.medical.Doctor;
 import com.bobridze5.TeleMed_backend.core.entity.medical.MedicalRecord;
 import com.bobridze5.TeleMed_backend.core.entity.medical.Patient;
 import com.bobridze5.TeleMed_backend.core.exceptions.AccessForbiddenException;
+import com.bobridze5.TeleMed_backend.core.exceptions.EntityAlreadyExistsException;
 import com.bobridze5.TeleMed_backend.core.exceptions.EntityNotFoundException;
 import com.bobridze5.TeleMed_backend.core.repository.AppointmentRepository;
 import com.bobridze5.TeleMed_backend.core.repository.MedicalRecordRepository;
@@ -52,6 +53,13 @@ public class MedicalRecordService {
             if (!appointment.getPatient().getId().equals(patient.getId())
                     || !appointment.getDoctor().getId().equals(doctor.getId())) {
                 throw new AccessForbiddenException("Запись на приём не относится к этому пациенту и врачу");
+            }
+            // Один приём — одна медицинская запись. Если врач хочет
+            // дополнить заметки, он редактирует существующую через PATCH.
+            if (recordRepository.existsByAppointmentId(request.appointmentId())) {
+                throw new EntityAlreadyExistsException(
+                        "Для этого приёма уже создана запись консультации. " +
+                                "Откройте существующую запись для редактирования.");
             }
         }
 

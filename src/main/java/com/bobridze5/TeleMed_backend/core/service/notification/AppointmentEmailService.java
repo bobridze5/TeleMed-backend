@@ -10,10 +10,17 @@ import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Email-канал доставки напоминаний о приёмах. Формирует тело письма для
+ * пациента и врача, делегирует фактическую отправку {@link EmailSender}.
+ * Триггерится из {@link AppointmentNotificationScheduler} за ~24 часа до
+ * приёма; параллельно создаётся in-app уведомление через
+ * {@link AppointmentNotifier#onReminder}.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class NotificationService {
+public class AppointmentEmailService {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
     private final EmailSender emailSender;
@@ -24,7 +31,10 @@ public class NotificationService {
     @Value("${mail.appointment.reminder.body:Напоминаем вам о приёме у врача %s %s}")
     private String reminderBodyTemplate;
 
-    public void sendConfirmationRequest(Appointment appointment) {
+    /**
+     * Отправляет напоминание о приёме на email пациента и врача (~ за 24ч до приёма).
+     */
+    public void sendAppointmentReminder(Appointment appointment) {
         try {
             Patient patient = appointment.getPatient();
             Doctor doctor = appointment.getDoctor();

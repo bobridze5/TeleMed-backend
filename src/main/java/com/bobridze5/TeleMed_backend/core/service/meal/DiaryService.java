@@ -79,9 +79,9 @@ public class DiaryService {
         double calories = 0, carbs = 0, protein = 0, fats = 0;
         for (Meal meal : day.getMeals()) {
             calories += meal.totalCalories();
-            carbs    += meal.totalCarbs();
-            protein  += meal.totalProtein();
-            fats     += meal.totalFats();
+            carbs += meal.totalCarbs();
+            protein += meal.totalProtein();
+            fats += meal.totalFats();
         }
         day.setTotalCalories(round(calories));
         day.setTotalCarbs(round(carbs));

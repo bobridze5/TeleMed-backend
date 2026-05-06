@@ -172,8 +172,12 @@ public class PatientReportService {
             doc.close();
             return out.toByteArray();
         } catch (Exception e) {
-            log.error("Ошибка генерации PDF-отчёта", e);
-            return new byte[0];
+            // Раньше здесь возвращался new byte[0] — в результате фронт получал
+            // 200 OK с пустым файлом и никак не мог понять, что произошла ошибка.
+            // Теперь пробрасываем исключение: Spring превратит его в 500 с телом,
+            // что хотя бы видно в DevTools и в логах сервера.
+            log.error("Ошибка генерации PDF-отчёта для пациента ID={}", patient.getId(), e);
+            throw new IllegalStateException("Не удалось сформировать PDF-отчёт: " + e.getMessage(), e);
         }
     }
 
