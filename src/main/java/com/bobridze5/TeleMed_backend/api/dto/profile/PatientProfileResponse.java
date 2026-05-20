@@ -19,6 +19,10 @@ public record PatientProfileResponse(
         Double targetHigh,
         String bloodType,
         Integer heightCm,
-        Double hba1c
+        Double hba1c,
+        Integer dailyCaloriesGoal,
+        Double dailyProteinGoal,
+        Double dailyFatsGoal,
+        Double dailyCarbsGoal
 ) {
 }

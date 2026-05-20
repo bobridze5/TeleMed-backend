@@ -17,7 +17,18 @@ public interface MedicalRecordRepository extends JpaRepository<MedicalRecord, Lo
 
     Optional<MedicalRecord> findByIdAndPatientId(Long id, Long patientId);
 
-    Optional<MedicalRecord> findByIdAndDoctorId(Long id, Long doctorId);
+    /**
+     * Явный JPQL с JOIN FETCH, чтобы гарантировать корректную работу
+     * через JOINED-наследование (Doctor extends User).
+     * Spring Data derived query тоже должен справляться, но явный запрос
+     * исключает сюрпризы при оптимизации/кэшировании Hibernate.
+     */
+    @org.springframework.data.jpa.repository.Query(
+            "SELECT mr FROM MedicalRecord mr JOIN FETCH mr.doctor d " +
+                    "WHERE mr.id = :id AND d.id = :doctorId")
+    Optional<MedicalRecord> findByIdAndDoctorId(
+            @org.springframework.data.repository.query.Param("id") Long id,
+            @org.springframework.data.repository.query.Param("doctorId") Long doctorId);
 
     /**
      * Используется для проверки «одна запись на приём» при создании новой

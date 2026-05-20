@@ -244,6 +244,12 @@ public class DoctorScheduleService {
      * Проверяет, что на указанное время ещё нет активной (не отменённой) записи
      * у этого врача. Используется и в пациент-flow, и во врач-flow (чтобы
      * врач сам себя не забукировал дважды).
+     *
+     * <p><b>Ограничение:</b> проверяет только точное совпадение {@code dateTime}
+     * со startTime appointment. Если врач создал приём с нестандартным временем
+     * (через {@code ensureSlotExists}) и он начинается внутри слота, но не ровно
+     * в его startTime — пересечение не обнаружится. Требуется поле
+     * {@code endDateTime} или {@code durationMinutes} в {@link Appointment}.
      */
     public void validateSlotNotTaken(Long doctorId, LocalDateTime dateTime) {
         if (appointmentRepository.existsByDoctorIdAndDateTimeAndStatusNot(

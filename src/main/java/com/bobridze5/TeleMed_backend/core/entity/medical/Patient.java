@@ -47,6 +47,20 @@ public class Patient extends User {
     @Column(name = "patient_hba1c")
     private Double hba1c;
 
+    // Дневные нутри-цели. Все nullable: если не заданы — дневник просто
+    // отображает текущие totals без сравнения с нормой.
+    @Column(name = "patient_daily_calories_goal")
+    private Integer dailyCaloriesGoal;
+
+    @Column(name = "patient_daily_protein_goal")
+    private Double dailyProteinGoal;
+
+    @Column(name = "patient_daily_fats_goal")
+    private Double dailyFatsGoal;
+
+    @Column(name = "patient_daily_carbs_goal")
+    private Double dailyCarbsGoal;
+
     @Override
     public String getRole() {
         return "PATIENT";

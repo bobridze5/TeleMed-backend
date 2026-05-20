@@ -23,7 +23,11 @@ public class PatientProfileMapper {
                 patient.getTargetHigh(),
                 patient.getBloodType(),
                 patient.getHeightCm(),
-                patient.getHba1c()
+                patient.getHba1c(),
+                patient.getDailyCaloriesGoal(),
+                patient.getDailyProteinGoal(),
+                patient.getDailyFatsGoal(),
+                patient.getDailyCarbsGoal()
         );
     }
 
@@ -37,5 +41,9 @@ public class PatientProfileMapper {
         if (request.getBloodType() != null) patient.setBloodType(request.getBloodType());
         if (request.getHeightCm() != null) patient.setHeightCm(request.getHeightCm());
         if (request.getHba1c() != null) patient.setHba1c(request.getHba1c());
+        if (request.getDailyCaloriesGoal() != null) patient.setDailyCaloriesGoal(request.getDailyCaloriesGoal());
+        if (request.getDailyProteinGoal() != null) patient.setDailyProteinGoal(request.getDailyProteinGoal());
+        if (request.getDailyFatsGoal() != null) patient.setDailyFatsGoal(request.getDailyFatsGoal());
+        if (request.getDailyCarbsGoal() != null) patient.setDailyCarbsGoal(request.getDailyCarbsGoal());
     }
 }

@@ -28,9 +28,20 @@ public class Appointment {
     @JoinColumn(name = "doctor_id", nullable = false)
     private Doctor doctor;
 
+    /**
+     * TODO: добавить {@code endDateTime} или {@code durationMinutes},
+     * иначе невозможно точно проверить пересечение с другими приёмами
+     * (см. DoctorScheduleService.validateSlotNotTaken).
+     */
     @Column(name = "appointment_datetime", nullable = false)
     private LocalDateTime dateTime;
 
+    /**
+     * Тип консультации на момент бронирования (snapshot).
+     * Если врач позже изменит/удалит слот в расписании, это поле
+     * останется неизменным — так и задумано (исторические данные).
+     * Связь с конкретным слотом пока не хранится (bookedSlotId).
+     */
     @Enumerated(EnumType.STRING)
     @Column(name = "appointment_consultation_type", nullable = false)
     private ConsultationType consultationType;

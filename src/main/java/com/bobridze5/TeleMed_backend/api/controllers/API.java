@@ -13,6 +13,7 @@ public final class API {
     public static final String DISH = V1 + "/dishes";
     public static final String CHATS = V1 + "/chats";
     public static final String ORGANIZATIONS = V1 + "/organizations";
+    public static final String ICD10 = V1 + "/icd10";
 
     // Admin
     public static final String ADMIN = V1 + "/admin";
