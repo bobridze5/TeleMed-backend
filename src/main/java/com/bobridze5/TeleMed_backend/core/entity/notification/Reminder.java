@@ -54,7 +54,7 @@ public class Reminder {
     @Column(name = "reminder_recurrence_time")
     private LocalTime recurrenceTime;
 
-    @Column(name = "reminder_recurrence_days", length = 40)
+    @Column(name = "reminder_recurrence_days", length = 120)
     private String recurrenceDays;
 
     @Column(name = "reminder_enabled", nullable = false)

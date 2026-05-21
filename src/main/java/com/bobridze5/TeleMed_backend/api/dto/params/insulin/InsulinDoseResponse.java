@@ -6,7 +6,6 @@ import java.time.Instant;
 
 public record InsulinDoseResponse(
         Long id,
-        Long mealId,
         Double units,
         InsulinType insulinType,
         String note,

@@ -57,8 +57,7 @@ public class InsulinDoseService {
 
     @Transactional
     public InsulinDoseResponse addDose(Patient patient, InsulinDoseRequest request) {
-        Meal meal = resolveMeal(patient, request.mealId());
-        InsulinDose insulinDose = InsulinMapper.mapToEntity(request, patient, meal);
+        InsulinDose insulinDose = InsulinMapper.mapToEntity(request, patient);
 
         InsulinDose savedInsulinDose = insulinRepository.save(insulinDose);
 
@@ -70,11 +69,7 @@ public class InsulinDoseService {
         InsulinDose dose = insulinRepository.findByIdAndPatientId(doseId, patient.getId())
                 .orElseThrow(() -> new EntityNotFoundException("Запись инсулина не найдена"));
 
-        Meal meal = request.mealId() != null
-                ? resolveMeal(patient, request.mealId())
-                : dose.getMeal();
-
-        InsulinMapper.updateEntity(request, dose, meal);
+        InsulinMapper.updateEntity(request, dose);
 
         return InsulinMapper.mapToResponse(dose);
     }
@@ -85,12 +80,6 @@ public class InsulinDoseService {
                 .orElseThrow(() -> new EntityNotFoundException("Запись инсулина не найдена"));
 
         insulinRepository.delete(dose);
-    }
-
-    private Meal resolveMeal(Patient patient, Long mealId) {
-        if (mealId == null) return null;
-        return mealRepository.findByIdAndPatientId(mealId, patient.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Приём пищи не найден"));
     }
 
     private Instant toInstant(LocalDateTime dt, ZoneId tz) {

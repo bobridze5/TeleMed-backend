@@ -39,10 +39,6 @@ public class InsulinDose {
     @JoinColumn(name = "patient_id", referencedColumnName = "patient_id", nullable = false)
     private Patient patient;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "meal_id", referencedColumnName = "meal_id")
-    private Meal meal;
-
     @Positive
     @Column(name = "insulin_dose_units", nullable = false)
     private Double units;

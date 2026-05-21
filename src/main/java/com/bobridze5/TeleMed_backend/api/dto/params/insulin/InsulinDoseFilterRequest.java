@@ -19,8 +19,6 @@ public record InsulinDoseFilterRequest(
         @PositiveOrZero
         Double maxUnits,
 
-        Long mealId,
-
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
         LocalDateTime startDate,
 

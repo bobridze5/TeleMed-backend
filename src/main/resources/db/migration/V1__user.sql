@@ -13,4 +13,4 @@ CREATE TABLE "users" (
     user_time_zone VARCHAR(50) NOT NULL DEFAULT 'Europe/Moscow'
 );
 
-CREATE INDEX idx_users_email ON users(user_email);
+CREATE INDEX idx_users_email ON users (user_email);

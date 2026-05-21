@@ -12,8 +12,6 @@ public record InsulinDoseRequest(
         @Positive(message = "Количество единиц должно быть больше нуля")
         Double units,
 
-        Long mealId,
-
         @NotNull(message = "Тип инсулина обязателен")
         InsulinType insulinType,
 

@@ -10,7 +10,6 @@ public record InsulinDoseUpdateRequest(
         @Positive(message = "Количество единиц должно быть больше нуля")
         Double units,
 
-        Long mealId,
         InsulinType insulinType,
         Instant takenAt,
 

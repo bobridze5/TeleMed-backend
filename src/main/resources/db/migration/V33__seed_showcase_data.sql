@@ -401,24 +401,25 @@ BEGIN
         (NULL, 'Оливковое масло',          884, 0.0, 0.0, 100.0, 'Заправка для салатов.'),
         (NULL, 'Помидор свежий',           18,  3.9, 0.9, 0.2, 'Сезонный овощ.'),
         (NULL, 'Авокадо',                  160, 8.5, 2.0, 14.7, 'Источник полезных жиров.')
-    RETURNING dish_id INTO v_dish_oatmeal;
-    -- RETURNING из multi-VALUES возвращает только последнюю строку,
-    -- поэтому подгружаем нужные ID отдельно через имя:
-    SELECT dish_id INTO v_dish_oatmeal   FROM dish WHERE dish_name = 'Овсяная каша на воде'    AND patient_id IS NULL;
-    SELECT dish_id INTO v_dish_buckwheat FROM dish WHERE dish_name = 'Гречневая каша варёная'  AND patient_id IS NULL;
-    SELECT dish_id INTO v_dish_chicken   FROM dish WHERE dish_name = 'Куриная грудка отварная' AND patient_id IS NULL;
-    SELECT dish_id INTO v_dish_apple     FROM dish WHERE dish_name = 'Яблоко (зелёное)'        AND patient_id IS NULL;
-    SELECT dish_id INTO v_dish_cucumber  FROM dish WHERE dish_name = 'Огурец свежий'           AND patient_id IS NULL;
-    SELECT dish_id INTO v_dish_egg       FROM dish WHERE dish_name = 'Яйцо куриное варёное'    AND patient_id IS NULL;
-    SELECT dish_id INTO v_dish_kefir     FROM dish WHERE dish_name = 'Кефир 1%'                AND patient_id IS NULL;
-    SELECT dish_id INTO v_dish_bread_rye FROM dish WHERE dish_name = 'Хлеб ржаной'             AND patient_id IS NULL;
-    SELECT dish_id INTO v_dish_cottage   FROM dish WHERE dish_name = 'Творог 5%'               AND patient_id IS NULL;
-    SELECT dish_id INTO v_dish_salmon    FROM dish WHERE dish_name = 'Лосось запечённый'       AND patient_id IS NULL;
-    SELECT dish_id INTO v_dish_brokkoli  FROM dish WHERE dish_name = 'Брокколи на пару'        AND patient_id IS NULL;
-    SELECT dish_id INTO v_dish_almonds   FROM dish WHERE dish_name = 'Миндаль сырой'           AND patient_id IS NULL;
-    SELECT dish_id INTO v_dish_olive     FROM dish WHERE dish_name = 'Оливковое масло'         AND patient_id IS NULL;
-    SELECT dish_id INTO v_dish_tomato    FROM dish WHERE dish_name = 'Помидор свежий'          AND patient_id IS NULL;
-    SELECT dish_id INTO v_dish_avocado   FROM dish WHERE dish_name = 'Авокадо'                 AND patient_id IS NULL;
+    ;
+    -- Важно: RETURNING при использовании multi-VALUES возвращает dish_id только для последней вставленной строки,
+    -- то есть только ID последнего блюда, а не всех вставленных; это может быть неочевидно.
+    -- Поэтому нужные ID подгружаем отдельно через имя:
+    SELECT dish_id INTO v_dish_oatmeal   FROM dish WHERE dish_name = 'Овсяная каша на воде'    AND patient_id IS NULL LIMIT 1;
+    SELECT dish_id INTO v_dish_buckwheat FROM dish WHERE dish_name = 'Гречневая каша варёная'  AND patient_id IS NULL LIMIT 1;
+    SELECT dish_id INTO v_dish_chicken   FROM dish WHERE dish_name = 'Куриная грудка отварная' AND patient_id IS NULL LIMIT 1;
+    SELECT dish_id INTO v_dish_apple     FROM dish WHERE dish_name = 'Яблоко (зелёное)'        AND patient_id IS NULL LIMIT 1;
+    SELECT dish_id INTO v_dish_cucumber  FROM dish WHERE dish_name = 'Огурец свежий'           AND patient_id IS NULL LIMIT 1;
+    SELECT dish_id INTO v_dish_egg       FROM dish WHERE dish_name = 'Яйцо куриное варёное'    AND patient_id IS NULL LIMIT 1;
+    SELECT dish_id INTO v_dish_kefir     FROM dish WHERE dish_name = 'Кефир 1%'                AND patient_id IS NULL LIMIT 1;
+    SELECT dish_id INTO v_dish_bread_rye FROM dish WHERE dish_name = 'Хлеб ржаной'             AND patient_id IS NULL LIMIT 1;
+    SELECT dish_id INTO v_dish_cottage   FROM dish WHERE dish_name = 'Творог 5%'               AND patient_id IS NULL LIMIT 1;
+    SELECT dish_id INTO v_dish_salmon    FROM dish WHERE dish_name = 'Лосось запечённый'       AND patient_id IS NULL LIMIT 1;
+    SELECT dish_id INTO v_dish_brokkoli  FROM dish WHERE dish_name = 'Брокколи на пару'        AND patient_id IS NULL LIMIT 1;
+    SELECT dish_id INTO v_dish_almonds   FROM dish WHERE dish_name = 'Миндаль сырой'           AND patient_id IS NULL LIMIT 1;
+    SELECT dish_id INTO v_dish_olive     FROM dish WHERE dish_name = 'Оливковое масло'         AND patient_id IS NULL LIMIT 1;
+    SELECT dish_id INTO v_dish_tomato    FROM dish WHERE dish_name = 'Помидор свежий'          AND patient_id IS NULL LIMIT 1;
+    SELECT dish_id INTO v_dish_avocado   FROM dish WHERE dish_name = 'Авокадо'                 AND patient_id IS NULL LIMIT 1;
 
     -- ============================================================
     -- 11. ЛИЧНЫЕ блюда Орлова (patient_id = его id)
@@ -493,8 +494,9 @@ BEGIN
            dish_calories_per_100, dish_carbs_per_100,
            dish_protein_per_100, dish_fats_per_100,
            dish_carbs_per_100 / 12.0, 1
-    FROM dish, (VALUES (v_dish_oatmeal, 200), (v_dish_apple, 150), (v_dish_kefir, 200)) AS t(d_id, portion)
-    WHERE dish.dish_id = t.d_id;
+    FROM dish
+    INNER JOIN (VALUES (v_dish_oatmeal, 200), (v_dish_apple, 150), (v_dish_kefir, 200)) AS t(d_id, portion)
+        ON dish.dish_id = t.d_id;
 
     -- Обед (сегодня): гречка 200 г + куриная грудка 150 г + овощи (огурец 100 г + помидор 100 г) + хлеб 30 г
     INSERT INTO meal_item (meal_id, dish_id, meal_item_portion_grams,
@@ -575,7 +577,6 @@ BEGIN
     ) AS t(d_id, portion)
     WHERE dish.dish_id = t.d_id;
 
-    -- Пересчёт total_* как делает DiaryService.recomputeTotals
     UPDATE nutrition_day nd
     SET total_calories = sub.cal,
         total_carbs    = sub.car,
@@ -592,25 +593,31 @@ BEGIN
         WHERE m.nutrition_day_id IN (v_day_today, v_day_yesterday, v_day_minus2)
         GROUP BY m.nutrition_day_id
     ) sub
-    WHERE nd.nutrition_day_id = sub.nutrition_day_id;
+    WHERE nd.nutrition_day_id = sub.nutrition_day_id
+      AND (
+        nd.total_calories IS DISTINCT FROM sub.cal OR
+        nd.total_carbs    IS DISTINCT FROM sub.car OR
+        nd.total_protein  IS DISTINCT FROM sub.pro OR
+        nd.total_fats     IS DISTINCT FROM sub.fat
+      );
 
     -- ============================================================
     -- 13. Инсулиновые дозы: SHORT перед каждым приёмом + LONG раз в сутки
     -- ============================================================
-    INSERT INTO insulin_dose (patient_id, meal_id, insulin_dose_units, insulin_dose_type,
+    INSERT INTO insulin_dose (patient_id, insulin_dose_units, insulin_dose_type,
                               insulin_dose_note, insulin_dose_taken_at,
                               insulin_dose_created_at, insulin_dose_updated_at) VALUES
-        (v_patient_orlov, v_meal_breakfast,   6.0, 'SHORT', 'Перед завтраком (по ХЕ)',
+        (v_patient_orlov,   6.0, 'SHORT', 'Перед завтраком (по ХЕ)',
             NOW() - INTERVAL '6 hours', NOW(), NOW()),
-        (v_patient_orlov, v_meal_lunch,       8.0, 'SHORT', 'Перед обедом',
+        (v_patient_orlov,   8.0, 'SHORT', 'Перед обедом',
             NOW() - INTERVAL '2 hours', NOW(), NOW()),
-        (v_patient_orlov, NULL,              18.0, 'LONG',  'Базальная доза перед сном',
+        (v_patient_orlov,  18.0, 'LONG',  'Базальная доза перед сном',
             (NOW() - INTERVAL '1 days')::TIMESTAMP, NOW(), NOW()),
-        (v_patient_orlov, NULL,              18.0, 'LONG',  'Базальная доза перед сном',
+        (v_patient_orlov,  18.0, 'LONG',  'Базальная доза перед сном',
             (NOW() - INTERVAL '2 days')::TIMESTAMP, NOW(), NOW()),
-        (v_patient_orlov, v_meal_y_breakfast, 5.0, 'SHORT', 'Перед завтраком (мало ХЕ)',
+        (v_patient_orlov,  5.0, 'SHORT', 'Перед завтраком (мало ХЕ)',
             (NOW() - INTERVAL '1 days' - INTERVAL '15 hours')::TIMESTAMP, NOW(), NOW()),
-        (v_patient_orlov, v_meal_y_lunch,     7.0, 'SHORT', 'Перед обедом',
+        (v_patient_orlov,  7.0, 'SHORT', 'Перед обедом',
             (NOW() - INTERVAL '1 days' - INTERVAL '10 hours')::TIMESTAMP, NOW(), NOW());
 
     -- ============================================================
@@ -686,7 +693,7 @@ BEGIN
                               appointment_confirmed_by_patient, appointment_confirmed_by_doctor,
                               appointment_created_at, appointment_updated_at)
     VALUES (v_patient_orlov, v_doctor_id,
-            (NOW() + INTERVAL '3 days')::TIMESTAMP + TIME '10:00',
+            DATE(NOW() + INTERVAL '3 days') + TIME '10:00',
             'VIDEO', 'CREATED',
             'Хочу обсудить результаты последнего HbA1c.',
             TRUE, FALSE,
@@ -700,7 +707,7 @@ BEGIN
                               appointment_confirmed_by_patient, appointment_confirmed_by_doctor,
                               appointment_created_at, appointment_updated_at)
     VALUES (v_patient_orlov, v_doctor_id,
-            (NOW() + INTERVAL '5 days')::TIMESTAMP + TIME '11:00',
+            DATE(NOW() + INTERVAL '5 days') + TIME '11:00',
             'VIDEO', 'CREATED',
             'https://meet.example.com/orlov-followup',
             'Контроль через 2 недели после коррекции инсулина.',
@@ -716,7 +723,7 @@ BEGIN
                               appointment_confirmed_by_patient, appointment_confirmed_by_doctor,
                               appointment_created_at, appointment_updated_at)
     VALUES (v_patient_orlov, v_doctor_id,
-            (NOW() + INTERVAL '10 days')::TIMESTAMP + TIME '14:00',
+            DATE(NOW() + INTERVAL '10 days') + TIME '14:00',
             'VIDEO', 'CONFIRMED',
             'https://meet.example.com/orlov-2025-06-10', '+7 (495) 555-78-90',
             'Принести дневник самоконтроля и результаты анализов.',
@@ -749,7 +756,7 @@ BEGIN
                               appointment_confirmed_by_patient, appointment_confirmed_by_doctor,
                               appointment_created_at, appointment_updated_at)
     VALUES (v_patient_smirnova, v_doctor_id,
-            (NOW() + INTERVAL '2 days')::TIMESTAMP + TIME '15:00',
+            DATE(NOW() + INTERVAL '2 days') + TIME '15:00',
             'AUDIO', 'CREATED',
             'Низкий канал — выбрала аудиоконсультацию.',
             TRUE, FALSE,
@@ -763,7 +770,7 @@ BEGIN
                               appointment_confirmed_by_patient, appointment_confirmed_by_doctor,
                               appointment_created_at, appointment_updated_at)
     VALUES (v_patient_petrov, v_doctor_id,
-            (NOW() + INTERVAL '4 days')::TIMESTAMP + TIME '09:00',
+            DATE(NOW() + INTERVAL '4 days') + TIME '09:00',
             'VIDEO', 'CONFIRMED',
             'https://meet.example.com/petrov-checkin',
             'Плановый контроль HbA1c.',

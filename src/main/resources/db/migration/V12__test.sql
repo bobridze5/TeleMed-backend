@@ -11,11 +11,7 @@ CREATE TABLE test_results (
     test_points_history INTEGER NOT NULL,
     test_points_total INTEGER NOT NULL,
     test_created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-
-    CONSTRAINT fk_test_results_patient
-        FOREIGN KEY (patient_id)
-        REFERENCES patients(patient_id)
-        ON DELETE CASCADE
+    CONSTRAINT fk_test_results_patient FOREIGN KEY (patient_id) REFERENCES patients (patient_id) ON DELETE CASCADE
 );
 
-CREATE INDEX idx_test_results_patient_id ON test_results(patient_id);
+CREATE INDEX idx_test_results_patient_id ON test_results (patient_id);

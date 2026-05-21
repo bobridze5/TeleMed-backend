@@ -231,9 +231,6 @@ public class PatientReportService {
         addHeaderRow(table, new String[]{"Дата и время", "Тип", "Ед.", "Приём пищи", "Заметка"}, headerFont);
         for (int i = 0; i < doses.size(); i++) {
             InsulinDose d = doses.get(i);
-            String mealLabel = d.getMeal() != null && d.getMeal().getMealType() != null
-                    ? d.getMeal().getMealType().name()
-                    : "—";
             String takenStr = d.getTakenAt() != null
                     ? java.time.LocalDateTime.ofInstant(d.getTakenAt(), tz).format(DATETIME_FMT)
                     : "—";
@@ -241,7 +238,6 @@ public class PatientReportService {
                     takenStr,
                     d.getInsulinType() != null ? d.getInsulinType().name() : "—",
                     d.getUnits() != null ? String.format("%.1f", d.getUnits()) : "—",
-                    mealLabel,
                     d.getNote() != null ? d.getNote() : "—"
             }, i % 2 == 1 ? smallFont : normalFont, i % 2 == 1);
         }
